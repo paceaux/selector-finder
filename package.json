@@ -1,0 +1,21 @@
+{
+  "name": "selector-finder",
+  "version": "1.0.0",
+  "description": "Find an element that matches a particular CSS selector on a website ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Frank M. Taylor",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.5",
+    "colors": "^1.4.0",
+    "xml2js": "^0.4.23",
+    "yargs": "^16.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.17.0"
+  }
+}
