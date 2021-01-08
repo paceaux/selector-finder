@@ -20,7 +20,7 @@ class SelectorFinder {
      * @returns {object} parsed xml
      * 
      */
-    async getSitemapAsync(sitemapUrl) {
+    static async getSitemapAsync(sitemapUrl) {
         try {
 
             const { data } = await axios(sitemapUrl);
@@ -47,7 +47,7 @@ class SelectorFinder {
      * 
      * @returns {null|SearchPageResult}
      */
-    async searchPageAsync(url, selector) {
+    static async searchPageAsync(url, selector) {
             let result = null;
 
             if (!url || !selector) {
@@ -78,7 +78,7 @@ class SelectorFinder {
      * 
      * @returns {Map<String, Object>}
      */
-    async searchPagesAsync(sitemapJson, selector) {
+    static async searchPagesAsync(sitemapJson, selector) {
         const results = new Map();
 
         try {
@@ -110,7 +110,7 @@ class SelectorFinder {
      *
      * @returns {SelectorSearchResult}
      */
-    async findSelectorAsync(sitemapUrl, limit, selector) {
+    static async findSelectorAsync(sitemapUrl, limit, selector) {
         let result = null;
 
         try {

@@ -7,7 +7,7 @@ const fs = promises;
 
 const { LOG_FILE_NAME, SITEMAP_URL } = require('./src/constants');
 const { jsonifyData } = require('./src/utils');
-const { SelectorFinder } = require('./src/selector-finder');
+const SelectorFinder = require('./src/selector-finder');
 const Log = require('./src/logger');
 const log = new Log(LOG_FILE_NAME);
 
@@ -75,8 +75,7 @@ async function main(sitemapUrl, limit, selector, outputFileName) {
 | limit: ${limit}           
 | CSS Selector: ${selector} 
 `
-        log.toConsole(startMessage);
-        await log.infoToFileAsync(startMessage);
+        await log.toConsole(startMessage).infoToFileAsync();
         const { totalPagesSearched, pagesWithSelector } = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector);
 
         const jsonifiedData = jsonifyData(pagesWithSelector);
