@@ -34,6 +34,18 @@ const argv = yargs(hideBin(process.argv))
         type: 'string',
         default: '.title',
     })
+    .option('takeScreenshots', {
+        alias: 'c',
+        description: 'Take a screenshot',
+        type: 'boolean',
+        default: false,
+    })
+    .option('isSpa', {
+        alias: 'd',
+        description: 'Is a Single Page Application',
+        type: 'boolean',
+        default: false,
+    })
     .option('outputFileName', {
         alias: 'o',
         description: 'name of output file',
@@ -44,9 +56,9 @@ const argv = yargs(hideBin(process.argv))
     .alias('help', 'h')
     .argv;
 
-const { sitemap, limit, selector, outputFileName } = argv;
+const { sitemap, limit, selector, outputFileName, takeScreenshots, isSpa } = argv;
 
-async function main(sitemapUrl, limit, selector, outputFileName) {
+async function main(sitemapUrl, limit, selector, outputFileName, takeScreenshots, isSpa) {
     try {
         const startMessage = 
 `
@@ -56,7 +68,7 @@ async function main(sitemapUrl, limit, selector, outputFileName) {
 | CSS Selector: ${selector} 
 `
         await log.toConsole(startMessage).infoToFileAsync();
-        const { totalPagesSearched, pagesWithSelector } = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector);
+        const { totalPagesSearched, pagesWithSelector } = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector, takeScreenshots);
 
         await Outputter.writeDataAsync(pagesWithSelector, outputFileName);
         const endMessage = `
@@ -71,4 +83,4 @@ async function main(sitemapUrl, limit, selector, outputFileName) {
 }
 
 
-main(sitemap, limit, selector, outputFileName);
+main(sitemap, limit, selector, outputFileName, takeScreenshots, isSpa);

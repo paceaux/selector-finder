@@ -27,16 +27,7 @@ function convertMapToObject (map) {
     const convertedMap = {};
 
     for (const [key, value] of map.entries()) {
-        const nodes = [];
-        for (let i = 0; i < value.length; i++) {
-            const node = value[i];
-
-            nodes.push({
-                tag: node.name,
-                attribs: node.attribs,
-            });
-        }
-        convertedMap[key] = nodes;
+        convertedMap[key] = value;
     }
     return convertedMap;
 }
@@ -49,7 +40,6 @@ function convertMapToObject (map) {
  */
 function jsonifyData(data) {
     const convertedMap = convertMapToObject(data);
-
     return JSON.stringify(convertedMap, null, 2);
 }
 
