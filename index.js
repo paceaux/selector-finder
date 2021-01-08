@@ -87,8 +87,7 @@ async function main(sitemapUrl, limit, selector, outputFileName) {
 | Scanned ${totalPagesSearched} pages                   
 | ${outputFileName}.json
 `;
-        log.toConsole(endMessage, true);
-        await log.infoToFileAsync(endMessage)
+        await log.toConsole(endMessage, true).infoToFileAsync();
     } catch (mainFunctionError) {
         await log.errorToFileAsync(mainFunctionError);
     }
