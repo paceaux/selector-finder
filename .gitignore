@@ -1,3 +1,4 @@
 node_modules
 log.txt
 pages.json
+*.pages.json

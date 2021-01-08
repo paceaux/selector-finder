@@ -1,13 +1,10 @@
 
-const { promises } = require('fs');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
-const fs = promises;
-
-const { LOG_FILE_NAME, SITEMAP_URL } = require('./src/constants');
-const { jsonifyData } = require('./src/utils');
+const { LOG_FILE_NAME, SITEMAP_URL, DEFAULT_OUTPUT_FILE } = require('./src/constants');
 const SelectorFinder = require('./src/selector-finder');
+const Outputter = require('./src/outputter');
 const Log = require('./src/logger');
 const log = new Log(LOG_FILE_NAME);
 
@@ -41,30 +38,13 @@ const argv = yargs(hideBin(process.argv))
         alias: 'o',
         description: 'name of output file',
         type: 'string',
-        default: 'pages',
+        default: DEFAULT_OUTPUT_FILE,
     })
     .help()
     .alias('help', 'h')
     .argv;
 
 const { sitemap, limit, selector, outputFileName } = argv;
-
-
-
-/** Outputs the results to a file
- * @param  {Map} resultsMap
- * @param  {string} fileName
- */
-async function writeResultAsync(data, fileName) {
-    try {
-        await fs.writeFile(fileName, data, {
-            encoding: 'utf-8'
-        });
-    } catch (fileWriteError) {
-        await log.errorToFileAsync(fileWriteError);
-    }
-}
-
 
 async function main(sitemapUrl, limit, selector, outputFileName) {
     try {
@@ -78,10 +58,7 @@ async function main(sitemapUrl, limit, selector, outputFileName) {
         await log.toConsole(startMessage).infoToFileAsync();
         const { totalPagesSearched, pagesWithSelector } = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector);
 
-        const jsonifiedData = jsonifyData(pagesWithSelector);
-        
-        await writeResultAsync(jsonifiedData, `${outputFileName}.json`);
-
+        await Outputter.writeDataAsync(pagesWithSelector, outputFileName);
         const endMessage = `
 | Finished
 | Scanned ${totalPagesSearched} pages                   
