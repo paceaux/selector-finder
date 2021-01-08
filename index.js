@@ -1,17 +1,16 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
-const { Parser } = require('xml2js');
+
 const { promises } = require('fs');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
 const fs = promises;
-const SITEMAP_URL = 'https://www.exlrt.com/sitemap.xml';
-const LOG_FILE_NAME = 'log.txt';
 
-const { forEachAsync, jsonifyData } = require('./utils');
-const Log = require('./logger');
+const { LOG_FILE_NAME, SITEMAP_URL } = require('./src/constants');
+const { jsonifyData } = require('./src/utils');
+const { findSelectorAsync } = require('./src/selector-finder');
+const Log = require('./src/logger');
 const log = new Log(LOG_FILE_NAME);
+
 
 /* 
 CLI arguments
@@ -51,89 +50,6 @@ const argv = yargs(hideBin(process.argv))
 const { sitemap, limit, selector, outputFileName } = argv;
 
 
-/**
- * @description Gets an XML Sitemap
- * @param  {string} sitemapUrl fully qualified url
- * 
- * @returns {object} parsed xml
- * 
- */
-async function getSitemapAsync(sitemapUrl) {
-    try {
-
-        const { data } = await axios(sitemapUrl);
-        const parser = new Parser();
-        const parsedXml = await parser.parseStringPromise(data);       
-        return parsedXml;
-    }
-    catch (getSitemapError) {
-        await log.errorToFileAsync(getSitemapError);
-    }
-}
-
-
-/**
- * @typedef SearchPageResult
- * @property {string} url Url of the page with a result
- * @property {object} elements a cheerio object with the results
- */
-
-/**
- * @description searches a single url for a selector
- * @param  {string} url
- * @param  {string} selector a valid css selector
- * 
- * @returns {null|SearchPageResult}
- */
-async function searchPageAsync(url, selector) {
-        let result = null;
-
-        if (!url || !selector) {
-            await log.errorToFileAsync(new Error('Tried to search on a page with invalid url or selector'));
-            return result;
-        }
-
-        try {
-            const { data } = await axios(url);
-            const $ = cheerio.load(data);
-            const elements = $(selector);
-
-            if (elements.length > 0) {
-                result = {url, elements};
-            }
-        } catch (searchPageError) {
-            await log.errorToFileAsync(searchPageError);
-        }
-
-        return result;
-}
-
-
-/**
- * @description Searches all pages provided from JSON object
- * @param  {Object} sitemapJson JSON object generated from sitemap
- * @param  {string} selector CSS Selector
- * 
- * @returns {Map<String, Object>}
- */
-async function searchPagesAsync(sitemapJson, selector) {
-    const results = new Map();
-
-    try {
-        await forEachAsync(sitemapJson, async (sitemapObj) => {
-            const result = await searchPageAsync(sitemapObj.loc[0], selector);
-            
-            if (result) {
-                results.set(result.url, result.elements);
-            }
-        });
-    } catch (searchPagesError) {
-        await log.errorToFileAsync(searchPagesError);
-    }
-
-    return results;
-}
-
 
 /** Outputs the results to a file
  * @param  {Map} resultsMap
@@ -161,17 +77,15 @@ async function main(sitemapUrl, limit, selector, outputFileName) {
 `
         log.toConsole(startMessage);
         await log.infoToFileAsync(startMessage);
+        const { totalPagesSearched, pagesWithSelector } = await findSelectorAsync(sitemapUrl, limit, selector);
 
-        const sitemapJson = await getSitemapAsync(sitemapUrl);
-        const urls = sitemapJson.urlset.url.slice(0, limit || sitemapJson.urlset.url.length - 1);
-        const pagesWithSelector = await searchPagesAsync(urls, selector);
         const jsonifiedData = jsonifyData(pagesWithSelector);
         
         await writeResultAsync(jsonifiedData, `${outputFileName}.json`);
 
         const endMessage = `
 | Finished
-| Scanned ${urls.length} pages                   
+| Scanned ${totalPagesSearched} pages                   
 | ${outputFileName}.json
 `;
         log.toConsole(endMessage, true);
