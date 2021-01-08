@@ -21,6 +21,7 @@ Download it. Go to the folder. Then:
 ```
 node index.js --sitemap=https://wherever.com/xml --limit=20 --selector=".yourthing"
 node index.js -u https://wherever.com/xml -l 20 -s ".yourthing"
+node index.js -u https://wherever.com/xml -l 20 -s ".yourthing" -c
 
 ```
 
@@ -30,6 +31,8 @@ parameters
 | --sitemap, -u  |  String. Required. Must be fully qualified URL to an XML Sitemap  |
 | --limit, -l  |  Integer. optional. Maximum number of pages to crawl |
 | --selector, -s  |  String. Required. A valid CSS selector |
-| --outputFileName, -o  |  String. Required. Name of the file. It will be JSON |
+| --outputFileName, -o  |  String. Оptional. will be prepended to `pages.json`. It will be JSON |
+| --isSpa, -d  |  Boolean. Оptional. Switches to Puppeteer b/c content is dynamic |
+| --takeScreenshots, -c  |  Boolean. Оptional. Will take screenshots with Puppeteer |
 
 
