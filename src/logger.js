@@ -1,3 +1,5 @@
+/* This is a logger; it needs to write to console. */
+/* eslint-disable no-console */
 const colors = require('colors/safe');
 const { promises } = require('fs');
 
