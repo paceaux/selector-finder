@@ -84,7 +84,7 @@ ${info}
         if (this.timerStart && this.timerEnd) {
             elapsedTime = this.timerEnd - this.timerStart;
         }
-        return `${elapsedTime / 100}s`;
+        return `${elapsedTime / 1000}s`;
     }
 }
 
