@@ -10,10 +10,6 @@ const Log = require('./logger');
 const log = new Log(LOG_FILE_NAME);
 
 class SelectorFinder {
-  constructor() {
-
-  }
-
   /**
      * @description Gets an XML Sitemap
      * @param  {string} sitemapUrl fully qualified url
@@ -22,14 +18,16 @@ class SelectorFinder {
      *
      */
   static async getSitemapAsync(sitemapUrl) {
+    let parsedXml = null;
     try {
       const { data } = await axios(sitemapUrl);
       const parser = new Parser();
-      const parsedXml = await parser.parseStringPromise(data);
-      return parsedXml;
+
+      parsedXml = await parser.parseStringPromise(data);
     } catch (getSitemapError) {
       await log.errorToFileAsync(getSitemapError);
     }
+    return parsedXml;
   }
 
   static async screengrabAsync(element, fileName) {
@@ -71,8 +69,9 @@ class SelectorFinder {
 
     if (nodes.length > 0) {
       const elements = [];
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
+
+      for (let idx = 0; idx < nodes.length; idx += 1) {
+        const node = nodes[idx];
 
         elements.push({
           tag: node.name,
@@ -107,7 +106,7 @@ class SelectorFinder {
         const puppeteerNodes = await page.$$eval(selector, (pupEls) => [...pupEls].map((pupEl) => {
           const attributes = {};
 
-          for (let idx = 0; idx < pupEl.attributes.length; idx++) {
+          for (let idx = 0; idx < pupEl.attributes.length; idx += 1) {
             const { name, value } = pupEl.attributes.item(idx);
             attributes[name] = value;
           }
@@ -218,7 +217,13 @@ class SelectorFinder {
       }
 
       await forEachAsync(sitemapJson, async (sitemapObj) => {
-        const result = await SelectorFinder.searchPageAsync(sitemapObj.loc[0], selector, browser, takeScreenshots);
+        const result = await SelectorFinder
+          .searchPageAsync(
+            sitemapObj.loc[0],
+            selector,
+            browser,
+            takeScreenshots,
+          );
         if (result) {
           const { url, totalMatches, elements } = result;
           results.push({ url, totalMatches, elements });
@@ -256,7 +261,13 @@ class SelectorFinder {
     try {
       const sitemapJson = await SelectorFinder.getSitemapAsync(sitemapUrl);
       const urls = sitemapJson.urlset.url.slice(0, limit || sitemapJson.urlset.url.length - 1);
-      const pagesWithSelector = await SelectorFinder.searchPagesAsync(urls, selector, takeScreenshots, isSpa);
+      const pagesWithSelector = await SelectorFinder
+        .searchPagesAsync(
+          urls,
+          selector,
+          takeScreenshots,
+          isSpa,
+        );
 
       result = {
         cssSelector: selector,
