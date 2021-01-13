@@ -10,6 +10,10 @@ const Log = require('./logger');
 const log = new Log(LOG_FILE_NAME);
 
 class SelectorFinder {
+  constructor(config) {
+    this.config = config;
+  }
+
   /**
      * @description Gets an XML Sitemap
      * @param  {string} sitemapUrl fully qualified url
@@ -30,7 +34,7 @@ class SelectorFinder {
     return parsedXml;
   }
 
-  static async screengrabAsync(element, fileName) {
+  static async grabScreenAsync(element, fileName) {
     try {
       // logo is the element you want to capture
       await element.screenshot({
@@ -127,7 +131,7 @@ class SelectorFinder {
           await forEachAsync(elements, async (element, index) => {
             let fileName = `${url}-${index}`;
             fileName = fileName.replace('https://', '').replace('/', '-').replace('.', 'dot');
-            await SelectorFinder.screengrabAsync(element, fileName);
+            await SelectorFinder.grabScreenAsync(element, fileName);
           });
         }
       }
@@ -247,19 +251,30 @@ class SelectorFinder {
      */
 
   /**
-     * Finds a CSS selector on a site using a sitemap
-     * @param  {string} sitemapUrl
-     * @param  {number} limit total pages to search
-     * @param  {string} selector CSS selector
-     * @param  {boolean} takeScreenshots take screenshot of element
+     * @typedef FindSelectorConfig
+     * @property  {string} sitemap
+     * @property  {number} limit total pages to search
+     * @property  {string} selector CSS selector
+     * @property  {boolean} takeScreenshots take screenshot of element
+     * @property  {boolean} isSpa indicates the site may be a single-page app
      *
+  /**
+     * Finds a CSS selector on a site using a sitemap
+     * @param  {FindSelectorConfig} config
+
      * @returns {SelectorSearchResult}
      */
-  static async findSelectorAsync(sitemapUrl, limit, selector, takeScreenshots, isSpa) {
+  static async findSelectorAsync({
+    sitemap,
+    limit,
+    selector,
+    takeScreenshots,
+    isSpa,
+  } = {}) {
     let result = null;
 
     try {
-      const sitemapJson = await SelectorFinder.getSitemapAsync(sitemapUrl);
+      const sitemapJson = await SelectorFinder.getSitemapAsync(sitemap);
       const urls = sitemapJson.urlset.url.slice(0, limit || sitemapJson.urlset.url.length - 1);
       const pagesWithSelector = await SelectorFinder
         .searchPagesAsync(
@@ -280,6 +295,25 @@ class SelectorFinder {
     }
 
     return result;
+  }
+
+  /**
+     * Finds a CSS selector on a site using a sitemap
+     * @param  {FindSelectorConfig} config
+
+     * @returns {SelectorSearchResult}
+     */
+  async findSelectorAsync(config = this.config) {
+    let results = null;
+    if (!config) {
+      throw new Error('No config on SelectorFinder object or passed as argument');
+    }
+    try {
+      results = await SelectorFinder.findSelectorAsync(this.config);
+    } catch (findSelectorAsyncError) {
+      await log.errorToFileAsync(findSelectorAsyncError);
+    }
+    return results;
   }
 }
 

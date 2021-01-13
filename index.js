@@ -25,7 +25,7 @@ const { argv } = yargs(hideBin(process.argv))
     alias: 'l',
     description: 'how many pages to crawl',
     type: 'number',
-    default: 0,
+    default: 30,
   })
   .option('selector', {
     alias: 's',
@@ -55,14 +55,28 @@ const { argv } = yargs(hideBin(process.argv))
   .alias('help', 'h');
 
 const {
-  sitemap, limit, selector, outputFileName, takeScreenshots, isSpa,
+  sitemap,
+  limit,
+  selector,
+  outputFileName,
+  takeScreenshots,
+  isSpa,
 } = argv;
 
-async function main(sitemapUrl, limit, selector, outputFileName, takeScreenshots, isSpa) {
+const selectorFinderConfig = {
+  sitemap,
+  limit,
+  selector,
+  outputFileName,
+  takeScreenshots,
+  isSpa,
+};
+
+async function main(config) {
   try {
     const startMessage = `
 | Looking...                
-| Sitemap: ${sitemapUrl},   
+| Sitemap: ${config.sitemap},   
 | limit: ${limit}           
 | CSS Selector: ${selector} 
 `;
@@ -70,8 +84,11 @@ async function main(sitemapUrl, limit, selector, outputFileName, takeScreenshots
       .toConsole(startMessage)
       .startTimer()
       .infoToFileAsync();
-    const result = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector, takeScreenshots);
+
+    const selectorFinder = new SelectorFinder(config);
+    const result = await selectorFinder.findSelectorAsync();
     const { totalPagesSearched, pagesWithSelector, totalMatches } = result;
+
     await Outputter.writeDataAsync(result, outputFileName);
 
     log.endTimer();
@@ -88,4 +105,4 @@ async function main(sitemapUrl, limit, selector, outputFileName, takeScreenshots
   }
 }
 
-main(sitemap, limit, selector, outputFileName, takeScreenshots, isSpa);
+main(selectorFinderConfig);
