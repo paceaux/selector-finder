@@ -184,6 +184,12 @@ class SelectorFinder {
             return result;
     }
 
+    /**
+     * @typedef SearchPageResult
+     * @property {string} url
+     * @property {number} totalmatches  
+     * @param {Array<SelectorResult>} elements 
+     */
 
     /**
      * @description Searches all pages provided from JSON object
@@ -191,12 +197,26 @@ class SelectorFinder {
      * @param  {string} selector CSS Selector
      * @param  {boolean} takeScreenshots grab a screenshot of element
      * 
-     * @returns {Map<String, Object>}
+     * @returns {Array<SearchPageResult>}
      */
     static async searchPagesAsync(sitemapJson, selector, takeScreenshots, isSpa) {
         const usePuppeteer = takeScreenshots || isSpa;
-        const results = {};
+        const results = [];
         let browser = null;
+
+        Object.defineProperty(results, 'totalMatches', {
+            get() {
+                let total = 0;
+
+                this.forEach((match) => {
+                    if (match.totalMatches) {
+                        total = total + match.totalMatches;
+                    }
+                });
+
+                return total;
+            }
+        });
 
         try {
     
@@ -208,7 +228,7 @@ class SelectorFinder {
                 const result = await SelectorFinder.searchPageAsync(sitemapObj.loc[0], selector, browser, takeScreenshots);
                 if (result) {
                     const {url, totalMatches, elements } = result;
-                    results[url] = { totalMatches, elements };
+                    results.push({ url, totalMatches, elements });
                 }
             });
         
@@ -247,12 +267,14 @@ class SelectorFinder {
             const pagesWithSelector = await SelectorFinder.searchPagesAsync(urls, selector, takeScreenshots, isSpa);
             
             result =  {
+                cssSelector: selector,
                 totalPagesSearched: urls.length,
+                totalMatches: pagesWithSelector.totalMatches,
                 pagesWithSelector,
             };
 
         } catch (findSelectorError) {
-            await log.errorToFileAsync(findSelectorError);
+            await log.errorToFileAsync(JSON.stringify(findSelectorError));
         }
 
         return result;

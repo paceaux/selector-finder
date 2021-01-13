@@ -50,7 +50,7 @@ const argv = yargs(hideBin(process.argv))
         alias: 'o',
         description: 'name of output file',
         type: 'string',
-        default: DEFAULT_OUTPUT_FILE,
+        default: 'title plus subtitles',
     })
     .help()
     .alias('help', 'h')
@@ -68,17 +68,19 @@ async function main(sitemapUrl, limit, selector, outputFileName, takeScreenshots
 | CSS Selector: ${selector} 
 `
         await log.toConsole(startMessage).infoToFileAsync();
-        const { totalPagesSearched, pagesWithSelector } = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector, takeScreenshots);
-
-        await Outputter.writeDataAsync(pagesWithSelector, outputFileName);
+        const  result = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector, takeScreenshots);
+        const { totalPagesSearched, pagesWithSelector, totalMatches } = result;
+        await Outputter.writeDataAsync(result, outputFileName);
         const endMessage = `
 | Finished
-| Scanned ${totalPagesSearched} pages                   
-| ${outputFileName}.json
+| Pages Scanned: ${totalPagesSearched} 
+| Pages with a Match: ${pagesWithSelector.length}
+| Total Results: ${totalMatches}                  
+| FileName: ${outputFileName}.json
 `;
         await log.toConsole(endMessage, true).infoToFileAsync();
     } catch (mainFunctionError) {
-        await log.errorToFileAsync(mainFunctionError);
+        await log.errorToFileAsync(JSON.stringify(mainFunctionError));
     }
 }
 
