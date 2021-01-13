@@ -9,10 +9,6 @@ const Log = require('./logger');
 const log = new Log(LOG_FILE_NAME);
 
 class Outputter {
-  constructor() {
-
-  }
-
   /** Outputs the results to a file
      * @param  {Map} resultsMap
      * @param  {string} fileName
