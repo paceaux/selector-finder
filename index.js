@@ -67,20 +67,25 @@ async function main(sitemapUrl, limit, selector, outputFileName, takeScreenshots
 | limit: ${limit}           
 | CSS Selector: ${selector} 
 `
-        await log.toConsole(startMessage).infoToFileAsync();
+        await log
+            .toConsole(startMessage)
+            .startTimer()
+            .infoToFileAsync();
         const  result = await SelectorFinder.findSelectorAsync(sitemapUrl, limit, selector, takeScreenshots);
         const { totalPagesSearched, pagesWithSelector, totalMatches } = result;
         await Outputter.writeDataAsync(result, outputFileName);
+
+        log.endTimer();
         const endMessage = `
-| Finished
+| Finished after ${log.elapsedTime}
 | Pages Scanned: ${totalPagesSearched} 
 | Pages with a Match: ${pagesWithSelector.length}
 | Total Results: ${totalMatches}                  
-| FileName: ${outputFileName}.json
+| FileName: ${outputFileName}
 `;
         await log.toConsole(endMessage, true).infoToFileAsync();
     } catch (mainFunctionError) {
-        await log.errorToFileAsync(JSON.stringify(mainFunctionError));
+        await log.errorToFileAsync(mainFunctionError);
     }
 }
 

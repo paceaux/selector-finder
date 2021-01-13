@@ -12,11 +12,13 @@ class Log {
      * @param  {Error} error
      */
     async errorToFileAsync(error) {
-        const rawMessage = error || this.rawMessage;
+        const rawMessage = error
+        ? error.stack 
+        : this.rawMessage;
 
         this.rawMessage = rawMessage;
         try {
-            await fs.appendFile(this.logFile, Log.styleInfo(`${JSON.stringify(rawMessage)}`, true));
+            await fs.appendFile(this.logFile, Log.styleInfo(this.rawMessage, true));
         } catch (errorLoggingError) {
             console.log('That sucks. Couldn\'t write the error');
             console.error(errorLoggingError);
@@ -60,6 +62,29 @@ ${info}
         }
 
         return this;
+    }
+
+    startTimer() {
+        this.timerStart = Date.now();
+        if (this.timerEnd) {
+            delete this.timerEnd;
+        }
+        return this;
+    }
+
+    endTimer() {
+        this.timerEnd = Date.now();
+
+        return this;
+    }
+
+    get elapsedTime() {
+        let elapsedTime = null;
+
+        if (this.timerStart && this.timerEnd) {
+            elapsedTime = this.timerEnd - this.timerStart;
+        }
+        return `${elapsedTime / 100}s`;
     }
 }
 
