@@ -1,4 +1,4 @@
-module.exports = {
+{
     "env": {
         "browser": false,
         "commonjs": true,
@@ -10,4 +10,4 @@ module.exports = {
     },
     "rules": {
     }
-};
+}

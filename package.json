@@ -4,8 +4,8 @@
   "description": "Find an element that matches a particular CSS selector on a website ",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint src/**/*.js -f table && eslint src/**/*.js -f table -o reports/js.lint.txt",
-    "lint:fix": "eslint src/**/*.js --fix",
+    "lint": "eslint -f table src/**/*.js index.js",
+    "lint:fix": "eslint --fix src/**/*.js index.js",
     "test": "npm run lint"
   },
   "author": "Frank M. Taylor",
