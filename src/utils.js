@@ -24,9 +24,10 @@ function convertMapToObject(map) {
 
   const convertedMap = {};
 
-  for (const [key, value] of map.entries()) {
+  map.forEach((value, key) => {
     convertedMap[key] = value;
-  }
+  });
+
   return convertedMap;
 }
 
