@@ -4,7 +4,9 @@
   "description": "Find an element that matches a particular CSS selector on a website ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint src/**/*.js -f table && eslint src/**/*.js -f table -o reports/js.lint.txt",
+    "lint:fix": "eslint src/**/*.js --fix",
+    "test": "npm run lint"
   },
   "author": "Frank M. Taylor",
   "license": "ISC",
@@ -17,6 +19,8 @@
     "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "eslint": "^7.17.0"
+    "eslint": "^7.17.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
   }
 }
