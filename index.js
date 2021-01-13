@@ -50,7 +50,7 @@ const argv = yargs(hideBin(process.argv))
         alias: 'o',
         description: 'name of output file',
         type: 'string',
-        default: 'title plus subtitles',
+        default: DEFAULT_OUTPUT_FILE,
     })
     .help()
     .alias('help', 'h')
