@@ -2,6 +2,7 @@ const {
   LOG_FILE_NAME,
   SITEMAP_URL,
   DEFAULT_OUTPUT_FILE,
+  DEFAULT_SELECTOR,
   IS_SPA,
   LIMIT,
   TAKE_SCREENSHOTS,
@@ -21,6 +22,10 @@ describe('constants', () => {
     expect(DEFAULT_OUTPUT_FILE).toBeTruthy();
     expect(typeof DEFAULT_OUTPUT_FILE).toEqual('string');
     expect(DEFAULT_OUTPUT_FILE).toEqual('pages.json');
+  });
+  test('default selector', () =>{
+    expect(DEFAULT_SELECTOR).toBeTruthy();
+    expect(typeof DEFAULT_SELECTOR).toEqual('string');
   });
   test('is spa', () =>{
     expect(IS_SPA).toBeFalsy();
