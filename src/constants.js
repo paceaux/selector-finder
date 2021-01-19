@@ -1,17 +1,17 @@
 const LOG_FILE_NAME = 'log.txt';
-const SITEMAP_URL = 'https://www.exlrt.com/sitemap.xml';
+const DEFAULT_SITEMAP_URL = 'https://blog.frankmtaylor.com/wp-sitemap-posts-post-1.xml';
 const DEFAULT_OUTPUT_FILE = 'pages.json';
-const DEFAULT_SELECTOR = '.title';
-const IS_SPA = false;
-const LIMIT = 0;
-const TAKE_SCREENSHOTS = false;
+const DEFAULT_SELECTOR = '.sources';
+const DEFAULT_IS_SPA = false;
+const DEFAULT_LIMIT = 0;
+const DEFAULT_TAKE_SCREENSHOTS = false;
 
 module.exports = {
   LOG_FILE_NAME,
-  SITEMAP_URL,
+  DEFAULT_SITEMAP_URL,
   DEFAULT_SELECTOR,
   DEFAULT_OUTPUT_FILE,
-  IS_SPA,
-  LIMIT,
-  TAKE_SCREENSHOTS,
+  DEFAULT_IS_SPA,
+  DEFAULT_LIMIT,
+  DEFAULT_TAKE_SCREENSHOTS,
 };

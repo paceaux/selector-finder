@@ -3,12 +3,12 @@ const { hideBin } = require('yargs/helpers');
 
 const {
   LOG_FILE_NAME,
-  SITEMAP_URL,
+  DEFAULT_SITEMAP_URL,
   DEFAULT_SELECTOR,
   DEFAULT_OUTPUT_FILE,
-  IS_SPA,
-  LIMIT,
-  TAKE_SCREENSHOTS,
+  DEFAULT_IS_SPA,
+  DEFAULT_LIMIT,
+  DEFAULT_TAKE_SCREENSHOTS,
 } = require('./src/constants');
 const SelectorFinder = require('./src/selector-finder');
 const Outputter = require('./src/outputter');
@@ -27,13 +27,13 @@ const { argv } = yargs(hideBin(process.argv))
     alias: 'u',
     description: 'url for the sitemap',
     type: 'string',
-    default: SITEMAP_URL,
+    default: DEFAULT_SITEMAP_URL,
   })
   .option('limit', {
     alias: 'l',
     description: 'how many pages to crawl',
     type: 'number',
-    default: LIMIT,
+    default: DEFAULT_LIMIT,
   })
   .option('selector', {
     alias: 's',
@@ -45,13 +45,13 @@ const { argv } = yargs(hideBin(process.argv))
     alias: 'c',
     description: 'Take a screenshot',
     type: 'boolean',
-    default: TAKE_SCREENSHOTS,
+    default: DEFAULT_TAKE_SCREENSHOTS,
   })
   .option('isSpa', {
     alias: 'd',
     description: 'Is a Single Page Application',
     type: 'boolean',
-    default: IS_SPA,
+    default: DEFAULT_IS_SPA,
   })
   .option('outputFileName', {
     alias: 'o',

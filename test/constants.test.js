@@ -1,11 +1,11 @@
 const {
   LOG_FILE_NAME,
-  SITEMAP_URL,
+  DEFAULT_SITEMAP_URL,
   DEFAULT_OUTPUT_FILE,
   DEFAULT_SELECTOR,
-  IS_SPA,
-  LIMIT,
-  TAKE_SCREENSHOTS,
+  DEFAULT_IS_SPA,
+  DEFAULT_LIMIT,
+  DEFAULT_TAKE_SCREENSHOTS,
 } = require('../src/constants');
 
 describe('constants', () => {
@@ -15,8 +15,8 @@ describe('constants', () => {
     expect(LOG_FILE_NAME).toEqual('log.txt');
   });
   test('sitemap url', () =>{
-    expect(SITEMAP_URL).toBeTruthy();
-    expect(typeof SITEMAP_URL).toEqual('string');
+    expect(DEFAULT_SITEMAP_URL).toBeTruthy();
+    expect(typeof DEFAULT_SITEMAP_URL).toEqual('string');
   });
   test('default file', () =>{
     expect(DEFAULT_OUTPUT_FILE).toBeTruthy();
@@ -28,17 +28,13 @@ describe('constants', () => {
     expect(typeof DEFAULT_SELECTOR).toEqual('string');
   });
   test('is spa', () =>{
-    expect(IS_SPA).toBeFalsy();
-    expect(typeof IS_SPA).toEqual('boolean');
-    expect(IS_SPA).toEqual(false);
+    expect(DEFAULT_IS_SPA).toBeFalsy();
+    expect(typeof DEFAULT_IS_SPA).toEqual('boolean');
   });
   test('limit', () =>{
-    expect(typeof LIMIT).toEqual('number');
-    expect(LIMIT).toEqual(0);
+    expect(typeof DEFAULT_LIMIT).toEqual('number');
   });
   test('take screenshots', () =>{
-    expect(TAKE_SCREENSHOTS).toBeFalsy();
-    expect(typeof TAKE_SCREENSHOTS).toEqual('boolean');
-    expect(TAKE_SCREENSHOTS).toEqual(false);
+    expect(typeof DEFAULT_TAKE_SCREENSHOTS).toEqual('boolean');
   });
 });
