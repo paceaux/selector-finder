@@ -101,7 +101,7 @@ async function main(config) {
 
     log.endTimer();
     const endMessage = `
-| Finished after ${log.elapsedTime}
+| Finished after ${log.elapsedTime}s
 | Pages Scanned: ${totalPagesSearched} 
 | Pages with a Match: ${pagesWithSelector.length}
 | Total Results: ${totalMatches}                  
