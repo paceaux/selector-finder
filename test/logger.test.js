@@ -1,4 +1,9 @@
+const { promises } = require('fs');
 const Logger = require('../src/logger');
+
+afterAll(async () => {
+  await promises.unlink('test.log.txt');
+});
 
 describe('Logger', () => {
   const log = new Logger('test.log.txt');
@@ -27,14 +32,14 @@ A Test
       log.startTimer();
 
       expect(typeof log.timerStart).toBe('number');
-      expect(log.timerStart).toBeLessThan(Date.now());
+      expect(log.timerStart).toBeLessThanOrEqual(Date.now());
       expect(log.timerEnd).toBeUndefined();
     });
     test('endTimer', () => {
       log.endTimer();
 
       expect(typeof log.timerEnd).toBe('number');
-      expect(log.timerEnd).toBeLessThan(Date.now());
+      expect(log.timerEnd).toBeLessThanOrEqual(Date.now());
       expect(log.timerEnd).toBeGreaterThan(log.timerStart);
     });
     test('elapsedTime', () => {
@@ -42,6 +47,26 @@ A Test
 
       expect(typeof log.elapsedTime).toBe('number');
       expect(log.elapsedTime).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Logger: writing to files', () => {
+    test('it writes an error to a file', async () => {
+      const error = new Error('test error');
+
+      await log.errorToFileAsync(error);
+
+      const fileContents = await promises.readFile('test.log.txt', { encoding: 'utf-8' });
+
+      expect(fileContents).toContain(error.message);
+    });
+
+    test('it writes info to a file', async () => {
+      const testInfo = 'test info';
+      await log.infoToFileAsync('test info');
+      const fileContents = await promises.readFile('test.log.txt', { encoding: 'utf-8' });
+
+      expect(fileContents).toContain(testInfo);
     });
   });
 });

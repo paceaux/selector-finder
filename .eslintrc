@@ -12,7 +12,9 @@
         "process": true,
         "describe": true,
         "test" : true,
-        "expect": true
+        "expect": true,
+        "beforeAll": true,
+        "afterAll": true
     },
     "rules": {
     }
