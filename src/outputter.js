@@ -6,20 +6,27 @@ const { LOG_FILE_NAME, DEFAULT_OUTPUT_FILE } = require('./constants');
 const { jsonifyData } = require('./utils');
 const Log = require('./logger');
 
-const log = new Log(LOG_FILE_NAME);
-
 class Outputter {
+  constructor(defaultOutputFile = DEFAULT_OUTPUT_FILE, logger = new Log(LOG_FILE_NAME)) {
+    this.defaultOutputFile = defaultOutputFile;
+    this.log = logger;
+  }
   /** Outputs the results to a file
      * @param  {Map} resultsMap
      * @param  {string} fileName
      */
-  static async writeFileAsync(data, fileName) {
+
+  async writeFileAsync(data, fileName) {
+    if (!data || !fileName) {
+      throw new Error('No data or filename provided');
+    }
+
     try {
       await fs.writeFile(fileName, data, {
         encoding: 'utf-8',
       });
     } catch (fileWriteError) {
-      await log.errorToFileAsync(fileWriteError);
+      await this.log.errorToFileAsync(fileWriteError);
     }
   }
 
@@ -28,19 +35,19 @@ class Outputter {
      * @param  {Object} data
      * @param  {string} fileName
      */
-  static async writeDataAsync(data, fileName) {
-    let outputFileName = DEFAULT_OUTPUT_FILE;
+  async writeDataAsync(data, fileName) {
+    let outputFileName = this.defaultOutputFile;
 
-    if (fileName !== DEFAULT_OUTPUT_FILE) {
+    if (fileName !== this.defaultOutputFile) {
       outputFileName = `${fileName}.${outputFileName}`;
     }
 
     try {
       const jsonifiedData = jsonifyData(data);
 
-      await Outputter.writeFileAsync(jsonifiedData, outputFileName);
+      await this.writeFileAsync(jsonifiedData, outputFileName);
     } catch (writeDataAsyncError) {
-      await log.errorToFileAsync(writeDataAsyncError);
+      await this.log.errorToFileAsync(writeDataAsyncError);
     }
   }
 }
