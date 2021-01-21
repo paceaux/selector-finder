@@ -33,7 +33,6 @@ A Test
 
       expect(typeof log.timerStart).toBe('number');
       expect(log.timerStart).toBeLessThanOrEqual(Date.now());
-      expect(log.timerEnd).toBeUndefined();
     });
     test('endTimer', () => {
       log.endTimer();
@@ -47,6 +46,18 @@ A Test
 
       expect(typeof log.elapsedTime).toBe('number');
       expect(log.elapsedTime).toBeGreaterThan(0);
+    });
+    test('startTimer deletes the timerEnd property', () => {
+      log.startTimer();
+      expect(log.timerEnd).toBeUndefined();
+    });
+  });
+  describe('toConsole', () => {
+    test('raw message', () => {
+      const consoleInfo = 'test info';
+      log.toConsole('test info');
+
+      expect(log.rawMessage).toMatch(consoleInfo);
     });
   });
 
