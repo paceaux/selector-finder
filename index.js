@@ -81,6 +81,7 @@ const selectorFinderConfig = {
 };
 
 async function main(config) {
+  const outputter = new Outputter(DEFAULT_OUTPUT_FILE, log);
   try {
     const startMessage = `
 | Looking...                
@@ -97,7 +98,7 @@ async function main(config) {
     const result = await selectorFinder.findSelectorAsync();
     const { totalPagesSearched, pagesWithSelector, totalMatches } = result;
 
-    await Outputter.writeDataAsync(result, outputFileName);
+    await outputter.writeDataAsync(result, outputFileName);
 
     log.endTimer();
     const endMessage = `
