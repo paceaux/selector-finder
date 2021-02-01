@@ -9,9 +9,20 @@ const Log = require('./logger');
 
 const log = new Log(LOG_FILE_NAME);
 
+const DEFAULT_LIBRARIES = {
+  ajax: axios,
+  dom: cheerio,
+  Parser,
+  emulator: puppeteer,
+};
 class SelectorFinder {
-  constructor(config) {
+  constructor(config, libraries) {
     this.config = config;
+    this.libraries = { ...SelectorFinder.defaultLibraries, ...libraries };
+  }
+
+  static get defaultLibraries() {
+    return DEFAULT_LIBRARIES;
   }
 
   /**
@@ -21,11 +32,11 @@ class SelectorFinder {
      * @returns {object} parsed xml
      *
      */
-  static async getSitemapAsync(sitemapUrl) {
+  async getSitemapAsync(sitemapUrl) {
     let parsedXml = null;
     try {
-      const { data } = await axios(sitemapUrl);
-      const parser = new Parser();
+      const { data } = await this.libraries.ajax(sitemapUrl);
+      const parser = new this.libraries.Parser();
 
       parsedXml = await parser.parseStringPromise(data);
     } catch (getSitemapError) {
@@ -65,9 +76,9 @@ class SelectorFinder {
      *
      * @returns {PageResult|null}
      */
-  static async getResultFromCheerio(url, selector) {
+  async getResultFromCheerio(url, selector) {
     let result = null;
-    const { data } = await axios(url);
+    const { data } = await this.libraries.ajax(url);
     const $ = cheerio.load(data);
     const nodes = $(selector);
 
@@ -156,7 +167,7 @@ class SelectorFinder {
      *
      * @returns {null|SearchPageResult}
      */
-  static async searchPageAsync(url, selector, browser, takeScreenshots) {
+  async searchPageAsync(url, selector, browser, takeScreenshots) {
     let result = null;
 
     if (!url || !selector) {
@@ -166,12 +177,12 @@ class SelectorFinder {
 
     try {
       if (!browser) {
-        result = await SelectorFinder.getResultFromCheerio(url, selector);
+        result = await this.getResultFromCheerio(url, selector);
       } else {
         const page = await browser.newPage(); // Open new page
         await page.goto(url);
 
-        result = await SelectorFinder.getResultFromPuppeteer(page, selector, takeScreenshots);
+        result = await this.getResultFromPuppeteer(page, selector, takeScreenshots);
         await page.close(); // Close the website
       }
     } catch (searchPageError) {
@@ -196,7 +207,7 @@ class SelectorFinder {
      *
      * @returns {Array<SearchPageResult>}
      */
-  static async searchPagesAsync(sitemapJson, selector, takeScreenshots, isSpa) {
+  async searchPagesAsync(sitemapJson, selector, takeScreenshots, isSpa) {
     const usePuppeteer = takeScreenshots || isSpa;
     const results = [];
     let browser = null;
@@ -217,11 +228,11 @@ class SelectorFinder {
 
     try {
       if (usePuppeteer) {
-        browser = await puppeteer.launch();
+        browser = await this.libraries.emulator.launch();
       }
 
       await forEachAsync(sitemapJson, async (sitemapObj) => {
-        const result = await SelectorFinder
+        const result = await this
           .searchPageAsync(
             sitemapObj.loc[0],
             selector,
@@ -264,7 +275,7 @@ class SelectorFinder {
 
      * @returns {SelectorSearchResult}
      */
-  static async findSelectorAsync({
+  async getSearchResultsAsync({
     sitemap,
     limit,
     selector,
@@ -274,9 +285,9 @@ class SelectorFinder {
     let result = null;
 
     try {
-      const sitemapJson = await SelectorFinder.getSitemapAsync(sitemap);
+      const sitemapJson = await this.getSitemapAsync(sitemap);
       const urls = sitemapJson.urlset.url.slice(0, limit || sitemapJson.urlset.url.length - 1);
-      const pagesWithSelector = await SelectorFinder
+      const pagesWithSelector = await this
         .searchPagesAsync(
           urls,
           selector,
@@ -309,7 +320,7 @@ class SelectorFinder {
       throw new Error('No config on SelectorFinder object or passed as argument');
     }
     try {
-      results = await SelectorFinder.findSelectorAsync(this.config);
+      results = await this.getSearchResultsAsync(this.config);
     } catch (findSelectorAsyncError) {
       await log.errorToFileAsync(findSelectorAsyncError);
     }
