@@ -76,7 +76,7 @@ class SelectorFinder {
      *
      * @returns {PageResult|null}
      */
-  async getResultFromCheerio(url, selector) {
+  async getResultFromDOM(url, selector) {
     let result = null;
     const { data } = await this.libraries.ajax(url);
     const $ = cheerio.load(data);
@@ -111,7 +111,7 @@ class SelectorFinder {
      *
      * @returns {PageResult|null}
      */
-  static async getResultFromPuppeteer(page, selector, takeScreenshots) {
+  static async getResultFromEmulator(page, selector, takeScreenshots) {
     const elements = await page.$$(selector);
     const url = page.url();
     let result = null;
@@ -177,12 +177,12 @@ class SelectorFinder {
 
     try {
       if (!browser) {
-        result = await this.getResultFromCheerio(url, selector);
+        result = await this.getResultFromDOM(url, selector);
       } else {
         const page = await browser.newPage(); // Open new page
         await page.goto(url);
 
-        result = await this.getResultFromPuppeteer(page, selector, takeScreenshots);
+        result = await this.getResultFromEmulator(page, selector, takeScreenshots);
         await page.close(); // Close the website
       }
     } catch (searchPageError) {
