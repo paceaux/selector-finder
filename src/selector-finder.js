@@ -199,7 +199,7 @@ class SelectorFinder {
         const page = await browser.newPage(); // Open new page
         await page.goto(url);
 
-        result = await this.getResultFromEmulator(page, selector, takeScreenshots);
+        result = await SelectorFinder.getResultFromEmulator(page, selector, takeScreenshots);
         await page.close(); // Close the website
       }
     } catch (searchPageError) {
