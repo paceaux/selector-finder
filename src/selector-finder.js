@@ -26,6 +26,23 @@ class SelectorFinder {
   }
 
   /**
+   * @description makes an ajax request for a url
+   * @param  {string} url
+   *
+   * @returns {object} Result of the request
+   */
+  async getFileAsync(url) {
+    let result = null;
+    try {
+      const { data } = await this.libraries.ajax(url);
+      result = data;
+    } catch (getFileError) {
+      await log.errorToFileAsync(getFileError);
+    }
+    return result;
+  }
+
+  /**
      * @description Gets an XML Sitemap
      * @param  {string} sitemapUrl fully qualified url
      *
@@ -35,7 +52,7 @@ class SelectorFinder {
   async getSitemapAsync(sitemapUrl) {
     let parsedXml = null;
     try {
-      const { data } = await this.libraries.ajax(sitemapUrl);
+      const data = await this.getFileAsync(sitemapUrl);
       const parser = new this.libraries.Parser();
 
       parsedXml = await parser.parseStringPromise(data);
