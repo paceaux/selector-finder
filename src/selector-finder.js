@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
 const { LOG_FILE_NAME } = require('./constants');
 const { forEachAsync } = require('./utils');
 const Log = require('./logger');
-const { SiteSearchResult, PageSearchResult } = require('./site-results');
+const { SiteSearchResult, PageSearchResult, ElementSearchResult } = require('./site-results');
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -94,28 +94,18 @@ class SelectorFinder {
      *
      * @returns {PageResult|null}
      */
-  async getResultFromDOM(url, selector) {
-    let result = null;
+  async getResultFromStaticPage(url, selector) {
+    let pageSearchResult = null;
     const { data } = await this.libraries.ajax(url);
     const $ = cheerio.load(data);
     const nodes = $(selector);
 
     if (nodes.length > 0) {
-      const elements = [];
-
-      for (let idx = 0; idx < nodes.length; idx += 1) {
-        const node = nodes[idx];
-
-        elements.push({
-          tag: node.name,
-          attributes: node.attribs,
-          innerText: node.innerText,
-        });
-      }
-      result = new PageSearchResult(url, elements);
+      pageSearchResult = new PageSearchResult(url);
+      pageSearchResult.addElementSearchResults(nodes);
     }
 
-    return result;
+    return pageSearchResult;
   }
 
   /**
@@ -125,7 +115,7 @@ class SelectorFinder {
      *
      * @returns {PageResult|null}
      */
-  static async getResultFromEmulator(page, selector, takeScreenshots) {
+  static async getResultFromSpaPage(page, selector, takeScreenshots) {
     const elements = await page.$$(selector);
     const url = page.url();
     let result = null;
@@ -191,13 +181,13 @@ class SelectorFinder {
 
     try {
       if (!browser) {
-        pageSearchResult = await this.getResultFromDOM(url, selector);
+        pageSearchResult = await this.getResultFromStaticPage(url, selector);
       } else {
         const page = await browser.newPage(); // Open new page
         await page.goto(url);
 
         pageSearchResult = await SelectorFinder
-          .getResultFromEmulator(page, selector, takeScreenshots);
+          .getResultFromSpaPage(page, selector, takeScreenshots);
         await page.close(); // Close the website
       }
     } catch (searchPageError) {

@@ -1,8 +1,26 @@
 // eslint-disable-next-line max-classes-per-file
+class ElementSearchResult {
+  constructor(element) {
+    this.tag = element.name;
+    this.attributes = element.attribs;
+    this.innerText = element.innerText;
+  }
+}
+// eslint-disable-next-line max-classes-per-file
 class PageSearchResult {
-  constructor(url, elements) {
+  constructor(url) {
     this.url = url;
-    this.elements = elements;
+    this.elements = [];
+  }
+
+  addElementSearchResults(matches) {
+    if (matches.length > 0) {
+      for (let idx = 0; idx < matches.length; idx += 1) {
+        const node = matches[idx];
+        const elementSearchResult = new ElementSearchResult(node);
+        this.elements.push(elementSearchResult);
+      }
+    }
   }
 
   get totalMatches() {
@@ -24,4 +42,4 @@ class SiteSearchResult extends Array {
   }
 }
 
-module.exports = { SiteSearchResult, PageSearchResult };
+module.exports = { SiteSearchResult, PageSearchResult, ElementSearchResult };
