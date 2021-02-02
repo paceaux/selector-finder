@@ -6,6 +6,7 @@ const puppeteer = require('puppeteer');
 const { LOG_FILE_NAME } = require('./constants');
 const { forEachAsync } = require('./utils');
 const Log = require('./logger');
+const { SiteSearchResult, PageSearchResult } = require('./site-results');
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -111,11 +112,7 @@ class SelectorFinder {
           innerText: node.innerText,
         });
       }
-      result = {
-        url,
-        totalMatches: elements.length,
-        elements,
-      };
+      result = new PageSearchResult(url, elements);
     }
 
     return result;
@@ -185,30 +182,53 @@ class SelectorFinder {
      * @returns {null|SearchPageResult}
      */
   async searchPageAsync(url, selector, browser, takeScreenshots) {
-    let result = null;
+    let pageSearchResult = null;
 
     if (!url || !selector) {
       await log.errorToFileAsync(new Error('Tried to search on a page with invalid url or selector'));
-      return result;
+      return pageSearchResult;
     }
 
     try {
       if (!browser) {
-        result = await this.getResultFromDOM(url, selector);
+        pageSearchResult = await this.getResultFromDOM(url, selector);
       } else {
         const page = await browser.newPage(); // Open new page
         await page.goto(url);
 
-        result = await SelectorFinder.getResultFromEmulator(page, selector, takeScreenshots);
+        pageSearchResult = await SelectorFinder
+          .getResultFromEmulator(page, selector, takeScreenshots);
         await page.close(); // Close the website
       }
     } catch (searchPageError) {
       await log.errorToFileAsync(searchPageError);
     }
 
-    return result;
+    return pageSearchResult;
   }
 
+  async searchPagesAsync(sitemapJson, selector, browser, takeScreenshots) {
+    const results = new SiteSearchResult();
+
+    try {
+      await forEachAsync(sitemapJson, async (sitemapObj) => {
+        const result = await this
+          .searchPageAsync(
+            sitemapObj.loc[0],
+            selector,
+            browser,
+            takeScreenshots,
+          );
+        if (result) {
+          const { url, totalMatches, elements } = result;
+          results.push({ url, totalMatches, elements });
+        }
+      });
+    } catch (iteratePagesError) {
+      await log.errorToFileAsync(iteratePagesError);
+    }
+    return results;
+  }
   /**
      * @typedef SearchPageResult
      * @property {string} url
@@ -224,43 +244,17 @@ class SelectorFinder {
      *
      * @returns {Array<SearchPageResult>}
      */
-  async searchPagesAsync(sitemapJson, selector, takeScreenshots, isSpa) {
+  async searchSiteAsync(sitemapJson, selector, takeScreenshots, isSpa) {
     const usePuppeteer = takeScreenshots || isSpa;
-    const results = [];
+    let results = null;
     let browser = null;
-
-    Object.defineProperty(results, 'totalMatches', {
-      get() {
-        let total = 0;
-
-        this.forEach((match) => {
-          if (match.totalMatches) {
-            total += match.totalMatches;
-          }
-        });
-
-        return total;
-      },
-    });
 
     try {
       if (usePuppeteer) {
         browser = await this.libraries.emulator.launch();
       }
 
-      await forEachAsync(sitemapJson, async (sitemapObj) => {
-        const result = await this
-          .searchPageAsync(
-            sitemapObj.loc[0],
-            selector,
-            browser,
-            takeScreenshots,
-          );
-        if (result) {
-          const { url, totalMatches, elements } = result;
-          results.push({ url, totalMatches, elements });
-        }
-      });
+      results = await this.searchPagesAsync(sitemapJson, selector, takeScreenshots, isSpa);
 
       if (usePuppeteer) {
         await browser.close();
@@ -305,7 +299,7 @@ class SelectorFinder {
       const sitemapJson = await this.getSitemapAsync(sitemap);
       const urls = sitemapJson.urlset.url.slice(0, limit || sitemapJson.urlset.url.length - 1);
       const pagesWithSelector = await this
-        .searchPagesAsync(
+        .searchSiteAsync(
           urls,
           selector,
           takeScreenshots,
