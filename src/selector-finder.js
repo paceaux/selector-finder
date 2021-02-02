@@ -8,7 +8,7 @@ const { forEachAsync } = require('./utils');
 const Log = require('./logger');
 const PageSearchResult = require('./page-search-result');
 const ElementSearchResult = require('./element-search-result');
-const SiteSearchResult = require('./site-results');
+const SiteSearchResult = require('./site-search-result');
 
 const log = new Log(LOG_FILE_NAME);
 
