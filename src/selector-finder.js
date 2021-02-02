@@ -116,34 +116,24 @@ class SelectorFinder {
      * @returns {PageResult|null}
      */
   static async getResultFromSpaPage(page, selector, takeScreenshots) {
-    const elements = await page.$$(selector);
+    const nodes = await page.$$(selector);
     const url = page.url();
-    let result = null;
+    let pageSearchResult = null;
 
     try {
-      if (elements.length > 0) {
-        const puppeteerNodes = await page.$$eval(selector, (pupEls) => [...pupEls].map((pupEl) => {
-          const attributes = {};
+      if (nodes.length > 0) {
+        pageSearchResult = new PageSearchResult(url);
 
-          for (let idx = 0; idx < pupEl.attributes.length; idx += 1) {
-            const { name, value } = pupEl.attributes.item(idx);
-            attributes[name] = value;
-          }
-          return {
-            tag: pupEl.localName,
-            attributes,
-            innerText: pupEl.innerText,
-          };
-        }));
+        const elementSearchResults = await page.evaluate(
+          (element) => new ElementSearchResult(element),
+          nodes,
+          ElementSearchResult,
+        );
 
-        result = {
-          url,
-          totalMatches: elements.length,
-          elements: puppeteerNodes,
-        };
+        pageSearchResult.addElementSearchResults(elementSearchResults);
 
         if (takeScreenshots) {
-          await forEachAsync(elements, async (element, index) => {
+          await forEachAsync(nodes, async (element, index) => {
             let fileName = `${url}-${index}`;
             fileName = fileName.replace('https://', '').replace('/', '-').replace('.', 'dot');
             await SelectorFinder.grabScreenAsync(element, fileName);
@@ -153,7 +143,7 @@ class SelectorFinder {
     } catch (puppeteerError) {
       await log.errorToFileAsync(puppeteerError);
     }
-    return result;
+    return pageSearchResult;
   }
 
   /**
