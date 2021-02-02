@@ -6,7 +6,9 @@ const puppeteer = require('puppeteer');
 const { LOG_FILE_NAME } = require('./constants');
 const { forEachAsync } = require('./utils');
 const Log = require('./logger');
-const { SiteSearchResult, PageSearchResult, ElementSearchResult } = require('./site-results');
+const PageSearchResult = require('./page-search-result');
+const ElementSearchResult = require('./element-search-result');
+const SiteSearchResult = require('./site-results');
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -75,6 +77,22 @@ class SelectorFinder {
   }
 
   /**
+   * @param  {Array<puppeternodes>} nodes
+   * @param  {string} url
+   */
+  static async grabScreensAsync(nodes, url) {
+    await forEachAsync(nodes, async (element, index) => {
+      let fileName = `${url}-${index}`;
+      fileName = fileName
+        .replace('https://', '')
+        .replace('/', '-')
+        .replace('.', 'dot');
+
+      await SelectorFinder.grabScreenAsync(element, fileName);
+    });
+  }
+
+  /**
      * @typedef SelectorResult
      * @param {string} tag tag name of element
      * @param {object} attributes all attributes on element
@@ -133,11 +151,7 @@ class SelectorFinder {
         pageSearchResult.addElementSearchResults(elementSearchResults);
 
         if (takeScreenshots) {
-          await forEachAsync(nodes, async (element, index) => {
-            let fileName = `${url}-${index}`;
-            fileName = fileName.replace('https://', '').replace('/', '-').replace('.', 'dot');
-            await SelectorFinder.grabScreenAsync(element, fileName);
-          });
+          await SelectorFinder.grabScreensAsync(nodes, url);
         }
       }
     } catch (puppeteerError) {
