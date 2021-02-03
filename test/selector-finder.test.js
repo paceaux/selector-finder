@@ -90,7 +90,6 @@ describe('SelectorFinder', () => {
       const { elements } = pageSearchResult;
       expect(elements).toHaveLength(2);
     });
-  });
     test('comma separated selector gets the elements we chose', async () => {
       const response = { data: '<DOCTYPE html><html><head></head><body><h1>Foo</h1><h2>bar</h2></body></html>' };
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
