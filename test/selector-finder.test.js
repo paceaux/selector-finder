@@ -81,4 +81,25 @@ describe('SelectorFinder', () => {
       expect(elements[0].attributes).toBeUndefined();
     });
   });
+  describe('multipleSelectors', () => {
+    test('it will get us results with a comma-separated selector', async () => {
+      const response = { data: '<DOCTYPE html><html><head></head><body><h1>Foo</h1><h2>bar</h2></body></html>' };
+      const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
+      axios.mockImplementation(() => Promise.resolve(response));
+      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', 'html,body');
+      const { elements } = pageSearchResult;
+      expect(elements).toHaveLength(2);
+    });
+  });
+    test('comma separated selector gets the elements we chose', async () => {
+      const response = { data: '<DOCTYPE html><html><head></head><body><h1>Foo</h1><h2>bar</h2></body></html>' };
+      const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
+      axios.mockImplementation(() => Promise.resolve(response));
+      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', 'html,body');
+      const { elements } = pageSearchResult;
+      const [first, second] = elements;
+      expect(first.tag).toEqual('html');
+      expect(second.tag).toEqual('body');
+    });
+  });
 });
