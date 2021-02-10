@@ -4,6 +4,7 @@
  */
 
 module.exports = {
+
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -56,10 +57,10 @@ module.exports = {
 
   // A path to a module which exports an async function that is triggered once before 
   // all test suites
-  // globalSetup: undefined,
+  globalSetup: './test/config/setup.js',
 
   // A path to a module which exports an async function that is triggered once after all test suites
-  // globalTeardown: undefined,
+  globalTeardown: './test/config/teardown.js',
 
   // A set of global variables that need to be available in all test environments
   // globals: {},
@@ -146,7 +147,7 @@ module.exports = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: 'node',
+  testEnvironment: './test/config/puppeteer_environment.js',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},

@@ -23,6 +23,9 @@
     "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "jest": "^26.6.3"
+    "jest": "^26.6.3",
+    "jest-environment-node": "^26.6.2",
+    "jest-puppeteer": "^4.4.0",
+    "mkdirp": "^1.0.4"
   }
 }
