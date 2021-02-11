@@ -6,10 +6,17 @@ class PageSearchResult {
     this.elements = [];
   }
 
-  addElementSearchResults(matches) {
+  addUnusedSelectors(selectors) {
+    if (selectors.length > 0) {
+      this.unusedSelectors = selectors;
+    }
+  }
+
+  addElementSearchResults(matches, cssSelector) {
     if (matches.length > 0) {
       for (let idx = 0; idx < matches.length; idx += 1) {
         const node = matches[idx];
+        if (!node.selector && cssSelector) node.selector = cssSelector;
         const elementSearchResult = new ElementSearchResult(node);
         this.elements.push(elementSearchResult);
       }

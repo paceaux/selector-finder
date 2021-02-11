@@ -108,19 +108,36 @@ class SelectorFinder {
   /**
      * @description Gets result from Cheeri
      * @param  {string} url
-     * @param  {Array|String} selector
+     * @param  {Array|String} cssSelector
      *
      * @returns {PageResult|null}
      */
-  async getResultFromStaticPage(url, selector) {
+  async getResultFromStaticPage(url, cssSelector) {
     let pageSearchResult = null;
+    const selectors = Array.isArray(cssSelector) ? cssSelector : cssSelector.split(',');
     const { data } = await this.libraries.ajax(url);
     const $ = cheerio.load(data);
-    const nodes = $(selector.toString());
 
-    if (nodes.length > 0) {
-      pageSearchResult = new PageSearchResult(url);
-      pageSearchResult.addElementSearchResults(nodes);
+    const elementResults = [];
+    const unusedSelectors = [];
+    selectors.forEach((selector) => {
+      const nodes = $(selector);
+
+      if (nodes.length > 0) {
+        const nodesWithSelector = [...nodes].map((node) => ({
+          ...node,
+          selector,
+        }));
+        elementResults.push(...nodesWithSelector);
+      } else {
+        unusedSelectors.push(selector);
+      }
+    });
+
+    if (elementResults.length > 0) {
+      pageSearchResult = new PageSearchResult(url, cssSelector);
+      pageSearchResult.addElementSearchResults(elementResults);
+      pageSearchResult.addUnusedSelectors(unusedSelectors);
     }
 
     return pageSearchResult;
@@ -233,8 +250,7 @@ class SelectorFinder {
             takeScreenshots,
           );
         if (result) {
-          const { url, totalMatches, elements } = result;
-          results.push({ url, totalMatches, elements });
+          results.push(result);
         }
       });
     } catch (iteratePagesError) {

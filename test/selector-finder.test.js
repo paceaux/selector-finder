@@ -66,7 +66,7 @@ describe('SelectorFinder', () => {
       expect(elements.length).toBeGreaterThan(0);
       expect(elements[0]).toBeInstanceOf(ElementSearchResult);
     });
-    test('elementSearchResult has tag, attributes, innertext', async () => {
+    test('elementSearchResult has tag, attributes, innertext, selector', async () => {
       const response = { data: '<DOCTYPE html><html><head></head><body class="boo"></body></html>' };
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
       axios.mockImplementation(() => Promise.resolve(response));
@@ -76,6 +76,7 @@ describe('SelectorFinder', () => {
       expect(element).toHaveProperty('tag');
       expect(element).toHaveProperty('attributes');
       expect(element).toHaveProperty('innerText');
+      expect(element).toHaveProperty('selector');
       expect(element.attributes).toHaveProperty('class', 'boo');
     });
     test('elementSearchResult has will not show attributes if they are not present', async () => {
@@ -113,6 +114,22 @@ describe('SelectorFinder', () => {
       const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['html', 'body']);
       const { elements } = pageSearchResult;
       expect(elements).toHaveLength(2);
+    });
+    test('getResultFromStaticPage is null if nothing at all is found', async () => {
+      const response = { data: '<DOCTYPE html><html><head></head><body class="boo"></body></html>' };
+      const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
+      axios.mockImplementation(() => Promise.resolve(response));
+      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['foo', 'bar']);
+      expect(pageSearchResult).toBeNull();
+    });
+    test('getResultFromStaticPage will have unused selectors if some are found', async () => {
+      const response = { data: '<DOCTYPE html><html><head></head><body class="boo"></body></html>' };
+      const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
+      axios.mockImplementation(() => Promise.resolve(response));
+      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['.boo', 'bar']);
+
+      expect(pageSearchResult).toHaveProperty('unusedSelectors');
+      expect(pageSearchResult.unusedSelectors).toHaveLength(1);
     });
   });
 });
