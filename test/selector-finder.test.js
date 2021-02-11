@@ -66,14 +66,17 @@ describe('SelectorFinder', () => {
       expect(elements.length).toBeGreaterThan(0);
       expect(elements[0]).toBeInstanceOf(ElementSearchResult);
     });
-    test('elementSearchResult has a tag and attributes', async () => {
+    test('elementSearchResult has tag, attributes, innertext', async () => {
       const response = { data: '<DOCTYPE html><html><head></head><body class="boo"></body></html>' };
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
       axios.mockImplementation(() => Promise.resolve(response));
       const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', 'body');
       const { elements } = pageSearchResult;
-      expect(elements[0]).toHaveProperty('tag');
-      expect(elements[0]).toHaveProperty('attributes');
+      const [element] = elements;
+      expect(element).toHaveProperty('tag');
+      expect(element).toHaveProperty('attributes');
+      expect(element).toHaveProperty('innerText');
+      expect(element.attributes).toHaveProperty('class', 'boo');
     });
     test('elementSearchResult has will not show attributes if they are not present', async () => {
       const response = { data: '<DOCTYPE html><html><head></head><body></body></html>' };
