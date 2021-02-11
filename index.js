@@ -59,6 +59,11 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'string',
     default: DEFAULT_OUTPUT_FILE,
   })
+  .option('cssFile', {
+    alias: 'f',
+    description: 'path to a CSS File',
+    type: 'string',
+  })
   .help()
   .alias('help', 'h');
 
@@ -69,6 +74,7 @@ const {
   outputFileName,
   takeScreenshots,
   isSpa,
+  cssFile,
 } = argv;
 
 const selectorFinderConfig = {
@@ -78,6 +84,7 @@ const selectorFinderConfig = {
   outputFileName,
   takeScreenshots,
   isSpa,
+  cssFile,
 };
 
 async function main(config) {
@@ -86,8 +93,11 @@ async function main(config) {
     const startMessage = `
 | Looking...                
 | Sitemap: ${config.sitemap},   
-| limit: ${limit}           
-| CSS Selector: ${selector} 
+| limit: ${limit}
+${config.cssFile ? `| cssFile (${cssFile})` : ''}         
+${config.selector && !config.cssFile ? `| CSS Selector (${selector})` : ''}         
+${config.isSpa ? '| Handle as Single Page Application' : ''}         
+${config.takeScreenshots ? '| Take Screenshots' : ''}         
 `;
     await log
       .toConsole(startMessage)
