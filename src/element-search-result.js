@@ -6,6 +6,20 @@ class ElementSearchResult {
     this.selector = element.cssSelector || element.selector;
   }
 
+  static extractAttributes(element) {
+    let attributes = null;
+    const elAttributes = element.attribs || element.attributes;
+    if (elAttributes && elAttributes.length > 0) {
+      attributes = {};
+
+      [...element.attributes].forEach((attribute) => {
+        const { name, value } = attribute;
+        attributes[name] = value;
+      });
+    }
+    return attributes;
+  }
+
   applyAttributes(element) {
     const attributes = element.attribs || element.attributes;
     if (attributes && Object.keys(attributes).length > 0) {
