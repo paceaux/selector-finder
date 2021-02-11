@@ -150,15 +150,22 @@ class SelectorFinder {
                 innerText,
               } = el;
 
+              const attributes = el.attributes.length > 0 ? {} : null;
+
+              [...el.attributes].forEach((attribute) => {
+                const { name, value } = attribute;
+                attributes[name] = value;
+              });
+              // TODO: Figure out how to use ElementSearchResult
               return {
                 localName,
                 innerText,
                 selector: cssSelector,
-                attributes: el.attributes,
+                attributes,
               };
             });
           },
-          selector,
+          selector, // arguments passed here can be used in the callback above
         );
         pageSearchResult.addElementSearchResults(elementSearchResults);
 

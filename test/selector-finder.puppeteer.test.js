@@ -49,6 +49,13 @@ describe('getResultFromSpaPage', () => {
     expect(element).toHaveProperty('innerText');
     expect(element.attributes).toHaveProperty('class', 'boo');
   });
+  test('the elementSearchResult wil not show attributes if they are not present', async () => {
+    const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, 'html', false);
+    const { elements } = pageSearchResult;
+    const [element] = elements;
+
+    expect(element.attributes).toBeUndefined();
+  });
   test('the pageSearchResult has ElementSearchResults', async () => {
     const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, 'p', false);
     const [el1, el2] = pageSearchResult.elements;

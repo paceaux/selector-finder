@@ -8,7 +8,7 @@ class ElementSearchResult {
 
   applyAttributes(element) {
     const attributes = element.attribs || element.attributes;
-    if (Object.keys(attributes).length > 0) {
+    if (attributes && Object.keys(attributes).length > 0) {
       this.attributes = attributes;
     }
   }
