@@ -3,6 +3,7 @@ class ElementSearchResult {
     this.tag = element.name || element.localName;
     this.applyAttributes(element);
     this.innerText = element.innerText;
+    this.selector = element.cssSelector || element.selector;
   }
 
   applyAttributes(element) {

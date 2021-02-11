@@ -1,6 +1,9 @@
 /* eslint-disable no-undef */
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { promises } = require('fs');
+
+const fs = promises;
 
 const PageSearchResult = require('../src/page-search-result');
 const ElementSearchResult = require('../src/element-search-result');
@@ -99,6 +102,14 @@ describe('SelectorFinder', () => {
       const [first, second] = elements;
       expect(first.tag).toEqual('html');
       expect(second.tag).toEqual('body');
+    });
+    test('getResultFromStaticPage can accept an array as a selector', async () => {
+      const response = { data: '<DOCTYPE html><html><head></head><body class="boo"></body></html>' };
+      const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
+      axios.mockImplementation(() => Promise.resolve(response));
+      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['html', 'body']);
+      const { elements } = pageSearchResult;
+      expect(elements).toHaveLength(2);
     });
   });
 });

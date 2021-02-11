@@ -108,7 +108,7 @@ class SelectorFinder {
   /**
      * @description Gets result from Cheeri
      * @param  {string} url
-     * @param  {} selector
+     * @param  {Array|String} selector
      *
      * @returns {PageResult|null}
      */
@@ -116,7 +116,7 @@ class SelectorFinder {
     let pageSearchResult = null;
     const { data } = await this.libraries.ajax(url);
     const $ = cheerio.load(data);
-    const nodes = $(selector);
+    const nodes = $(selector.toString());
 
     if (nodes.length > 0) {
       pageSearchResult = new PageSearchResult(url);
@@ -137,17 +137,29 @@ class SelectorFinder {
     const nodes = await page.$$(selector);
     const url = page.url();
     let pageSearchResult = null;
-
     try {
       if (nodes.length > 0) {
         pageSearchResult = new PageSearchResult(url);
-
         const elementSearchResults = await page.evaluate(
-          (element) => new ElementSearchResult(element),
-          nodes,
-          ElementSearchResult,
-        );
+          (cssSelector) => {
+            // eslint-disable-next-line no-undef
+            const els = document.querySelectorAll(cssSelector);
+            return [...els].map((el) => {
+              const {
+                localName,
+                innerText,
+              } = el;
 
+              return {
+                localName,
+                innerText,
+                selector: cssSelector,
+                attributes: el.attributes,
+              };
+            });
+          },
+          selector,
+        );
         pageSearchResult.addElementSearchResults(elementSearchResults);
 
         if (takeScreenshots) {
@@ -248,7 +260,7 @@ class SelectorFinder {
         browser = await this.libraries.emulator.launch();
       }
 
-      results = await this.searchPagesAsync(sitemapJson, selector, takeScreenshots, isSpa);
+      results = await this.searchPagesAsync(sitemapJson, selector, browser, takeScreenshots);
 
       if (usePuppeteer) {
         await browser.close();
