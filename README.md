@@ -29,6 +29,7 @@ Only scan the first 20 pages for `.yourthing`
 ```
 node index.js --sitemap=https://wherever.com/xml --limit=20 --selector=".yourthing"
 node index.js -u https://wherever.com/xml -l 20 -s ".yourthing"
+```
 
 Scan the first 20 pages and take screenshots
 ```
