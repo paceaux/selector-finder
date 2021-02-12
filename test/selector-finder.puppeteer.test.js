@@ -39,7 +39,7 @@ describe('getResultFromSpaPage', () => {
     expect(pageSearchResult.elements.length).toBeGreaterThan(0);
     expect(pageSearchResult.elements[0]).toBeInstanceOf(ElementSearchResult);
   });
-  test('the elementSearchResult has tag, attributes, innerText', async () => {
+  test('the elementSearchResult has tag, attributes, innerText, selector', async () => {
     const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, 'body', false);
     const { elements } = pageSearchResult;
     const [element] = elements;
@@ -47,6 +47,7 @@ describe('getResultFromSpaPage', () => {
     expect(element).toHaveProperty('tag');
     expect(element).toHaveProperty('attributes');
     expect(element).toHaveProperty('innerText');
+    expect(element).toHaveProperty('selector');
     expect(element.attributes).toHaveProperty('class', 'boo');
   });
   test('the elementSearchResult wil not show attributes if they are not present', async () => {
@@ -62,6 +63,35 @@ describe('getResultFromSpaPage', () => {
     expect(el1).toHaveProperty('tag');
     expect(el2).toHaveProperty('tag');
     expect(el1).toHaveProperty('attributes');
-    console.log(el1, el2);
+  });
+  describe('multipleSelectors', () => {
+    test('it will get us results with a comma-separated selector', async () => {
+      const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, 'html, body', false);
+      const { elements } = pageSearchResult;
+      expect(elements).toHaveLength(2);
+    });
+    test('comma separated selector gets the elements we chose', async () => {
+      const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, 'html, body', false);
+      const { elements } = pageSearchResult;
+      const [first, second] = elements;
+      expect(first.tag).toEqual('html');
+      expect(second.tag).toEqual('body');
+    });
+    test('getResultFromSpaPage can accept an array as a selector', async () => {
+      const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, ['html', 'body'], false);
+      const { elements } = pageSearchResult;
+      expect(elements).toHaveLength(2);
+    });
+    test('getResultFromSpaPage is null if nothing at all is found', async () => {
+      const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, ['foo', 'bar'], false);
+
+      expect(pageSearchResult).toBeNull();
+    });
+    test('getResultFromSpaPage will have unused selectors if some are found', async () => {
+      const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, ['html', 'bar'], false);
+
+      expect(pageSearchResult).toHaveProperty('unusedSelectors');
+      expect(pageSearchResult.unusedSelectors).toHaveLength(1);
+    });
   });
 }, timeout);

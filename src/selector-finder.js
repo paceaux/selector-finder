@@ -112,7 +112,7 @@ class SelectorFinder {
   /**
      * @description Gets result from Cheeri
      * @param  {string} url
-     * @param  {Array|String} cssSelector
+     * @param  {string|Array<string>} cssSelector
      *
      * @returns {PageResult|null}
      */
@@ -147,55 +147,76 @@ class SelectorFinder {
     return pageSearchResult;
   }
 
+  static async getOneResultFromSpaPage(page, selector) {
+    const elementSearchResults = await page.evaluate(
+      (cssSelector) => {
+        // eslint-disable-next-line no-undef
+        const els = document.querySelectorAll(cssSelector);
+        return [...els].map((el) => {
+          const {
+            localName,
+            innerText,
+          } = el;
+
+          const attributes = el.attributes.length > 0 ? {} : null;
+
+          [...el.attributes].forEach((attribute) => {
+            const { name, value } = attribute;
+            attributes[name] = value;
+          });
+          // TODO: Figure out how to use ElementSearchResult
+          return {
+            localName,
+            innerText,
+            selector: cssSelector,
+            attributes,
+          };
+        });
+      },
+      selector, // arguments passed here can be used in the callback above
+    );
+
+    return elementSearchResults;
+  }
+
   /**
      * @param  {Object} page Puppeteer Page Object
-     * @param  {string} selector
+     * @param  {string|Array<string>} cssSelector
      * @param  {boolean} takeScreenshots
      *
      * @returns {PageResult|null}
      */
-  static async getResultFromSpaPage(page, selector, takeScreenshots) {
-    const nodes = await page.$$(selector);
-    const url = page.url();
+  static async getResultFromSpaPage(page, cssSelector, takeScreenshots) {
     let pageSearchResult = null;
-    try {
-      if (nodes.length > 0) {
-        pageSearchResult = new PageSearchResult(url);
-        const elementSearchResults = await page.evaluate(
-          (cssSelector) => {
-            // eslint-disable-next-line no-undef
-            const els = document.querySelectorAll(cssSelector);
-            return [...els].map((el) => {
-              const {
-                localName,
-                innerText,
-              } = el;
+    const selectors = Array.isArray(cssSelector) ? cssSelector : cssSelector.split(',');
+    const url = page.url();
 
-              const attributes = el.attributes.length > 0 ? {} : null;
+    const elementResults = [];
+    const unusedSelectors = [];
 
-              [...el.attributes].forEach((attribute) => {
-                const { name, value } = attribute;
-                attributes[name] = value;
-              });
-              // TODO: Figure out how to use ElementSearchResult
-              return {
-                localName,
-                innerText,
-                selector: cssSelector,
-                attributes,
-              };
-            });
-          },
-          selector, // arguments passed here can be used in the callback above
-        );
-        pageSearchResult.addElementSearchResults(elementSearchResults);
+    await forEachAsync(selectors, async (selector) => {
+      const nodes = await page.$$(selector);
+      try {
+        if (nodes.length > 0) {
+          const nodesWithSelector = await SelectorFinder
+            .getOneResultFromSpaPage(page, selector);
 
-        if (takeScreenshots) {
-          await SelectorFinder.grabScreensAsync(nodes, url);
+          elementResults.push(...nodesWithSelector);
+
+          if (takeScreenshots) {
+            await SelectorFinder.grabScreensAsync(nodes, url);
+          }
+        } else {
+          unusedSelectors.push(selector);
         }
+      } catch (puppeteerError) {
+        await log.errorToFileAsync(puppeteerError);
       }
-    } catch (puppeteerError) {
-      await log.errorToFileAsync(puppeteerError);
+    });
+    if (elementResults.length > 0) {
+      pageSearchResult = new PageSearchResult(url, cssSelector);
+      pageSearchResult.addElementSearchResults(elementResults);
+      pageSearchResult.addUnusedSelectors(unusedSelectors);
     }
     return pageSearchResult;
   }
