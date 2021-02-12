@@ -13,6 +13,7 @@ const {
 const SelectorFinder = require('./src/selector-finder');
 const Outputter = require('./src/outputter');
 const Log = require('./src/logger');
+const CSSReader = require('./src/css-reader');
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -87,24 +88,41 @@ const selectorFinderConfig = {
   cssFile,
 };
 
+async function setCSSFileSelectors(config) {
+  if (config.cssFile) {
+    try {
+      const cssReader = new CSSReader(config.cssFile);
+      await cssReader.readFileAsync();
+      // eslint-disable-next-line no-param-reassign
+      config.selector = cssReader.selectors;
+    } catch (cssFileReadError) {
+      await log.errorToFileAsync(cssFileReadError);
+    }
+  }
+  return config;
+}
 async function main(config) {
   const outputter = new Outputter(DEFAULT_OUTPUT_FILE, log);
+  let mainConfig = { ...config };
   try {
     const startMessage = `
 | Looking...                
-| Sitemap: ${config.sitemap},   
-| limit: ${limit}
-${config.cssFile ? `| cssFile (${cssFile})` : ''}         
-${config.selector && !config.cssFile ? `| CSS Selector (${selector})` : ''}         
-${config.isSpa ? '| Handle as Single Page Application' : ''}         
-${config.takeScreenshots ? '| Take Screenshots' : ''}         
+| Sitemap: ${mainConfig.sitemap},   
+| limit: ${limit === 0 ? 'None' : limit}
+${mainConfig.cssFile ? `| cssFile (${cssFile})` : ''}         
+${mainConfig.selector && !mainConfig.cssFile ? `| CSS Selector (${selector})` : ''}         
+${mainConfig.isSpa ? '| Handle as Single Page Application' : ''}         
+${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}         
 `;
     await log
       .toConsole(startMessage)
       .startTimer()
       .infoToFileAsync();
 
-    const selectorFinder = new SelectorFinder(config);
+    if (mainConfig.cssFile) {
+      mainConfig = await setCSSFileSelectors(mainConfig);
+    }
+    const selectorFinder = new SelectorFinder(mainConfig);
     const result = await selectorFinder.findSelectorAsync();
     const { totalPagesSearched, pagesWithSelector, totalMatches } = result;
 

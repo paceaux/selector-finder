@@ -9,7 +9,6 @@ const Log = require('./logger');
 const PageSearchResult = require('./page-search-result');
 const ElementSearchResult = require('./element-search-result');
 const SiteSearchResult = require('./site-search-result');
-const CSSReader = require('./css-reader');
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -359,16 +358,6 @@ class SelectorFinder {
     let results = null;
     if (!config) {
       throw new Error('No config on SelectorFinder object or passed as argument');
-    }
-    if (config.cssFile) {
-      try {
-        const cssReader = new CSSReader(config.cssFile);
-        await cssReader.readFileAsync();
-        // eslint-disable-next-line no-param-reassign
-        config.selector = cssReader.selectors;
-      } catch (cssFileReadError) {
-        await log.errorToFileAsync(cssFileReadError);
-      }
     }
 
     try {
