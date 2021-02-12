@@ -44,10 +44,10 @@ describe('getResultFromSpaPage', () => {
     const { elements } = pageSearchResult;
     const [element] = elements;
 
-    expect(element).toHaveProperty('tag');
+    expect(element).toHaveProperty('tag', 'body');
     expect(element).toHaveProperty('attributes');
     expect(element).toHaveProperty('innerText');
-    expect(element).toHaveProperty('selector');
+    expect(element).toHaveProperty('selector', 'body');
     expect(element.attributes).toHaveProperty('class', 'boo');
   });
   test('the elementSearchResult wil not show attributes if they are not present', async () => {
@@ -60,8 +60,8 @@ describe('getResultFromSpaPage', () => {
   test('the pageSearchResult has ElementSearchResults', async () => {
     const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, 'p', false);
     const [el1, el2] = pageSearchResult.elements;
-    expect(el1).toHaveProperty('tag');
-    expect(el2).toHaveProperty('tag');
+    expect(el1).toHaveProperty('tag', 'p');
+    expect(el2).toHaveProperty('tag', 'p');
     expect(el1).toHaveProperty('attributes');
   });
   describe('multipleSelectors', () => {
