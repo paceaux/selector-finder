@@ -7,7 +7,6 @@ const { LOG_FILE_NAME } = require('./constants');
 const { forEachAsync } = require('./utils');
 const Log = require('./logger');
 const PageSearchResult = require('./page-search-result');
-const ElementSearchResult = require('./element-search-result');
 const SiteSearchResult = require('./site-search-result');
 
 const log = new Log(LOG_FILE_NAME);
@@ -65,6 +64,11 @@ class SelectorFinder {
     return parsedXml;
   }
 
+  /**
+   * Grabs a screenshot of a puppeteer element
+   * @param  {Object} element puppeteer element
+   * @param  {string} fileName name of the image element saved to the filesystem
+   */
   static async grabScreenAsync(element, fileName) {
     try {
       // logo is the element you want to capture
@@ -237,6 +241,12 @@ class SelectorFinder {
     return pageSearchResult;
   }
 
+  /**
+     * @param  {Object} sitemapJson JSON object generated from sitemap
+     * @param  {string|Array} selector CSS Selector
+     * @param {PuppeteerBrowser} browser a browser object instantiated with puppeteer
+     * @param  {boolean} takeScreenshots grab a screenshot of element
+   */
   async searchPagesAsync(sitemapJson, selector, browser, takeScreenshots) {
     const results = new SiteSearchResult();
 
@@ -268,7 +278,7 @@ class SelectorFinder {
   /**
      * @description Searches all pages provided from JSON object
      * @param  {Object} sitemapJson JSON object generated from sitemap
-     * @param  {string} selector CSS Selector
+     * @param  {string|Array} selector CSS Selector
      * @param  {boolean} takeScreenshots grab a screenshot of element
      *
      * @returns {Array<SearchPageResult>}
@@ -305,9 +315,10 @@ class SelectorFinder {
      * @typedef FindSelectorConfig
      * @property  {string} sitemap
      * @property  {number} limit total pages to search
-     * @property  {string} selector CSS selector
+     * @property  {string|array} selector CSS selector
      * @property  {boolean} takeScreenshots take screenshot of element
      * @property  {boolean} isSpa indicates the site may be a single-page app
+     * @property {string} cssFile path to a CSS file where there are css rules
      *
   /**
      * Finds a CSS selector on a site using a sitemap
