@@ -9,6 +9,7 @@ const {
   DEFAULT_IS_SPA,
   DEFAULT_LIMIT,
   DEFAULT_TAKE_SCREENSHOTS,
+  DEFAULT_SHOW_ELEMENT_DETAILS,
 } = require('./src/constants');
 const SelectorFinder = require('./src/selector-finder');
 const Outputter = require('./src/outputter');
@@ -65,6 +66,12 @@ const { argv } = yargs(hideBin(process.argv))
     description: 'path to a CSS File',
     type: 'string',
   })
+  .option('showElementDetails', {
+    alias: 'e',
+    description: 'Show details like tagname, attributes, innerText for elements',
+    type: 'boolean',
+    default: DEFAULT_SHOW_ELEMENT_DETAILS,
+  })
   .help()
   .alias('help', 'h');
 
@@ -76,6 +83,7 @@ const {
   takeScreenshots,
   isSpa,
   cssFile,
+  showElementDetails,
 } = argv;
 
 const selectorFinderConfig = {
@@ -86,6 +94,7 @@ const selectorFinderConfig = {
   takeScreenshots,
   isSpa,
   cssFile,
+  showElementDetails,
 };
 
 async function setCSSFileSelectors(config) {
@@ -100,6 +109,26 @@ async function setCSSFileSelectors(config) {
     }
   }
   return config;
+}
+
+function getFormattedResult(result, hasElementDetails) {
+  const formattedResult = { ...result };
+
+  const { pagesWithSelector } = result;
+
+  const editedPages = pagesWithSelector.map((pageWithSelector) => {
+    const editedPageWithSelector = { ...pageWithSelector };
+
+    if (!hasElementDetails) {
+      delete editedPageWithSelector.elements;
+    }
+
+    return editedPageWithSelector;
+  });
+
+  formattedResult.pagesWithSelector = editedPages;
+
+  return formattedResult;
 }
 async function main(config) {
   const outputter = new Outputter(DEFAULT_OUTPUT_FILE, log);
@@ -126,7 +155,8 @@ ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}
     const result = await selectorFinder.findSelectorAsync();
     const { totalPagesSearched, pagesWithSelector, totalMatches } = result;
 
-    await outputter.writeDataAsync(result, outputFileName);
+    const formattedResult = getFormattedResult(result, mainConfig.showElementDetails);
+    await outputter.writeDataAsync(formattedResult, outputFileName);
 
     log.endTimer();
     const endMessage = `

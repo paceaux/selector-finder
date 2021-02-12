@@ -2,7 +2,7 @@ class ElementSearchResult {
   constructor(element) {
     this.tag = element.name || element.localName;
     this.applyAttributes(element);
-    this.innerText = element.innerText;
+    this.innerText = element.text || element.innerText;
     this.selector = element.cssSelector || element.selector;
   }
 

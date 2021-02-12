@@ -4,11 +4,18 @@ class PageSearchResult {
   constructor(url) {
     this.url = url;
     this.elements = [];
+    this.usedSelectors = [];
   }
 
   addUnusedSelectors(selectors) {
     if (selectors.length > 0) {
       this.unusedSelectors = selectors;
+    }
+  }
+
+  addUsedSelector(selector) {
+    if (this.usedSelectors.indexOf(selector) === -1) {
+      this.usedSelectors.push(selector);
     }
   }
 
@@ -19,6 +26,7 @@ class PageSearchResult {
         if (!node.selector && cssSelector) node.selector = cssSelector;
         const elementSearchResult = new ElementSearchResult(node);
         this.elements.push(elementSearchResult);
+        this.addUsedSelector(elementSearchResult.selector);
       }
     }
   }

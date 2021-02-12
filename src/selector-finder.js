@@ -130,6 +130,7 @@ class SelectorFinder {
       if (nodes.length > 0) {
         const nodesWithSelector = [...nodes].map((node) => ({
           ...node,
+          innerText: $(node).text(),
           selector,
         }));
         elementResults.push(...nodesWithSelector);

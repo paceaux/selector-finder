@@ -48,7 +48,7 @@ describe('SelectorFinder', () => {
 
       expect(pageSearchResult).toBeInstanceOf(PageSearchResult);
     });
-    test('the pageSearchResult will have elements and a url', async () => {
+    test('the pageSearchResult will have elements, url, usedSelectors', async () => {
       const response = { data: '<DOCTYPE html><html><head></head><body></body></html>' };
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
       axios.mockImplementation(() => Promise.resolve(response));
@@ -56,6 +56,7 @@ describe('SelectorFinder', () => {
 
       expect(pageSearchResult).toHaveProperty('elements');
       expect(pageSearchResult).toHaveProperty('url');
+      expect(pageSearchResult).toHaveProperty('usedSelectors');
     });
     test('the elements in pageSearchResult will be ElementSearchResult', async () => {
       const response = { data: '<DOCTYPE html><html><head></head><body class="boo"></body></html>' };
@@ -67,16 +68,16 @@ describe('SelectorFinder', () => {
       expect(elements[0]).toBeInstanceOf(ElementSearchResult);
     });
     test('elementSearchResult has tag, attributes, innertext, selector', async () => {
-      const response = { data: '<DOCTYPE html><html><head></head><body class="boo"></body></html>' };
+      const response = { data: '<DOCTYPE html><html><head></head><body class="boo">body text</body></html>' };
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
       axios.mockImplementation(() => Promise.resolve(response));
       const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', 'body');
       const { elements } = pageSearchResult;
       const [element] = elements;
-      expect(element).toHaveProperty('tag');
+      expect(element).toHaveProperty('tag', 'body');
       expect(element).toHaveProperty('attributes');
-      expect(element).toHaveProperty('innerText');
-      expect(element).toHaveProperty('selector');
+      expect(element).toHaveProperty('innerText', 'body text');
+      expect(element).toHaveProperty('selector', 'body');
       expect(element.attributes).toHaveProperty('class', 'boo');
     });
     test('elementSearchResult has will not show attributes if they are not present', async () => {
