@@ -5,11 +5,18 @@ class PageSearchResult {
     this.url = url;
     this.elements = [];
     this.usedSelectors = [];
+    this.selectorErrors = [];
   }
 
   addUnusedSelectors(selectors) {
     if (selectors.length > 0) {
       this.unusedSelectors = selectors;
+    }
+  }
+
+  addSelectorErrors(selectorErrors) {
+    if (selectorErrors.length > 0) {
+      this.selectorErrors.push([...selectorErrors]);
     }
   }
 

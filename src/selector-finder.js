@@ -124,18 +124,25 @@ class SelectorFinder {
 
     const elementResults = [];
     const unusedSelectors = [];
+    const selectorErrors = [];
     selectors.forEach((selector) => {
-      const nodes = $(selector);
+      try {
+        const nodes = $(selector);
 
-      if (nodes.length > 0) {
-        const nodesWithSelector = [...nodes].map((node) => ({
-          ...node,
-          innerText: $(node).text(),
-          selector,
-        }));
-        elementResults.push(...nodesWithSelector);
-      } else {
-        unusedSelectors.push(selector);
+        if (nodes.length > 0) {
+          const nodesWithSelector = [...nodes].map((node) => ({
+            ...node,
+            innerText: $(node).text(),
+            selector,
+          }));
+          elementResults.push(...nodesWithSelector);
+        } else {
+          unusedSelectors.push(selector);
+        }
+      } catch (querySelectorError) {
+        if (querySelectorError.message.includes('unmatched pseudo-class')) {
+          selectorErrors.push(`${selector} cannot be matched outside of a browser`);
+        }
       }
     });
 
@@ -143,6 +150,16 @@ class SelectorFinder {
       pageSearchResult = new PageSearchResult(url, cssSelector);
       pageSearchResult.addElementSearchResults(elementResults);
       pageSearchResult.addUnusedSelectors(unusedSelectors);
+
+      if (selectorErrors.length > 0) {
+        pageSearchResult.addSelectorErrors(selectorErrors);
+      }
+    }
+
+    if (elementResults.length === 0 && selectorErrors.length > 0) {
+      await log.errorToFileAsync(`The page ${url} had no matches, and only the errors:
+        ${selectorErrors.toString()}
+      `);
     }
 
     return pageSearchResult;
