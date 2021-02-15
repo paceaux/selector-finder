@@ -5,6 +5,7 @@ const DEFAULT_SELECTOR = '.sources';
 const DEFAULT_IS_SPA = false;
 const DEFAULT_LIMIT = 0;
 const DEFAULT_TAKE_SCREENSHOTS = false;
+const DEFAULT_SHOW_ELEMENT_DETAILS = true;
 
 module.exports = {
   LOG_FILE_NAME,
@@ -14,4 +15,5 @@ module.exports = {
   DEFAULT_IS_SPA,
   DEFAULT_LIMIT,
   DEFAULT_TAKE_SCREENSHOTS,
+  DEFAULT_SHOW_ELEMENT_DETAILS,
 };
