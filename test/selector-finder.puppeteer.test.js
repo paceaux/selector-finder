@@ -64,6 +64,11 @@ describe('getResultFromSpaPage', () => {
     expect(el2).toHaveProperty('tag', 'p');
     expect(el1).toHaveProperty('attributes');
   });
+  test('a single interactive pseudo class will be null', async () => {
+    const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, ':hover', false);
+
+    expect(pageSearchResult).toBeNull();
+  });
   describe('multipleSelectors', () => {
     test('it will get us results with a comma-separated selector', async () => {
       const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, 'html, body', false);
@@ -92,6 +97,11 @@ describe('getResultFromSpaPage', () => {
 
       expect(pageSearchResult).toHaveProperty('unusedSelectors');
       expect(pageSearchResult.unusedSelectors).toHaveLength(1);
+    });
+    test('an interactive pseudo class will NOT beget a selectorErrors property', async () => {
+      const pageSearchResult = await SelectorFinder.getResultFromSpaPage(page, ['body', ':hover', ':focus', ':active'], false);
+
+      expect(pageSearchResult).not.toHaveProperty('selectorErrors');
     });
   });
 }, timeout);

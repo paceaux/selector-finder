@@ -146,7 +146,6 @@ describe('SelectorFinder', () => {
       axios.mockImplementation(() => Promise.resolve(response));
       const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['body', ':hover', ':focus', ':active']);
       expect(pageSearchResult).toHaveProperty('selectorErrors');
-      console.log(pageSearchResult.selectorErrors);
       expect(pageSearchResult.selectorErrors).toHaveLength(1);
     });
   });
