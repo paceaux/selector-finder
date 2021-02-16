@@ -140,9 +140,7 @@ class SelectorFinder {
           unusedSelectors.push(selector);
         }
       } catch (querySelectorError) {
-        if (querySelectorError.message.includes('unmatched pseudo-class')) {
-          selectorErrors.push(`${selector} cannot be matched outside of a browser`);
-        }
+        selectorErrors.push(querySelectorError);
       }
     });
 
@@ -157,7 +155,7 @@ class SelectorFinder {
     }
 
     if (elementResults.length === 0 && selectorErrors.length > 0) {
-      await log.errorToFileAsync(`The page ${url} had no matches, and only the errors:
+      await log.infoToFileAsync(`The page ${url} had no matches, and only the errors:
         ${selectorErrors.toString()}
       `);
     }

@@ -139,12 +139,14 @@ describe('SelectorFinder', () => {
       expect(pageSearchResult).toHaveProperty('unusedSelectors');
       expect(pageSearchResult.unusedSelectors).toHaveLength(1);
     });
+    // NOTE: Cheerio throw an error on :focus, not :hober or :active
     test('an interactive pseudo class will beget a selectorErrors property', async () => {
       const response = { data: '<DOCTYPE html><html><head></head><body></body></html>' };
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
       axios.mockImplementation(() => Promise.resolve(response));
       const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['body', ':hover', ':focus', ':active']);
       expect(pageSearchResult).toHaveProperty('selectorErrors');
+      console.log(pageSearchResult.selectorErrors);
       expect(pageSearchResult.selectorErrors).toHaveLength(1);
     });
   });
