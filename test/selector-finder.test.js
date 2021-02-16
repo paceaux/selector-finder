@@ -88,6 +88,13 @@ describe('SelectorFinder', () => {
       const { elements } = pageSearchResult;
       expect(elements[0].attributes).toBeUndefined();
     });
+    test('a single interactive pseudo class will be null', async () => {
+      const response = { data: '<DOCTYPE html><html><head></head><body></body></html>' };
+      const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
+      axios.mockImplementation(() => Promise.resolve(response));
+      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ':hover');
+      expect(pageSearchResult).toBeNull();
+    });
   });
   describe('multipleSelectors', () => {
     test('it will get us results with a comma-separated selector', async () => {
@@ -137,7 +144,6 @@ describe('SelectorFinder', () => {
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
       axios.mockImplementation(() => Promise.resolve(response));
       const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['body', ':hover']);
-      console.log(pageSearchResult);
       expect(pageSearchResult).toHaveProperty('selectorErrors');
     });
   });
