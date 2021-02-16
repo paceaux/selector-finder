@@ -5,7 +5,6 @@ class PageSearchResult {
     this.url = url;
     this.elements = [];
     this.usedSelectors = [];
-    this.selectorErrors = [];
   }
 
   addUnusedSelectors(selectors) {
@@ -16,6 +15,7 @@ class PageSearchResult {
 
   addSelectorErrors(selectorErrors) {
     if (selectorErrors.length > 0) {
+      if (!this.selectorErrors) this.selectorErrors = [];
       this.selectorErrors.push(...selectorErrors);
     }
   }
