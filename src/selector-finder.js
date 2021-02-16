@@ -148,12 +148,14 @@ class SelectorFinder {
       pageSearchResult = new PageSearchResult(url, cssSelector);
       pageSearchResult.addElementSearchResults(elementResults);
       pageSearchResult.addUnusedSelectors(unusedSelectors);
-
-      if (selectorErrors.length > 0) {
-        pageSearchResult.addSelectorErrors(selectorErrors);
-      }
+      pageSearchResult.addSelectorErrors(selectorErrors);
     }
 
+    if (elementResults.length === 0 && unusedSelectors.length > 0) {
+      await log.infoToFileAsync(`The page ${url} had no matches, all of these selectors were unused:
+        ${unusedSelectors.toString()}
+      `);
+    }
     if (elementResults.length === 0 && selectorErrors.length > 0) {
       await log.infoToFileAsync(`The page ${url} had no matches, and only the errors:
         ${selectorErrors.toString()}
