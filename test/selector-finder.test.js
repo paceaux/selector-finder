@@ -143,8 +143,9 @@ describe('SelectorFinder', () => {
       const response = { data: '<DOCTYPE html><html><head></head><body></body></html>' };
       const selectorFinder = new SelectorFinder({}, { ajax: axios, dom: cheerio });
       axios.mockImplementation(() => Promise.resolve(response));
-      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['body', ':hover']);
+      const pageSearchResult = await selectorFinder.getResultFromStaticPage('http://google.com', ['body', ':hover', ':focus', ':active']);
       expect(pageSearchResult).toHaveProperty('selectorErrors');
+      expect(pageSearchResult.selectorErrors).toHaveLength(1);
     });
   });
 });

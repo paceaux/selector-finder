@@ -16,7 +16,7 @@ class PageSearchResult {
 
   addSelectorErrors(selectorErrors) {
     if (selectorErrors.length > 0) {
-      this.selectorErrors.push([...selectorErrors]);
+      this.selectorErrors.push(...selectorErrors);
     }
   }
 
