@@ -139,7 +139,7 @@ async function main(config) {
 | Sitemap: ${mainConfig.sitemap},   
 | limit: ${limit === 0 ? 'None' : limit}
 ${mainConfig.cssFile ? `| cssFile (${cssFile})` : ''}         
-${mainConfig.selector && !mainConfig.cssFile ? `| CSS Selector (${selector})` : ''}         
+${mainConfig.selector && !mainConfig.cssFile ? `| CSS Selector (${mainConfig.selector})` : ''}         
 ${mainConfig.isSpa ? '| Handle as Single Page Application' : ''}         
 ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}         
 `;
