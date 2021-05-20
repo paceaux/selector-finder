@@ -1,9 +1,12 @@
+const cheerio = require('cheerio');
+
 class ElementSearchResult {
   constructor(element) {
     this.tag = element.name || element.localName;
     this.applyAttributes(element);
     this.innerText = element.text || element.innerText;
     this.selector = element.cssSelector || element.selector;
+    this.html = cheerio.html(element);
   }
 
   static extractAttributes(element) {

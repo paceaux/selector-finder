@@ -1,11 +1,12 @@
 const LOG_FILE_NAME = 'log.txt';
-const DEFAULT_SITEMAP_URL = 'https://blog.frankmtaylor.com/wp-sitemap-posts-post-1.xml';
+const DEFAULT_SITEMAP_URL = 'https://exlrt.com/sitemap.xml';
 const DEFAULT_OUTPUT_FILE = 'pages.json';
-const DEFAULT_SELECTOR = '.sources';
+const DEFAULT_SELECTOR = '.title';
 const DEFAULT_IS_SPA = false;
 const DEFAULT_LIMIT = 0;
 const DEFAULT_TAKE_SCREENSHOTS = false;
-const DEFAULT_SHOW_ELEMENT_DETAILS = true;
+const DEFAULT_SHOW_ELEMENT_DETAILS = false;
+const DEFAULT_SHOW_HTML = true;
 
 module.exports = {
   LOG_FILE_NAME,
@@ -16,4 +17,5 @@ module.exports = {
   DEFAULT_LIMIT,
   DEFAULT_TAKE_SCREENSHOTS,
   DEFAULT_SHOW_ELEMENT_DETAILS,
+  DEFAULT_SHOW_HTML,
 };

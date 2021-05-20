@@ -10,6 +10,7 @@ const {
   DEFAULT_LIMIT,
   DEFAULT_TAKE_SCREENSHOTS,
   DEFAULT_SHOW_ELEMENT_DETAILS,
+  DEFAULT_SHOW_HTML,
 } = require('./src/constants');
 const SelectorFinder = require('./src/selector-finder');
 const Outputter = require('./src/outputter');
@@ -72,6 +73,12 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'boolean',
     default: DEFAULT_SHOW_ELEMENT_DETAILS,
   })
+  .option('showHtml', {
+    alias: 'm',
+    description: 'Shows the HTML for the element',
+    type: 'boolean',
+    default: DEFAULT_SHOW_HTML,
+  })
   .help()
   .alias('help', 'h');
 
@@ -84,6 +91,7 @@ const {
   isSpa,
   cssFile,
   showElementDetails,
+  showHtml,
 } = argv;
 
 const selectorFinderConfig = {
@@ -95,6 +103,7 @@ const selectorFinderConfig = {
   isSpa,
   cssFile,
   showElementDetails,
+  showHtml,
 };
 
 async function setCSSFileSelectors(config) {
@@ -111,7 +120,7 @@ async function setCSSFileSelectors(config) {
   return config;
 }
 
-function getFormattedResult(result, hasElementDetails) {
+function getFormattedResult(result, hasElementDetails, hasElementHtml) {
   const formattedResult = { ...result };
 
   const { pagesWithSelector } = result;
@@ -120,7 +129,20 @@ function getFormattedResult(result, hasElementDetails) {
     const editedPageWithSelector = { ...pageWithSelector };
 
     if (!hasElementDetails) {
-      delete editedPageWithSelector.elements;
+      const editedElements = editedPageWithSelector.elements.map((element) => {
+        const { html } = element;
+        return { selector: element.selector, html };
+      });
+      editedPageWithSelector.elements = editedElements;
+    }
+
+    if (!hasElementHtml) {
+      const editedElements = editedPageWithSelector.elements.map((element) => {
+        const newEl = { ...element };
+        delete newEl.html;
+        return newEl;
+      });
+      editedPageWithSelector.elements = editedElements;
     }
 
     return editedPageWithSelector;
@@ -155,7 +177,11 @@ ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}
     const result = await selectorFinder.findSelectorAsync();
     const { totalPagesSearched, pagesWithSelector, totalMatches } = result;
 
-    const formattedResult = getFormattedResult(result, mainConfig.showElementDetails);
+    const formattedResult = getFormattedResult(
+      result,
+      mainConfig.showElementDetails,
+      mainConfig.showHtml,
+    );
     await outputter.writeDataAsync(formattedResult, outputFileName);
 
     log.endTimer();

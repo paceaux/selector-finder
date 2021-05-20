@@ -188,6 +188,7 @@ class SelectorFinder {
             innerText,
             selector: cssSelector,
             attributes,
+            html: el.outerHTML,
           };
         });
       },
