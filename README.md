@@ -53,6 +53,7 @@ node index.js -u https://wherever.com/xml -f "mystyles.css" -d
 | --isSpa, -d  |  Boolean. Оptional. Default: `false` | Switches to Puppeteer b/c content is dynamic |
 | --takeScreenshots, -c  |  Boolean. Оptional. Default: `false` | Will take screenshots with Puppeteer |
 | --outputFileName, -o  |  String. Оptional. Default: `pages.json` | A provided value will be prepended to `pages.json`. It will be JSON |
-| --showElementDetails, -e  |  Boolean. Оptional. Default is `true`. | Show details for elements that match result (`tag`, `innerText`, `attributes`) |
+| --showElementDetails, -e  |  Boolean. Оptional. Default is `false`. | Show details for elements that match result (`tag`, `innerText`, `attributes`) |
+| --showHtml, -m | Boolean. Optional. Default is `true`. | Shows HTML of the elements that match the result |
 
 
