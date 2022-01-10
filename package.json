@@ -13,7 +13,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.5",
-    "colors": "^1.4.0",
+    "colors": "1.4.0",
     "cssom": "^0.4.4",
     "puppeteer": "^5.5.0",
     "xml2js": "^0.4.23",
