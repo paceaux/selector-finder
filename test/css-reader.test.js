@@ -1,4 +1,4 @@
-const {promises} = require('fs');
+const { promises } = require('fs');
 
 const Logger = require('../src/logger');
 const CSSReader = require('../src/css-reader');
