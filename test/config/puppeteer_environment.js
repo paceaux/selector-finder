@@ -7,7 +7,9 @@ const NodeEnvironment = require('jest-environment-node');
 
 const DIR = path.join(os.tmpdir(), 'jest_puppeteer_global_setup');
 
+// lint overrides b/c these are necessar
 class PuppeteerEnvironment extends NodeEnvironment {
+  // eslint-disable-next-line no-useless-constructor
   constructor(config) {
     super(config);
   }
@@ -21,6 +23,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
     }
 
     // connect to puppeteer
+    // eslint-disable-next-line no-underscore-dangle
     this.global.__BROWSER__ = await puppeteer.connect({
       browserWSEndpoint: wsEndpoint,
     });

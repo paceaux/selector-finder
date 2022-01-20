@@ -1,9 +1,6 @@
 /* eslint-disable no-undef */
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { promises } = require('fs');
-
-const fs = promises;
 
 const PageSearchResult = require('../src/page-search-result');
 const ElementSearchResult = require('../src/element-search-result');
@@ -24,7 +21,7 @@ describe('SelectorFinder', () => {
     });
   });
   describe('getting Sitemap', () => {
-    const response = { data: '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<?xml-stylesheet type=\"text/xsl\" href=\"https://blog.frankmtaylor.com/wp-sitemap.xsl\" ?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"><url><loc>https://blog.frankmtaylor.com/2012/04/26/learning-css-selectors-from-newbie-to-ninja/</loc></url><url><loc>https://blog.frankmtaylor.com/2012/04/27/css-sorcery-performing-magic-with-the-attribute-selector/</loc></url></urlset>\n' };
+    const response = { data: '<?xml version="1.0" encoding="UTF-8"?>\n<?xml-stylesheet type="text/xsl" href="https://blog.frankmtaylor.com/wp-sitemap.xsl" ?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://blog.frankmtaylor.com/2012/04/26/learning-css-selectors-from-newbie-to-ninja/</loc></url><url><loc>https://blog.frankmtaylor.com/2012/04/27/css-sorcery-performing-magic-with-the-attribute-selector/</loc></url></urlset>\n' };
     const selectorFinder = new SelectorFinder({}, { ajax: axios });
     test('getFileAsync', async () => {
       axios.mockImplementation(() => Promise.resolve(response));

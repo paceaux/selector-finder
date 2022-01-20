@@ -14,6 +14,7 @@ describe('getResultFromSpaPage', () => {
 
   beforeAll(async () => {
     await fs.writeFile(testHTMLPageName, testHTML);
+    // eslint-disable-next-line no-underscore-dangle
     page = await global.__BROWSER__.newPage();
     await page.goto(`file:///${__dirname}/../${testHTMLPageName}`);
   }, timeout);
