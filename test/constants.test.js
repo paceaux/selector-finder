@@ -1,6 +1,7 @@
 const {
   LOG_FILE_NAME,
   DEFAULT_SITEMAP_URL,
+  DEFAULT_SHOULD_CRAWL_SITEMAP,
   DEFAULT_OUTPUT_FILE,
   DEFAULT_SELECTOR,
   DEFAULT_IS_SPA,
@@ -17,6 +18,10 @@ describe('constants', () => {
   test('sitemap url', () =>{
     expect(DEFAULT_SITEMAP_URL).toBeTruthy();
     expect(typeof DEFAULT_SITEMAP_URL).toEqual('string');
+  });
+  test('sitemap url', () =>{
+    expect(DEFAULT_SHOULD_CRAWL_SITEMAP).toBeFalsy();
+    expect(typeof DEFAULT_SHOULD_CRAWL_SITEMAP).toEqual('boolean');
   });
   test('default file', () =>{
     expect(DEFAULT_OUTPUT_FILE).toBeTruthy();

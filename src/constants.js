@@ -1,5 +1,6 @@
 const LOG_FILE_NAME = 'log.txt';
 const DEFAULT_SITEMAP_URL = 'https://exlrt.com/sitemap.xml';
+const DEFAULT_SHOULD_CRAWL_SITEMAP = false;
 const DEFAULT_OUTPUT_FILE = 'pages.json';
 const DEFAULT_SELECTOR = '.title';
 const DEFAULT_IS_SPA = false;
@@ -11,6 +12,7 @@ const DEFAULT_SHOW_HTML = true;
 module.exports = {
   LOG_FILE_NAME,
   DEFAULT_SITEMAP_URL,
+  DEFAULT_SHOULD_CRAWL_SITEMAP,
   DEFAULT_SELECTOR,
   DEFAULT_OUTPUT_FILE,
   DEFAULT_IS_SPA,
