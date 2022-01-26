@@ -80,13 +80,15 @@ class SiteCrawler {
     return uniqueLinks;
   }
 
-  async getLinksFromPage(url) {
+  async getLinksFromPageAsync(url) {
     let links = [];
 
     try {
+      const { linkSelector } = this.config;
       const { ajax, dom } = this.libraries;
       const pageMarkup = await SiteCrawler.getPageAsync(url, ajax);
-      links = SiteCrawler.getLinksFromMarkup(pageMarkup, dom);
+      const pageLinks = SiteCrawler.getLinksFromMarkup(pageMarkup, linkSelector, dom);
+      links = SiteCrawler.filterPageLinks(pageLinks, this.origin);
     } catch (getLinksError) {
       await log.errorToFileAsync(getLinksError);
     }
