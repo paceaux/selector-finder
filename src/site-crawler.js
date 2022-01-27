@@ -36,6 +36,14 @@ class SiteCrawler {
     return url.origin;
   }
 
+  /**
+   * @description Gets an HTML page
+   * @async
+   * @param  {string|URL} url fully qualified url to page
+   * @param  {Axios} [ajax=this.defaultLibraries.ajax] ajax library
+   *
+   * @returns {string} HTML markup as a string
+   */
   static async getPageAsync(url, ajax = this.defaultLibraries.ajax) {
     let result = null;
 
@@ -49,6 +57,14 @@ class SiteCrawler {
     return result;
   }
 
+  /**
+   * @description Gets only links from a string containing markup
+   * @param  {string} pageMarkup string containing markup
+   * @param  {string} [linkSelector=this.defaultConfig.linkSelector] selector to find links
+   * @param  {Cheerio} [dom=this.defaultLibraries.dom] Dom querying library
+   *
+   * @returns {string[]} array of href values
+   */
   static getLinksFromMarkup(
     pageMarkup,
     linkSelector = this.defaultConfig.linkSelector,
@@ -65,6 +81,13 @@ class SiteCrawler {
     return pageLinks;
   }
 
+  /**
+   * @description Filters an array of links (removes duplicates, external urls, and anchor links)
+   * @param  {string[]} pageLinks links to pages
+   * @param  {string} siteOrigin the origin of the website
+   *
+   * @returns {string[]} an array of href values
+   */
   static filterPageLinks(pageLinks, siteOrigin) {
     if (!Array.isArray(pageLinks)) throw new Error('pageLinks is not an array');
     if (!siteOrigin) throw new Error('No site origin is provided');
@@ -80,6 +103,13 @@ class SiteCrawler {
     return uniqueLinks;
   }
 
+  /**
+   * @description Gets array of href values from a page
+   * @async
+   * @param  {string} url fully qualified url to page
+   *
+   * @returns {string[]} an array of href values
+   */
   async getLinksFromPageAsync(url) {
     let links = [];
 
