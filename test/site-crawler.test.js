@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 const axios = require('axios');
-const cheerio = require('cheerio');
 
 const SiteCrawler = require('../src/site-crawler');
 
@@ -268,7 +267,7 @@ describe('SiteCrawler', () => {
     test('it crawls a mock site and collects all of the links', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' });
       await siteCrawler.crawlSiteAsync('https://frankmtaylor.com/work-history/');
-      expect(siteCrawler.urlset.length).toEqual(8)
+      expect(siteCrawler.urlset.length).toEqual(8);
     });
   });
 });
