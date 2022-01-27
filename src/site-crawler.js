@@ -3,6 +3,7 @@ const cheerio = require('cheerio');
 
 const { LOG_FILE_NAME } = require('./constants');
 const Log = require('./logger');
+const { forEachAsync } = require('./utils');
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -154,6 +155,17 @@ class SiteCrawler {
     try {
       const pageLinks = await this.getLinksFromPageAsync(url);
       this.addLinks(pageLinks);
+    } catch (crawlPageError) {
+      await log.errorToFileAsync(crawlPageError);
+    }
+  }
+
+  async crawlSiteAsync(url = this.config.startPage) {
+    try {
+      await this.crawlPageAsync(url);
+      await forEachAsync(this.urlset, async (urlObject) => {
+        await this.crawlPageAsync(urlObject.loc);
+      });
     } catch (crawlPageError) {
       await log.errorToFileAsync(crawlPageError);
     }

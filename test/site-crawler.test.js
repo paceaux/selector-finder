@@ -50,11 +50,27 @@ const MOCK_DATA = {
         <a class="portfolio__sectionLink" href="/portfolio/css.html"> 
         <a class="list__itemLink icon" href="http://stackoverflow.com/story/paceaux">Stack Overflow</a>
               </body></html>`,
+  workHistory: `<DOCTYPE html><html><head></head><body>
+    <a href="/work-history/exlrt.html">EXLRT</a>
+    <a href="/work-history/tahzoo.html">EXLRT</a>
+    </body></html>`,
 };
 
 axios.mockImplementation((url) => {
   switch (url) {
     case 'https://frankmtaylor.com/portfolio/':
+      return Promise.resolve({
+        data: MOCK_DATA.portfolio,
+      });
+    case 'https://frankmtaylor.com/work-history/':
+      return Promise.resolve({
+        data: MOCK_DATA.workHistory,
+      });
+    case 'https://frankmtaylor.com/work-history/exlrt.html':
+      return Promise.resolve({
+        data: MOCK_DATA.portfolio,
+      });
+    case 'https://frankmtaylor.com/work-history/tahzoo.html':
       return Promise.resolve({
         data: MOCK_DATA.portfolio,
       });
@@ -246,6 +262,13 @@ describe('SiteCrawler', () => {
           },
         ]),
       );
+    });
+  });
+  describe('crawlSite', () => {
+    test('it crawls a mock site and collects all of the links', async () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' });
+      await siteCrawler.crawlSiteAsync('https://frankmtaylor.com/work-history/');
+      expect(siteCrawler.urlset.length).toEqual(8)
     });
   });
 });
