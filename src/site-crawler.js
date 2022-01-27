@@ -20,6 +20,7 @@ class SiteCrawler {
   constructor(config, libraries) {
     this.config = { ...SiteCrawler.defaultConfig, ...config };
     this.libraries = { ...SiteCrawler.defaultLibraries, ...libraries };
+    this.linkSet = new Set();
   }
 
   static get defaultConfig() {
@@ -34,6 +35,19 @@ class SiteCrawler {
     const url = new URL(this.config.startPage);
 
     return url.origin;
+  }
+
+  get urlset() {
+    const linkArray = [...this.linkSet]
+      .map((link) => {
+        const url = link.indexOf(this.origin) === -1
+          ? `${this.origin}${link}`
+          : link;
+        return {
+          url,
+        };
+      });
+    return linkArray;
   }
 
   /**

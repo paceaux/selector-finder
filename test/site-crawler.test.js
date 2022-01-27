@@ -184,4 +184,33 @@ describe('SiteCrawler', () => {
       );
     });
   });
+  describe('links and urls', () => {
+    test('it has a linkSet when instantiated', () => {
+      const siteCrawler = new SiteCrawler();
+      expect(siteCrawler).toHaveProperty('linkSet');
+      expect(siteCrawler.linkSet).toHaveProperty('size', 0);
+    });
+    test('it has a urlset', () => {
+      const siteCrawler = new SiteCrawler();
+      expect(siteCrawler).toHaveProperty('urlset');
+      expect(siteCrawler.urlset).toHaveProperty('length', 0);
+    });
+    test('a urlset is an array of objects mapped from linkset vals', () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://foo.com' });
+      siteCrawler.linkSet.add('/bar');
+      expect(siteCrawler.urlset).toHaveProperty('length', 1);
+    });
+    test('the urlset\'s objects have fully qualified urls when linkset has relative ones', () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://foo.com' });
+      siteCrawler.linkSet.add('/bar');
+      expect(siteCrawler.urlset).toHaveProperty('length', 1);
+      expect(siteCrawler.urlset[0]).toHaveProperty('url', 'https://foo.com/bar');
+    });
+    test('the urlset\'s objects don\'t change when given fully qualified urls', () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://foo.com' });
+      siteCrawler.linkSet.add('https://foo.com/bar');
+      expect(siteCrawler.urlset).toHaveProperty('length', 1);
+      expect(siteCrawler.urlset[0]).toHaveProperty('url', 'https://foo.com/bar');
+    });
+  });
 });
