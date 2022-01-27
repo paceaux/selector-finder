@@ -47,7 +47,7 @@ class SiteCrawler {
           ? `${this.origin}${link}`
           : link;
         return {
-          url,
+          loc: url,
         };
       });
     return linkArray;
@@ -148,6 +148,15 @@ class SiteCrawler {
       await log.errorToFileAsync(getLinksError);
     }
     return links;
+  }
+
+  async crawlPageAsync(url) {
+    try {
+      const pageLinks = await this.getLinksFromPageAsync(url);
+      this.addLinks(pageLinks);
+    } catch (crawlPageError) {
+      await log.errorToFileAsync(crawlPageError);
+    }
   }
 }
 

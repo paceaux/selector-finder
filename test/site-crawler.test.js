@@ -204,19 +204,48 @@ describe('SiteCrawler', () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://foo.com' });
       siteCrawler.linkSet.add('/bar');
       expect(siteCrawler.urlset).toHaveProperty('length', 1);
-      expect(siteCrawler.urlset[0]).toHaveProperty('url', 'https://foo.com/bar');
+      expect(siteCrawler.urlset[0]).toHaveProperty('loc', 'https://foo.com/bar');
     });
     test('the urlset\'s objects don\'t change when given fully qualified urls', () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://foo.com' });
       siteCrawler.linkSet.add('https://foo.com/bar');
       expect(siteCrawler.urlset).toHaveProperty('length', 1);
-      expect(siteCrawler.urlset[0]).toHaveProperty('url', 'https://foo.com/bar');
+      expect(siteCrawler.urlset[0]).toHaveProperty('loc', 'https://foo.com/bar');
     });
     test('multiple links can be added at once', () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://foo.com' });
       siteCrawler.linkSet.add('/bar');
       siteCrawler.addLinks(['/baz', '/boop']);
       expect(siteCrawler.linkSet.size).toEqual(3);
+    });
+  });
+  describe('crawlPage', () => {
+    test('it crawls a page and adds links from that page', async () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' }, { ajax: axios });
+      await siteCrawler.crawlPageAsync('https://frankmtaylor.com/portfolio/');
+      expect(siteCrawler.urlset.length).toEqual(6);
+      expect(siteCrawler.urlset).toEqual(
+        expect.arrayContaining([
+          {
+            loc: 'https://frankmtaylor.com/portfolio',
+          },
+          {
+            loc: 'https://frankmtaylor.com/work-history',
+          },
+          {
+            loc: 'https://frankmtaylor.com/technologies',
+          },
+          {
+            loc: 'https://frankmtaylor.com/foreign-languages.html',
+          },
+          {
+            loc: 'https://frankmtaylor.com/education.html',
+          },
+          {
+            loc: 'https://frankmtaylor.com/portfolio/css.html',
+          },
+        ]),
+      );
     });
   });
 });
