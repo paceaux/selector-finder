@@ -37,6 +37,9 @@ class SiteCrawler {
     return url.origin;
   }
 
+  /**
+   * @description formats collection of links to look like jsonified sitemap
+   */
   get urlset() {
     const linkArray = [...this.linkSet]
       .map((link) => {
@@ -48,6 +51,14 @@ class SiteCrawler {
         };
       });
     return linkArray;
+  }
+
+  /**
+   * adds multiple items to the linkSet property
+   * @param  {string[]} linkArray an array of href values
+   */
+  addLinks(linkArray) {
+    this.linkSet = new Set([...this.linkSet, ...linkArray]);
   }
 
   /**

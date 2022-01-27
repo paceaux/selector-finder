@@ -212,5 +212,11 @@ describe('SiteCrawler', () => {
       expect(siteCrawler.urlset).toHaveProperty('length', 1);
       expect(siteCrawler.urlset[0]).toHaveProperty('url', 'https://foo.com/bar');
     });
+    test('multiple links can be added at once', () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://foo.com' });
+      siteCrawler.linkSet.add('/bar');
+      siteCrawler.addLinks(['/baz', '/boop']);
+      expect(siteCrawler.linkSet.size).toEqual(3);
+    });
   });
 });
