@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { Parser } = require('xml2js');
 
 const { LOG_FILE_NAME } = require('./constants');
 const Log = require('./logger');
@@ -12,11 +13,13 @@ const log = new Log(LOG_FILE_NAME);
 const DEFAULT_CONFIG = {
   startPage: 'https://frankmtaylor.com',
   linkSelector: 'a[href]',
+  shouldCrawl: false,
 };
 
 const DEFAULT_LIBRARIES = {
   ajax: axios,
   dom: cheerio,
+  Parser,
 };
 
 class SiteCrawler {
@@ -24,7 +27,7 @@ class SiteCrawler {
     this.config = { ...SiteCrawler.defaultConfig, ...config };
     this.libraries = { ...SiteCrawler.defaultLibraries, ...libraries };
     this.linkSet = new Set();
-    this.outputter = new Outputter('sitelinks.json', log);
+    this.outputter = new Outputter('sitemap.json', log);
   }
 
   static get defaultConfig() {
@@ -54,7 +57,7 @@ class SiteCrawler {
           loc: [url],
         };
       });
-    return linkArray;
+    return { url: linkArray };
   }
 
   /**
@@ -84,6 +87,52 @@ class SiteCrawler {
       await log.errorToFileAsync(getFileError);
     }
     return result;
+  }
+
+/**
+ * @description makes an ajax request for a url
+ * @param  {string} url
+ *
+ * @returns {object} Result of the request
+ */
+  async getFileAsync(url) {
+    let result = null;
+    try {
+      const { data } = await this.libraries.ajax(url);
+      result = data;
+    } catch (getFileError) {
+      await log.errorToFileAsync(getFileError);
+    }
+    return result;
+  }
+
+/**
+   * @description Gets an XML Sitemap
+   * @param  {string} [sitemapUrl=this.config.startPage] fully qualified url
+   *
+   * @returns {object} parsed xml
+   *
+   */
+  async getSitemapAsync(sitemapUrl = this.config.startPage) {
+    let parsedXml = null;
+    try {
+      const data = await this.getFileAsync(sitemapUrl);
+      const parser = new this.libraries.Parser();
+      parsedXml = await parser.parseStringPromise(data);
+    } catch (getSitemapError) {
+      await log.errorToFileAsync(getSitemapError);
+    }
+    return parsedXml;
+  }
+
+  static getLinksFromSitemap(sitemapJson) {
+    if (!sitemapJson) throw new Error('Sitemap JSON was not provided');
+    const pageLinks = sitemapJson
+      .urlset
+      .url
+      .map((urlObject) => urlObject.loc[0]);
+
+    return pageLinks;
   }
 
   /**
@@ -193,6 +242,24 @@ class SiteCrawler {
       await this.exportSiteLinks(fileName);
     } catch (crawlError) {
       await log.errorToFileAsync(crawlError);
+    }
+  }
+
+  async setSitemap(sitemapUrl = this.config.startPage) {
+    try {
+      const sitemapJson = await this.getSitemapAsync(sitemapUrl);
+      const sitemapUrls = SiteCrawler.getLinksFromSitemap(sitemapJson);
+      this.addLinks(sitemapUrls);
+    } catch (setSitemapError) {
+      await this.errorToFileAsync(setSitemapError);
+    }
+  }
+
+  async produceSitemap(shouldCrawl = this.config.shouldCrawl) {
+    if (shouldCrawl) {
+      await this.crawl();
+    } else {
+      await this.getSitemapAsync(this.config.startPage);
     }
   }
 }
