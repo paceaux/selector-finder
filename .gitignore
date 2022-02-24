@@ -4,3 +4,4 @@ log.txt
 pages.json
 *.pages.json
 *.png
+*.sitemap.json
