@@ -231,7 +231,7 @@ class SiteCrawler {
     }
   }
 
-  async exportSiteLinks(fileName = this.origin) {
+  async exportSiteLinks(fileName = this.exportFileName) {
     try {
       await this.outputter.writeDataAsync(this.urlset, fileName);
     } catch (exportSiteLinksError) {
@@ -239,11 +239,9 @@ class SiteCrawler {
     }
   }
 
-  async crawl() {
+  async crawl(startPage = this.config.startPage) {
     try {
-      await this.crawlSiteAsync(this.config.startPage);
-      const fileName = this.exportFileName;
-      await this.exportSiteLinks(fileName);
+      await this.crawlSiteAsync(startPage);
     } catch (crawlError) {
       await log.errorToFileAsync(crawlError);
     }
@@ -261,12 +259,13 @@ class SiteCrawler {
     }
   }
 
-  async produceSitemap(shouldCrawl = this.config.shouldCrawl) {
+  async produceSiteLinks(shouldCrawl = this.config.shouldCrawl) {
     if (shouldCrawl) {
       await this.crawl();
     } else {
-      await this.getSitemapAsync(this.config.startPage);
+      await this.setSitemap(this.config.startPage);
     }
+    await this.exportSiteLinks(this.exportFileName);
   }
 }
 

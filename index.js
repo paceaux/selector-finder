@@ -168,7 +168,6 @@ async function main(config) {
     const startMessage = `
 | Looking...                
 | Sitemap: ${mainConfig.sitemap},
-${mainConfig.crawl ? 'Crawling...' : ''}    
 | limit: ${limit === 0 ? 'None' : limit}
 ${mainConfig.cssFile ? `| cssFile (${cssFile})` : ''}         
 ${mainConfig.selector && !mainConfig.cssFile ? `| CSS Selector (${mainConfig.selector})` : ''}         
@@ -184,11 +183,24 @@ ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}
       mainConfig = await setCSSFileSelectors(mainConfig);
     }
 
-    if (mainConfig.crawl) {
-      const siteCrawler = new SiteCrawler({ startPage: mainConfig.sitemap });
-      await siteCrawler.crawl();
-      mainConfig.sitemap = { urlset: { url: siteCrawler.urlset } };
-    }
+    // Set up the Crawler
+    const siteCrawler = new SiteCrawler(
+      {
+        startPage: mainConfig.sitemap,
+        shouldCrawl: mainConfig.crawl,
+      },
+    );
+    await log.toConsole(`
+      ||> ${mainConfig.crawl ? 'Crawling site' : 'Fetching sitemap'}
+      ||> ${mainConfig.crawl ? 'Starting on' : 'using'} ${siteCrawler.config.startPage}
+      `);
+    siteCrawler.produceSiteLinks();
+
+    await log.toConsole(`
+      ||-> Site links exported to ${siteCrawler.exportFileName}
+    `);
+
+    mainConfig.siteCrawler = siteCrawler;
 
     const selectorFinder = new SelectorFinder(mainConfig);
     const result = await selectorFinder.findSelectorAsync();

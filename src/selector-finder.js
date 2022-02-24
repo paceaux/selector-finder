@@ -1,6 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { Parser } = require('xml2js');
 const puppeteer = require('puppeteer');
 
 const { LOG_FILE_NAME } = require('./constants');
@@ -14,7 +13,6 @@ const log = new Log(LOG_FILE_NAME);
 const DEFAULT_LIBRARIES = {
   ajax: axios,
   dom: cheerio,
-  Parser,
   emulator: puppeteer,
 };
 class SelectorFinder {
@@ -25,43 +23,6 @@ class SelectorFinder {
 
   static get defaultLibraries() {
     return DEFAULT_LIBRARIES;
-  }
-
-  /**
-   * @description makes an ajax request for a url
-   * @param  {string} url
-   *
-   * @returns {object} Result of the request
-   */
-  async getFileAsync(url) {
-    let result = null;
-    try {
-      const { data } = await this.libraries.ajax(url);
-      result = data;
-    } catch (getFileError) {
-      await log.errorToFileAsync(getFileError);
-    }
-    return result;
-  }
-
-  /**
-     * @description Gets an XML Sitemap
-     * @param  {string} sitemapUrl fully qualified url
-     *
-     * @returns {object} parsed xml
-     *
-     */
-  async getSitemapAsync(sitemapUrl) {
-    let parsedXml = null;
-    try {
-      const data = await this.getFileAsync(sitemapUrl);
-      const parser = new this.libraries.Parser();
-
-      parsedXml = await parser.parseStringPromise(data);
-    } catch (getSitemapError) {
-      await log.errorToFileAsync(getSitemapError);
-    }
-    return parsedXml;
   }
 
   /**
@@ -367,8 +328,8 @@ class SelectorFinder {
      * @returns {SelectorSearchResult}
      */
   async getSearchResultsAsync({
-    sitemap,
     limit,
+    siteCrawler,
     selector,
     takeScreenshots,
     isSpa,
@@ -376,8 +337,8 @@ class SelectorFinder {
     let result = null;
 
     try {
-      const sitemapJson = typeof sitemap === 'object' ? sitemap : await this.getSitemapAsync(sitemap);
-      const urls = sitemapJson.urlset.url.slice(0, limit || sitemapJson.urlset.url.length - 1);
+      const sitemapUrls = siteCrawler.urlset;
+      const urls = sitemapUrls.slice(0, limit || sitemapUrls.length - 1);
       const pagesWithSelector = await this
         .searchSiteAsync(
           urls,
