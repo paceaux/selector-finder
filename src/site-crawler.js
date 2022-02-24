@@ -44,6 +44,10 @@ class SiteCrawler {
     return url.origin;
   }
 
+  get exportFileName() {
+    return this.origin.replace(/https?:\/\//gi, '');
+  }
+
   /**
    * @description formats collection of links to look like jsonified sitemap
    */
@@ -129,7 +133,7 @@ class SiteCrawler {
     if (!sitemapJson) throw new Error('Sitemap JSON was not provided');
     const pageLinks = sitemapJson
       .urlset
-      .url
+      .url // note: each url node in the xml becomes object in an array called url
       .map((urlObject) => urlObject.loc[0]);
 
     return pageLinks;
@@ -238,7 +242,7 @@ class SiteCrawler {
   async crawl() {
     try {
       await this.crawlSiteAsync(this.config.startPage);
-      const fileName = this.origin.replace(/https?:\/\//gi, '');
+      const fileName = this.exportFileName;
       await this.exportSiteLinks(fileName);
     } catch (crawlError) {
       await log.errorToFileAsync(crawlError);
@@ -246,6 +250,8 @@ class SiteCrawler {
   }
 
   async setSitemap(sitemapUrl = this.config.startPage) {
+    this.config.startPage = sitemapUrl;
+
     try {
       const sitemapJson = await this.getSitemapAsync(sitemapUrl);
       const sitemapUrls = SiteCrawler.getLinksFromSitemap(sitemapJson);

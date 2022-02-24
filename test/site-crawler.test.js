@@ -305,17 +305,29 @@ describe('SiteCrawler:Crawling', () => {
       );
     });
   });
-  describe('crawlSite', () => {
+  describe('crawlSiteAsync', () => {
     test('it crawls a mock site and collects all of the links', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' });
       await siteCrawler.crawlSiteAsync('https://frankmtaylor.com/work-history/');
       expect(siteCrawler.urlset.length).toEqual(8);
     });
   });
+  describe('crawl', () => {
+    test('it crawls a mock site and collects all of the links', async () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' });
+      await siteCrawler.crawlSiteAsync('https://frankmtaylor.com/work-history/');
+      expect(siteCrawler.urlset.length).toEqual(8);
+    });
+    test.skip('it crawls the site, collects links, produces a file', async () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' });
+      await siteCrawler.crawlSiteAsync('https://frankmtaylor.com/work-history/');
+      expect();
+    });
+  });
 });
 describe('SiteCrawler: Fetching Sitemap', () => {
   describe('getSitemap', () => {
-    test('it can get a sitemap', async () => {
+    test('getSitemapAsync', async () => {
       const siteCrawler = new SiteCrawler();
 
       const sitemapJson = await siteCrawler.getSitemapAsync('https://frankmtaylor.com/sitemap.xml');
