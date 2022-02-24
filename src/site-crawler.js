@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 
 const { LOG_FILE_NAME } = require('./constants');
 const Log = require('./logger');
+const Outputter = require('./outputter');
+
 const { forEachAsync } = require('./utils');
 
 const log = new Log(LOG_FILE_NAME);
@@ -22,6 +24,7 @@ class SiteCrawler {
     this.config = { ...SiteCrawler.defaultConfig, ...config };
     this.libraries = { ...SiteCrawler.defaultLibraries, ...libraries };
     this.linkSet = new Set();
+    this.outputter = new Outputter('sitelinks.json', log);
   }
 
   static get defaultConfig() {
@@ -48,7 +51,7 @@ class SiteCrawler {
           ? `${this.origin}${link}`
           : link;
         return {
-          loc: url,
+          loc: [url],
         };
       });
     return linkArray;
@@ -99,10 +102,14 @@ class SiteCrawler {
     if (!pageMarkup) throw new Error('Markup was not provided');
     let pageLinks = [];
 
-    const $ = dom.load(pageMarkup);
-    const nodes = $(linkSelector);
-    pageLinks = [...nodes]
-      .map((node) => node.attribs.href);
+    try {
+      const $ = dom.load(pageMarkup);
+      const nodes = $(linkSelector);
+      pageLinks = [...nodes]
+        .map((node) => node.attribs.href);
+    } catch (getLinksFromMarkupError) {
+      log.toConsole(getLinksFromMarkupError);
+    }
 
     return pageLinks;
   }
@@ -168,6 +175,24 @@ class SiteCrawler {
       });
     } catch (crawlPageError) {
       await log.errorToFileAsync(crawlPageError);
+    }
+  }
+
+  async exportSiteLinks(fileName = this.origin) {
+    try {
+      await this.outputter.writeDataAsync(this.urlset, fileName);
+    } catch (exportSiteLinksError) {
+      await log.errorToFileAsync(exportSiteLinksError);
+    }
+  }
+
+  async crawl() {
+    try {
+      await this.crawlSiteAsync(this.config.startPage);
+      const fileName = this.origin.replace(/https?:\/\//gi, '');
+      await this.exportSiteLinks(fileName);
+    } catch (crawlError) {
+      await log.errorToFileAsync(crawlError);
     }
   }
 }

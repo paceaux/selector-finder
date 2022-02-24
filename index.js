@@ -13,6 +13,7 @@ const {
   DEFAULT_SHOW_HTML,
 } = require('./src/constants');
 const SelectorFinder = require('./src/selector-finder');
+const SiteCrawler = require('./src/site-crawler');
 const Outputter = require('./src/outputter');
 const Log = require('./src/logger');
 const CSSReader = require('./src/css-reader');
@@ -31,6 +32,12 @@ const { argv } = yargs(hideBin(process.argv))
     description: 'url for the sitemap',
     type: 'string',
     default: DEFAULT_SITEMAP_URL,
+  })
+  .option('crawl', {
+    alias: 'r',
+    description: 'treat the url as an html page and crawl from there',
+    type: 'boolean',
+    default: false,
   })
   .option('limit', {
     alias: 'l',
@@ -84,6 +91,7 @@ const { argv } = yargs(hideBin(process.argv))
 
 const {
   sitemap,
+  crawl,
   limit,
   selector,
   outputFileName,
@@ -96,6 +104,7 @@ const {
 
 const selectorFinderConfig = {
   sitemap,
+  crawl,
   limit,
   selector,
   outputFileName,
@@ -158,7 +167,8 @@ async function main(config) {
   try {
     const startMessage = `
 | Looking...                
-| Sitemap: ${mainConfig.sitemap},   
+| Sitemap: ${mainConfig.sitemap},
+${mainConfig.crawl ? 'Crawling...' : ''}    
 | limit: ${limit === 0 ? 'None' : limit}
 ${mainConfig.cssFile ? `| cssFile (${cssFile})` : ''}         
 ${mainConfig.selector && !mainConfig.cssFile ? `| CSS Selector (${mainConfig.selector})` : ''}         
@@ -173,6 +183,13 @@ ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}
     if (mainConfig.cssFile) {
       mainConfig = await setCSSFileSelectors(mainConfig);
     }
+
+    if (mainConfig.crawl) {
+      const siteCrawler = new SiteCrawler({ startPage: mainConfig.sitemap });
+      await siteCrawler.crawl();
+      mainConfig.sitemap = { urlset: { url: siteCrawler.urlset } };
+    }
+
     const selectorFinder = new SelectorFinder(mainConfig);
     const result = await selectorFinder.findSelectorAsync();
     const { totalPagesSearched, pagesWithSelector, totalMatches } = result;

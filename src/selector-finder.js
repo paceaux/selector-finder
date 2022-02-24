@@ -376,7 +376,7 @@ class SelectorFinder {
     let result = null;
 
     try {
-      const sitemapJson = await this.getSitemapAsync(sitemap);
+      const sitemapJson = typeof sitemap === 'object' ? sitemap : await this.getSitemapAsync(sitemap);
       const urls = sitemapJson.urlset.url.slice(0, limit || sitemapJson.urlset.url.length - 1);
       const pagesWithSelector = await this
         .searchSiteAsync(
