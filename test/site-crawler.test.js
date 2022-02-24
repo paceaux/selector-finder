@@ -124,7 +124,7 @@ axios.mockImplementation((url) => {
   }
 });
 
-describe.skip('SiteCrawler:Crawling', () => {
+describe('SiteCrawler:Crawling', () => {
   describe('defaultLibraries', () => {
     test('it has default libraries', () => {
       expect(SiteCrawler).toHaveProperty('defaultLibraries');
@@ -330,7 +330,6 @@ describe('SiteCrawler: Fetching Sitemap', () => {
       const siteMapJson = await siteCrawler.getSitemapAsync('https://frankmtaylor.com/sitemap.xml');
       const sitemapLinks = SiteCrawler.getLinksFromSitemap(siteMapJson);
       expect(sitemapLinks).toBeInstanceOf(Array);
-      console.log(sitemapLinks);
       expect(sitemapLinks.length).toEqual(7);
     });
   });
@@ -343,8 +342,7 @@ describe('SiteCrawler: Fetching Sitemap', () => {
     test('the urlSet will have the same links from sitemap', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
       await siteCrawler.setSitemap();
-      expect(siteCrawler.urlset.url.length).toEqual(7);
-      console.log(siteCrawler.urlset.url);
+      expect(siteCrawler.urlset.length).toEqual(7);
     });
   });
 });

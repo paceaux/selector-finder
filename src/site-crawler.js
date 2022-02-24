@@ -54,10 +54,10 @@ class SiteCrawler {
           ? `${this.origin}${link}`
           : link;
         return {
-          loc: [url],
+          loc: url,
         };
       });
-    return { url: linkArray };
+    return linkArray;
   }
 
   /**
