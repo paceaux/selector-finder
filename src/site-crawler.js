@@ -44,6 +44,12 @@ class SiteCrawler {
     return url.origin;
   }
 
+  get host() {
+    const url = new URL(this.config.startPage);
+
+    return url.host;
+  }
+
   get exportFileName() {
     return this.origin.replace(/https?:\/\//gi, '');
   }
@@ -54,7 +60,7 @@ class SiteCrawler {
   get urlset() {
     const linkArray = [...this.linkSet]
       .map((link) => {
-        const url = link.indexOf(this.origin) === -1
+        const url = link.indexOf(this.host) === -1
           ? `${this.origin}${link}`
           : link;
         return {

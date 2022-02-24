@@ -194,7 +194,7 @@ ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}
       ||> ${mainConfig.crawl ? 'Crawling site' : 'Fetching sitemap'}
       ||> ${mainConfig.crawl ? 'Starting on' : 'using'} ${siteCrawler.config.startPage}
       `);
-    siteCrawler.produceSiteLinks();
+    await siteCrawler.produceSiteLinks();
 
     await log.toConsole(`
       ||-> Site links exported to ${siteCrawler.exportFileName}

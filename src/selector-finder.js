@@ -255,7 +255,7 @@ class SelectorFinder {
       await forEachAsync(sitemapJson, async (sitemapObj) => {
         const result = await this
           .searchPageAsync(
-            sitemapObj.loc[0],
+            sitemapObj.loc,
             selector,
             browser,
             takeScreenshots,
