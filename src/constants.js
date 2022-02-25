@@ -8,6 +8,7 @@ const DEFAULT_LIMIT = 0;
 const DEFAULT_TAKE_SCREENSHOTS = false;
 const DEFAULT_SHOW_ELEMENT_DETAILS = false;
 const DEFAULT_SHOW_HTML = true;
+const DEFAULT_CRAWL = false;
 
 module.exports = {
   LOG_FILE_NAME,
@@ -20,4 +21,5 @@ module.exports = {
   DEFAULT_TAKE_SCREENSHOTS,
   DEFAULT_SHOW_ELEMENT_DETAILS,
   DEFAULT_SHOW_HTML,
+  DEFAULT_CRAWL,
 };

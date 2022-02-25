@@ -11,6 +11,7 @@ const {
   DEFAULT_TAKE_SCREENSHOTS,
   DEFAULT_SHOW_ELEMENT_DETAILS,
   DEFAULT_SHOW_HTML,
+  DEFAULT_CRAWL,
 } = require('./src/constants');
 const SelectorFinder = require('./src/selector-finder');
 const SiteCrawler = require('./src/site-crawler');
@@ -37,7 +38,7 @@ const { argv } = yargs(hideBin(process.argv))
     alias: 'r',
     description: 'treat the url as an html page and crawl from there',
     type: 'boolean',
-    default: false,
+    default: DEFAULT_CRAWL,
   })
   .option('limit', {
     alias: 'l',
