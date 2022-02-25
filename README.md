@@ -42,6 +42,11 @@ node index.js -u https://wherever.com/xml -f "mystyles.css" -d
 
 ```
 
+Crawl the site, starting from a landing page
+```
+node index.js -u https://mysite.com/landing -r -s ".myClass"
+```
+
 ### Parameters
 
 | Parameter | Details   | Description   |
@@ -55,5 +60,6 @@ node index.js -u https://wherever.com/xml -f "mystyles.css" -d
 | --outputFileName, -o  |  String. Оptional. Default: `pages.json` | A provided value will be prepended to `pages.json`. It will be JSON |
 | --showElementDetails, -e  |  Boolean. Оptional. Default is `false`. | Show details for elements that match result (`tag`, `innerText`, `attributes`) |
 | --showHtml, -m | Boolean. Optional. Default is `true`. | Shows HTML of the elements that match the result |
+| --crawl, -r | Boolean. Optional. Default is `false` | Will crawl the site instead of using a sitemap |
 
 
