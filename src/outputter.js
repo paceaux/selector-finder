@@ -1,4 +1,6 @@
 const { promises } = require('fs');
+const process = require('process');
+const path = require('path');
 
 const fs = promises;
 
@@ -21,8 +23,10 @@ class Outputter {
       throw new Error('No data or filename provided');
     }
 
+    const fullFileAndPath = path.resolve(process.cwd(), fileName);
+
     try {
-      await fs.writeFile(fileName, data, {
+      await fs.writeFile(fullFileAndPath, data, {
         encoding: 'utf-8',
       });
     } catch (fileWriteError) {
@@ -42,10 +46,12 @@ class Outputter {
       outputFileName = `${fileName}.${outputFileName}`;
     }
 
+    const fullFileAndPath = path.resolve(process.cwd(), outputFileName);
+
     try {
       const jsonifiedData = jsonifyData(data);
 
-      await this.writeFileAsync(jsonifiedData, outputFileName);
+      await this.writeFileAsync(jsonifiedData, fullFileAndPath);
     } catch (writeDataAsyncError) {
       await this.log.errorToFileAsync(writeDataAsyncError);
     }
