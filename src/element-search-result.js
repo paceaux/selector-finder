@@ -6,7 +6,7 @@ class ElementSearchResult {
     this.applyAttributes(element);
     this.innerText = element.text || element.innerText;
     this.selector = element.cssSelector || element.selector;
-    this.html = cheerio.html(element);
+    this.html = cheerio.load(element, null, false);
   }
 
   static extractAttributes(element) {
