@@ -1,8 +1,11 @@
 {
-  "name": "selector-finder",
+  "name": "selector-hound",
   "version": "1.3.0",
   "description": "Find an element that matches a particular CSS selector on a website ",
   "main": "cli.js",
+  "bin": {
+    "SelectorHound": "./cli.js"
+  },
   "scripts": {
     "lint": "eslint -f table src/**/*.js test/**/*.js cli.js",
     "lint:fix": "eslint --fix src/**/*.js test/**/*.js cli.js",
