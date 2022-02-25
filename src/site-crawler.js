@@ -99,7 +99,7 @@ class SiteCrawler {
     return result;
   }
 
-/**
+  /**
  * @description makes an ajax request for a url
  * @param  {string} url
  *
@@ -116,7 +116,7 @@ class SiteCrawler {
     return result;
   }
 
-/**
+  /**
    * @description Gets an XML Sitemap
    * @param  {string} [sitemapUrl=this.config.startPage] fully qualified url
    *
@@ -217,6 +217,10 @@ class SiteCrawler {
     return links;
   }
 
+  /**
+   * @description Crawls a page and adds links to the linkSet
+   * @param  {string} url fully qualified usrl to page
+   */
   async crawlPageAsync(url) {
     try {
       const pageLinks = await this.getLinksFromPageAsync(url);
@@ -226,6 +230,10 @@ class SiteCrawler {
     }
   }
 
+  /**
+   * @description Crawls entire site looking for links
+   * @param  {string} url=this.config.startPage
+   */
   async crawlSiteAsync(url = this.config.startPage) {
     try {
       await this.crawlPageAsync(url);
@@ -237,6 +245,10 @@ class SiteCrawler {
     }
   }
 
+  /**
+   * @description Exports all of the collected site links to a file
+   * @param {string} [fileName=this.exportFileName] Name of file to be concatenated to sitemap.json
+   */
   async exportSiteLinks(fileName = this.exportFileName) {
     try {
       await this.outputter.writeDataAsync(this.urlset, fileName);
@@ -245,6 +257,10 @@ class SiteCrawler {
     }
   }
 
+  /**
+   * @description Crawls. Wrapper for crawl, in case other functionality should be added
+   * @param  {string} startPage=this.config.startPage
+   */
   async crawl(startPage = this.config.startPage) {
     try {
       await this.crawlSiteAsync(startPage);
@@ -253,6 +269,10 @@ class SiteCrawler {
     }
   }
 
+  /**
+   * @description Fetches a sitemap and adds links to linkset
+   * @param  {string} [sitemapUrl=this.config.startPage]
+   */
   async setSitemap(sitemapUrl = this.config.startPage) {
     this.config.startPage = sitemapUrl;
 
@@ -265,6 +285,10 @@ class SiteCrawler {
     }
   }
 
+  /**
+   * @description wrapper for crawl and setSitemap that also produces export file
+   * @param  {boolean} [shouldCrawl=this.config.shouldCrawl]
+   */
   async produceSiteLinks(shouldCrawl = this.config.shouldCrawl) {
     if (shouldCrawl) {
       await this.crawl();
