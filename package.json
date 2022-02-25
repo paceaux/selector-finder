@@ -2,10 +2,10 @@
   "name": "selector-finder",
   "version": "1.3.0",
   "description": "Find an element that matches a particular CSS selector on a website ",
-  "main": "index.js",
+  "main": "cli.js",
   "scripts": {
-    "lint": "eslint -f table src/**/*.js test/**/*.js index.js",
-    "lint:fix": "eslint --fix src/**/*.js test/**/*.js index.js",
+    "lint": "eslint -f table src/**/*.js test/**/*.js cli.js",
+    "lint:fix": "eslint --fix src/**/*.js test/**/*.js cli.js",
     "test": "jest"
   },
   "author": "Frank M. Taylor",
