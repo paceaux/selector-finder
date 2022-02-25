@@ -1,5 +1,5 @@
 const LOG_FILE_NAME = 'log.txt';
-const DEFAULT_SITEMAP_URL = 'https://exlrt.com/sitemap.xml';
+const DEFAULT_SITEMAP_URL = 'https://frankmtaylor.com/sitemap.xml';
 const DEFAULT_SHOULD_CRAWL_SITEMAP = false;
 const DEFAULT_OUTPUT_FILE = 'pages.json';
 const DEFAULT_SELECTOR = '.title';
