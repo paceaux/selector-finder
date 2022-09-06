@@ -146,6 +146,8 @@ describe('SiteCrawler:Crawling', () => {
       expect(SiteCrawler).toHaveProperty('defaultConfig');
       expect(SiteCrawler.defaultConfig).toHaveProperty('startPage', 'https://frankmtaylor.com');
       expect(SiteCrawler.defaultConfig).toHaveProperty('linkSelector', 'a[href]');
+      expect(SiteCrawler.defaultConfig).toHaveProperty('shouldCrawl', false);
+      expect(SiteCrawler.defaultConfig).toHaveProperty('useExportedSitemap', true);
     });
   });
   describe('static getPageAsync', () => {
@@ -217,6 +219,25 @@ describe('SiteCrawler:Crawling', () => {
       expect(filteredLinks).toEqual(
         expect.arrayContaining(['/foo', '/foo/bar', '/foo#beep']),
       );
+    });
+  });
+  describe('getters', () => {
+    const siteCrawler = new SiteCrawler();
+
+    test('it has an origin', () => {
+      expect(siteCrawler.origin).toEqual('https://frankmtaylor.com');
+    });
+    test('it has an host', () => {
+      expect(siteCrawler.host).toEqual('frankmtaylor.com');
+    });
+    test('exportFileName', () => {
+      expect(siteCrawler.exportFileName).toEqual('frankmtaylor.com');
+    });
+    test('pathToExportedFile', () => {
+      expect(siteCrawler.pathToExportedFile).toEqual(`${process.cwd()}/frankmtaylor.com.sitemap.json`);
+    });
+    test('hasExportedLinks', () => {
+      expect(siteCrawler.hasExportedLinks).toEqual(false);
     });
   });
   describe('getLinksFromPageAsync', () => {
@@ -364,6 +385,13 @@ describe('SiteCrawler: Fetching Sitemap', () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
       await siteCrawler.setSitemap();
       expect(siteCrawler.urlset.length).toEqual(7);
+    });
+  });
+  describe('produceSiteLinks', () => {
+    test('when produceSiteLinks is run, a file is created and it knows it', async () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
+      await siteCrawler.produceSiteLinks();
+      expect(siteCrawler.hasExportedLinks).toEqual(true);
     });
   });
 });

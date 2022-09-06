@@ -1,4 +1,7 @@
+/* eslint-disable max-len */
 const axios = require('axios');
+const fs = require('fs');
+const Path = require('path');
 const cheerio = require('cheerio');
 const { Parser } = require('xml2js');
 
@@ -14,6 +17,7 @@ const DEFAULT_CONFIG = {
   startPage: 'https://frankmtaylor.com',
   linkSelector: 'a[href]',
   shouldCrawl: false,
+  useExportedSitemap: true,
 };
 
 const DEFAULT_LIBRARIES = {
@@ -68,6 +72,22 @@ class SiteCrawler {
         };
       });
     return linkArray;
+  }
+
+  /**
+   * @description provides a fully qualified path to the sitemap json file
+   * @type {string}
+   */
+  get pathToExportedFile() {
+    return Path.join(process.cwd(), `${this.exportFileName}.${this.outputter.defaultOutputFile}`);
+  }
+
+  /**
+   * @description determines if the links have already been exported to a file
+   * @type {boolean}
+   */
+  get hasExportedLinks() {
+    return fs.existsSync(this.pathToExportedFile);
   }
 
   /**
@@ -288,8 +308,20 @@ class SiteCrawler {
   /**
    * @description wrapper for crawl and setSitemap that also produces export file
    * @param  {boolean} [shouldCrawl=this.config.shouldCrawl]
+   * @param {boolean} [useExportedSitemap=this.config.useExportedSitemap] use existing file if already exists
    */
-  async produceSiteLinks(shouldCrawl = this.config.shouldCrawl) {
+  async produceSiteLinks(
+    shouldCrawl = this.config.shouldCrawl,
+    useExportedSitemap = this.config.useExportedSitemap,
+  ) {
+    const shouldNotProduceLinks = useExportedSitemap && this.hasExportedLinks;
+    if (shouldNotProduceLinks) {
+      const alreadyExistsMessage = `The file ${this.pathToExportedFile} already exists and recrawling was not forced.`;
+      await log.infoToFileAsync(alreadyExistsMessage);
+      await log.toConsole(alreadyExistsMessage);
+      return;
+    }
+
     if (shouldCrawl) {
       await this.crawl();
     } else {
