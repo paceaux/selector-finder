@@ -138,6 +138,7 @@ describe('SiteCrawler:Crawling', () => {
       expect(SiteCrawler).toHaveProperty('defaultLibraries');
       expect(SiteCrawler.defaultLibraries).toHaveProperty('ajax');
       expect(SiteCrawler.defaultLibraries).toHaveProperty('dom');
+      expect(SiteCrawler.defaultLibraries).toHaveProperty('Parser');
     });
   });
   describe('defaultConfig', () => {

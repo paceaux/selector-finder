@@ -16,7 +16,6 @@ describe('SelectorFinder', () => {
       expect(SelectorFinder).toHaveProperty('defaultLibraries');
       expect(SelectorFinder.defaultLibraries).toHaveProperty('ajax');
       expect(SelectorFinder.defaultLibraries).toHaveProperty('dom');
-      expect(SelectorFinder.defaultLibraries).toHaveProperty('Parser');
       expect(SelectorFinder.defaultLibraries).toHaveProperty('emulator');
     });
   });
