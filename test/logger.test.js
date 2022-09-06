@@ -39,13 +39,13 @@ A Test
 
       expect(typeof log.timerEnd).toBe('number');
       expect(log.timerEnd).toBeLessThanOrEqual(Date.now());
-      expect(log.timerEnd).toBeGreaterThan(log.timerStart);
+      expect(log.timerEnd).toBeGreaterThanOrEqual(log.timerStart);
     });
     test('elapsedTime', () => {
       log.endTimer();
 
       expect(typeof log.elapsedTime).toBe('number');
-      expect(log.elapsedTime).toBeGreaterThan(0);
+      expect(log.elapsedTime).toBeGreaterThanOrEqual(0);
     });
     test('startTimer deletes the timerEnd property', () => {
       log.startTimer();
