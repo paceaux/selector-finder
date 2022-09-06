@@ -20,21 +20,6 @@ describe('SelectorFinder', () => {
       expect(SelectorFinder.defaultLibraries).toHaveProperty('emulator');
     });
   });
-  describe('getting Sitemap', () => {
-    const response = { data: '<?xml version="1.0" encoding="UTF-8"?>\n<?xml-stylesheet type="text/xsl" href="https://blog.frankmtaylor.com/wp-sitemap.xsl" ?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://blog.frankmtaylor.com/2012/04/26/learning-css-selectors-from-newbie-to-ninja/</loc></url><url><loc>https://blog.frankmtaylor.com/2012/04/27/css-sorcery-performing-magic-with-the-attribute-selector/</loc></url></urlset>\n' };
-    const selectorFinder = new SelectorFinder({}, { ajax: axios });
-    test('getFileAsync', async () => {
-      axios.mockImplementation(() => Promise.resolve(response));
-      const result = await selectorFinder.getFileAsync('https://google.com');
-
-      expect(result).toEqual(response.data);
-    });
-    test('getSitemapAsync', async () => {
-      axios.mockImplementation(() => Promise.resolve(response));
-      const sitemap = await selectorFinder.getSitemapAsync('https://blog.frankmtaylor.com/wp-sitemap-posts-post-1.xml');
-      expect(sitemap).toHaveProperty('urlset');
-    });
-  });
   describe('getResultFromStaticPage', () => {
     test('the result is a PageSearchResult', async () => {
       jest.mock('../src/page-search-result');

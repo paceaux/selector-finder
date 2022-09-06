@@ -124,6 +124,14 @@ axios.mockImplementation((url) => {
   }
 });
 
+describe('getting file', () => {
+  const siteCrawler = new SiteCrawler();
+  test('getFileAsync', async () => {
+    const result = await siteCrawler.getFileAsync('https://frankmtaylor.com/qualified/');
+
+    expect(result).toEqual(MOCK_DATA.fullyQualified);
+  });
+});
 describe('SiteCrawler:Crawling', () => {
   describe('defaultLibraries', () => {
     test('it has default libraries', () => {
