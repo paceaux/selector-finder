@@ -12,6 +12,13 @@ Pages not showing up that should? Check the `log.txt` for any issues.
 
 ## Installation
 
+### Prerequisites
+- Node LTS (as of September 2022, Node 16.17.0)
+
+- If you want to use the `-d` or `-c` (`--isSpa` and `--takeScreenshots` options), this requires Puppeteer which in turn requires Chromium.  
+
+- If running this on a Mac, be sure you install chromium without a quarantine flag: `brew install chromium --no-quarantine`
+
 ### Running on-demand:
 Download this package. Then run
 
