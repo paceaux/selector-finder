@@ -42,6 +42,12 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'boolean',
     default: DEFAULT_CRAWL,
   })
+  .option('dontUseExportedSitemap', {
+    alias: 'X',
+    description: 'Force the Site Crawler to refetch links and ignore an existing sitemap',
+    type: 'boolean',
+    default: false,
+  })
   .option('limit', {
     alias: 'l',
     description: 'how many pages to crawl',
@@ -96,6 +102,7 @@ const {
   sitemap,
   crawl,
   limit,
+  dontUseExportedSitemap,
   selector,
   outputFileName,
   takeScreenshots,
@@ -109,6 +116,7 @@ const selectorFinderConfig = {
   sitemap,
   crawl,
   limit,
+  useExportedSitemap: !dontUseExportedSitemap,
   selector,
   outputFileName,
   takeScreenshots,
@@ -175,7 +183,8 @@ async function main(config) {
 ${mainConfig.cssFile ? `| cssFile (${cssFile})` : ''}         
 ${mainConfig.selector && !mainConfig.cssFile ? `| CSS Selector (${mainConfig.selector})` : ''}         
 ${mainConfig.isSpa ? '| Handle as Single Page Application' : ''}         
-${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}         
+${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}  
+${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file and fetch a sitemap or recrawl'}       
 `;
     await log
       .toConsole(startMessage)
@@ -191,6 +200,7 @@ ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}
       {
         startPage: mainConfig.sitemap,
         shouldCrawl: mainConfig.crawl,
+        useExportedSitemap: mainConfig.useExportedSitemap,
       },
     );
     await log.toConsole(`
@@ -199,9 +209,15 @@ ${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}
       `);
     await siteCrawler.produceSiteLinks();
 
-    await log.toConsole(`
+    if (!mainConfig.useExportedSitemap) {
+      await log.toConsole(`
       ||-> Site links exported to ${siteCrawler.exportFileName}
-    `);
+      `);
+    } else {
+      await log.toConsole(`
+      ||-> Site links read from ${siteCrawler.exportFileName}
+      `);
+    }
 
     mainConfig.siteCrawler = siteCrawler;
 
