@@ -291,7 +291,11 @@ class SelectorFinder {
 
     try {
       if (usePuppeteer) {
-        browser = await this.libraries.emulator.launch();
+        browser = await this.libraries.emulator.launch({
+          headless: true,
+          ignoreDefaultArgs: ['--disable-extensions'],
+          args: ['--use-gl=egl'],
+        });
       }
 
       results = await this.searchPagesAsync(sitemapJson, selector, browser, takeScreenshots);

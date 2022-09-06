@@ -124,12 +124,21 @@ axios.mockImplementation((url) => {
   }
 });
 
+describe('getting file', () => {
+  const siteCrawler = new SiteCrawler();
+  test('getFileAsync', async () => {
+    const result = await siteCrawler.getFileAsync('https://frankmtaylor.com/qualified/');
+
+    expect(result).toEqual(MOCK_DATA.fullyQualified);
+  });
+});
 describe('SiteCrawler:Crawling', () => {
   describe('defaultLibraries', () => {
     test('it has default libraries', () => {
       expect(SiteCrawler).toHaveProperty('defaultLibraries');
       expect(SiteCrawler.defaultLibraries).toHaveProperty('ajax');
       expect(SiteCrawler.defaultLibraries).toHaveProperty('dom');
+      expect(SiteCrawler.defaultLibraries).toHaveProperty('Parser');
     });
   });
   describe('defaultConfig', () => {
