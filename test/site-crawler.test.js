@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 const axios = require('axios');
-
+const fs = require('fs');
 const SiteCrawler = require('../src/site-crawler');
 
 jest.mock('axios');
@@ -122,6 +122,10 @@ axios.mockImplementation((url) => {
     default:
       return Promise.resolve({ data: MOCK_DATA.default });
   }
+});
+
+afterAll(async () => {
+  await fs.promises.unlink('frankmtaylor.com.sitemap.json');
 });
 
 describe('getting file', () => {
@@ -388,10 +392,12 @@ describe('SiteCrawler: Fetching Sitemap', () => {
     });
   });
   describe('produceSiteLinks', () => {
-    test('when produceSiteLinks is run, a file is created and it knows it', async () => {
+    test('when produceSiteLinks is run, a file is created and it knows it, and still has data', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
       await siteCrawler.produceSiteLinks();
       expect(siteCrawler.hasExportedLinks).toEqual(true);
+      expect(siteCrawler.linkSet.size).toBeGreaterThan(0);
+      expect(siteCrawler.linkSet.has('http://frankmtaylor.com'));
     });
   });
 });

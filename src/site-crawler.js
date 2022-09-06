@@ -92,10 +92,18 @@ class SiteCrawler {
 
   /**
    * adds multiple items to the linkSet property
-   * @param  {string[]} linkArray an array of href values
+   * @param  {string[]|object[]} linkArray an array of href values, or objects with a loc property
    */
   addLinks(linkArray) {
-    this.linkSet = new Set([...this.linkSet, ...linkArray]);
+    const cleanArray = linkArray.map((link) => {
+      if (typeof link === 'string') {
+        return link;
+      }
+      if (typeof link === 'object' && link.loc) {
+        return link.loc;
+      }
+    });
+    this.linkSet = new Set([...this.linkSet, ...cleanArray]);
   }
 
   /**
@@ -306,6 +314,21 @@ class SiteCrawler {
   }
 
   /**
+   * @description sets links from an existing json file
+   * @param  {string} fileName
+   */
+  async setLinksFromJsonFile(fileName) {
+    if (!fileName) return;
+    try {
+      const existingJson = await fs.promises.readFile(fileName, 'utf-8');
+      const existingSiteLinks = JSON.parse(existingJson);
+      this.addLinks(existingSiteLinks);
+    } catch (setLinksError) {
+      await this.errorToFileAsync(setLinksError);
+    }
+  }
+
+  /**
    * @description wrapper for crawl and setSitemap that also produces export file
    * @param  {boolean} [shouldCrawl=this.config.shouldCrawl]
    * @param {boolean} [useExportedSitemap=this.config.useExportedSitemap] use existing file if already exists
@@ -319,6 +342,7 @@ class SiteCrawler {
       const alreadyExistsMessage = `The file ${this.pathToExportedFile} already exists and recrawling was not forced.`;
       await log.infoToFileAsync(alreadyExistsMessage);
       await log.toConsole(alreadyExistsMessage);
+      await this.setLinksFromJsonFile(`${this.exportFileName}.${this.outputter.defaultOutputFile}`);
       return;
     }
 
