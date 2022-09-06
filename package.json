@@ -36,18 +36,18 @@
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.5",
     "colors": "1.4.0",
-    "cssom": "^0.4.4",
-    "puppeteer": "^5.5.0",
+    "cssom": "^0.5.0",
+    "puppeteer": "^17.1.1",
     "xml2js": "^0.4.23",
-    "yargs": "^16.2.0"
+    "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "eslint": "^7.17.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1",
-    "jest": "^26.6.3",
+    "eslint": "^8.23.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "jest": "^29.0.2",
     "jest-environment-node": "^26.6.2",
-    "jest-puppeteer": "^4.4.0",
+    "jest-puppeteer": "^6.1.1",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   }
