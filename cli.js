@@ -175,6 +175,11 @@ function getFormattedResult(result, hasElementDetails, hasElementHtml) {
 async function main(config) {
   const outputter = new Outputter(DEFAULT_OUTPUT_FILE, log);
   let mainConfig = { ...config };
+  if (!mainConfig.sitemap) {
+    await log.toConsole('No sitemap provided. Exiting.');
+    await log.errorToFileAsync('No sitemap provided. Exiting.');
+    return;
+  }
   try {
     const startMessage = `
 | Looking...                
@@ -219,6 +224,14 @@ ${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file
       `);
     }
 
+    if (siteCrawler.linkSet.size === 0) {
+      const noLinksMessage = `
+      ||-> No links found. Nothing To search.`;
+      await log
+        .toConsole(noLinksMessage)
+        .infoToFileAsync(noLinksMessage);
+      return;
+    }
     mainConfig.siteCrawler = siteCrawler;
 
     const selectorFinder = new SelectorFinder(mainConfig);
