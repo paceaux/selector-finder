@@ -102,6 +102,7 @@ class SiteCrawler {
       if (typeof link === 'object' && link.loc) {
         return link.loc;
       }
+      return '';
     });
     this.linkSet = new Set([...this.linkSet, ...cleanArray]);
   }
@@ -158,7 +159,11 @@ class SiteCrawler {
       const parser = new this.libraries.Parser();
       parsedXml = await parser.parseStringPromise(data);
     } catch (getSitemapError) {
-      await log.errorToFileAsync(getSitemapError);
+      await log
+        .errorToFileAsync(getSitemapError)
+        .errorToConsoleAsync(
+          `Couldn't get the sitemap:\n ${getSitemapError}`,
+        );
     }
     return parsedXml;
   }
