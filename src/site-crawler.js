@@ -102,6 +102,7 @@ class SiteCrawler {
       if (typeof link === 'object' && link.loc) {
         return link.loc;
       }
+      return '';
     });
     this.linkSet = new Set([...this.linkSet, ...cleanArray]);
   }
