@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
 
-const {
+import {
   LOG_FILE_NAME,
   DEFAULT_SITEMAP_URL,
   DEFAULT_SELECTOR,
@@ -14,12 +14,13 @@ const {
   DEFAULT_SHOW_ELEMENT_DETAILS,
   DEFAULT_SHOW_HTML,
   DEFAULT_CRAWL,
-} = require('./src/constants');
-const SelectorFinder = require('./src/selector-finder');
-const SiteCrawler = require('./src/site-crawler');
-const Outputter = require('./src/outputter');
-const Log = require('./src/logger');
-const CSSReader = require('./src/css-reader');
+} from './src/constants.js';
+
+import SelectorFinder from './src/selector-finder.js';
+import SiteCrawler from './src/site-crawler.js';
+import Outputter from './src/outputter.js';
+import Log from './src/logger.js';
+import CSSReader from './src/css-reader.js';
 
 const log = new Log(LOG_FILE_NAME);
 

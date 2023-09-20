@@ -1,4 +1,4 @@
-const { convertMapToObject, jsonifyData } = require('../src/utils');
+import { convertMapToObject, jsonifyData } from '../src/utils.js';
 
 describe('utils', () => {
   describe('convertMapToObject', () => {

@@ -1,13 +1,13 @@
 /* This is a logger; it needs to write to console. */
 /* eslint-disable no-console */
-const colors = require('chalk');
-const process = require('process');
-const path = require('path');
-const { promises } = require('fs');
+import colors from 'chalk';
+import process from 'process';
+import path from 'path';
+import { promises } from 'fs';
 
 const fs = promises;
 
-class Log {
+export default class Log {
   constructor(logFile) {
     this.logFile = path.resolve(process.cwd(), logFile);
   }
@@ -91,5 +91,3 @@ ${info}
     return (elapsedTime / 1000);
   }
 }
-
-module.exports = Log;

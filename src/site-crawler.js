@@ -1,15 +1,14 @@
 /* eslint-disable max-len */
-const axios = require('axios');
-const fs = require('fs');
-const Path = require('path');
-const cheerio = require('cheerio');
-const { Parser } = require('xml2js');
+import axios from 'axios';
+import fs from 'fs';
+import Path from 'path';
+import cheerio from 'cheerio';
+import { Parser } from 'xml2js';
 
-const { LOG_FILE_NAME } = require('./constants');
-const Log = require('./logger');
-const Outputter = require('./outputter');
-
-const { forEachAsync } = require('./utils');
+import { LOG_FILE_NAME } from './constants.js';
+import Log from './logger.js';
+import Outputter from './outputter.js';
+import { forEachAsync } from './utils.js';
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -26,7 +25,7 @@ const DEFAULT_LIBRARIES = {
   Parser,
 };
 
-class SiteCrawler {
+export default class SiteCrawler {
   constructor(config, libraries) {
     this.config = { ...SiteCrawler.defaultConfig, ...config };
     this.libraries = { ...SiteCrawler.defaultLibraries, ...libraries };
@@ -359,5 +358,3 @@ class SiteCrawler {
     await this.exportSiteLinks(this.exportFileName);
   }
 }
-
-module.exports = SiteCrawler;

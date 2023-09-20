@@ -17,5 +17,6 @@
         "afterAll": true
     },
     "rules": {
+        "import/extensions": "off"
     }
 }
