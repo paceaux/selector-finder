@@ -1,6 +1,4 @@
-const axios = require('axios');
-
-const SiteCrawler = require('../src/site-crawler');
+import SiteCrawler from '../src/site-crawler.js';
 
 describe('SiteCrawler External', () => {
   test('it crawls a site and collects all of the links', async () => {
@@ -18,20 +16,17 @@ describe('SiteCrawler External', () => {
 
     await siteCrawler.setSitemap();
     expect(siteCrawler.urlset.length).toBeGreaterThan(12);
-    console.log(siteCrawler.urlset);
   });
   test.skip('it can produce siteLinks:false, which is a sitemap', async () => {
     const siteCrawler = new SiteCrawler({ startPage: 'http://frankmtaylor.com/sitemap.xml' });
 
     await siteCrawler.produceSiteLinks(false);
     expect(siteCrawler.urlset.length).toBeGreaterThan(12);
-    console.log(siteCrawler.urlset);
   });
   test('it can produce siteLinks:true, which is a crawl', async () => {
     const siteCrawler = new SiteCrawler({ startPage: 'http://frankmtaylor.com/sitemap.xml' });
 
     await siteCrawler.produceSiteLinks(false);
     expect(siteCrawler.urlset.length).toBeGreaterThan(12);
-    console.log(siteCrawler.urlset);
   });
 });

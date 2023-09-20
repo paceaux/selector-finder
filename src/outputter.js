@@ -1,14 +1,14 @@
-const { promises } = require('fs');
-const process = require('process');
-const path = require('path');
+import { promises } from 'fs';
+import process from 'process';
+import path from 'path';
+
+import { LOG_FILE_NAME, DEFAULT_OUTPUT_FILE } from './constants.js';
+import { jsonifyData } from './utils.js';
+import Log from './logger.js';
 
 const fs = promises;
 
-const { LOG_FILE_NAME, DEFAULT_OUTPUT_FILE } = require('./constants');
-const { jsonifyData } = require('./utils');
-const Log = require('./logger');
-
-class Outputter {
+export default class Outputter {
   constructor(defaultOutputFile = DEFAULT_OUTPUT_FILE, logger = new Log(LOG_FILE_NAME)) {
     this.defaultOutputFile = defaultOutputFile;
     this.log = logger;
@@ -57,5 +57,3 @@ class Outputter {
     }
   }
 }
-
-module.exports = Outputter;

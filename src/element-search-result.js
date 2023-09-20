@@ -1,6 +1,6 @@
-const cheerio = require('cheerio');
+import cheerio from 'cheerio';
 
-class ElementSearchResult {
+export default class ElementSearchResult {
   constructor(element) {
     this.tag = element.name || element.localName;
     this.applyAttributes(element);
@@ -30,5 +30,3 @@ class ElementSearchResult {
     }
   }
 }
-
-module.exports = ElementSearchResult;

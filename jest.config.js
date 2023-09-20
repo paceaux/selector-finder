@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/en/configuration.html
  */
 
-module.exports = {
+export default {
 
   // All imported modules in your tests should be mocked automatically
   // automock: false,
@@ -56,7 +56,7 @@ module.exports = {
   // Force coverage collection from ignored files using an array of glob patterns
   // forceCoverageMatch: [],
 
-  // A path to a module which exports an async function that is triggered once before 
+  // A path to a module which exports an async function that is triggered once before
   // all test suites
   globalSetup: './test/config/setup.js',
 
@@ -140,7 +140,7 @@ module.exports = {
   // set up the testing framework before each test
   // setupFilesAfterEnv: [],
 
-  // The number of seconds after which a test is considered as slow 
+  // The number of seconds after which a test is considered as slow
   // and reported as such in the results.
   // slowTestThreshold: 5,
 
@@ -185,7 +185,7 @@ module.exports = {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  transform: {},
 
   // An array of regexp pattern strings that are matched against all source file paths,
   // matched files will skip transformation

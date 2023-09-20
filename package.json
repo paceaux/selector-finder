@@ -2,6 +2,7 @@
   "name": "selector-hound",
   "version": "1.4.1",
   "description": "Find an element that matches a particular CSS selector on a website ",
+  "type": "module",
   "keywords": [
     "CSS",
     "selector",
@@ -15,7 +16,7 @@
   "scripts": {
     "lint": "eslint -f table src/**/*.js test/**/*.js cli.js",
     "lint:fix": "eslint --fix src/**/*.js test/**/*.js cli.js",
-    "test": "jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "repository": {
     "type": "git",

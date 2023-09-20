@@ -1,10 +1,13 @@
-const { promises } = require('fs');
+import { promises } from 'fs';
+import { fileURLToPath } from 'path';
+
+import PageSearchResult from '../src/page-search-result.js';
+import ElementSearchResult from '../src/element-search-result.js';
+import SelectorFinder from '../src/selector-finder.js';
 
 const fs = promises;
-
-const PageSearchResult = require('../src/page-search-result');
-const ElementSearchResult = require('../src/element-search-result');
-const SelectorFinder = require('../src/selector-finder');
+// eslint-disable-next-line no-underscore-dangle
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const timeout = 5000;
 describe('getResultFromSpaPage', () => {

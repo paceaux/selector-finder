@@ -1,7 +1,8 @@
 /* eslint-disable no-undef */
-const axios = require('axios');
-const fs = require('fs');
-const SiteCrawler = require('../src/site-crawler');
+import axios from 'axios';
+import fs from 'fs';
+
+import SiteCrawler from '../src/site-crawler.js';
 
 jest.mock('axios');
 

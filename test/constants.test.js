@@ -1,4 +1,4 @@
-const {
+import {
   LOG_FILE_NAME,
   DEFAULT_SITEMAP_URL,
   DEFAULT_SHOULD_CRAWL_SITEMAP,
@@ -7,7 +7,7 @@ const {
   DEFAULT_IS_SPA,
   DEFAULT_LIMIT,
   DEFAULT_TAKE_SCREENSHOTS,
-} = require('../src/constants');
+} from '../src/constants.js';
 
 describe('constants', () => {
   test('log file', () => {

@@ -3,7 +3,7 @@
  * @param  {array} array items to iterate over
  * @param  {function} callback asynchronous callback to execute
  */
-async function forEachAsync(array, callback) {
+export async function forEachAsync(array, callback) {
   for (let index = 0; index < array.length; index += 1) {
     // the entire friggin' point of this function is this problem
     // eslint-disable-next-line no-await-in-loop
@@ -17,7 +17,7 @@ async function forEachAsync(array, callback) {
  *
  * @returns {Object}
  */
-function convertMapToObject(map) {
+export function convertMapToObject(map) {
   if (Object.getPrototypeOf(map) !== Map.prototype) {
     return map;
   }
@@ -37,13 +37,7 @@ function convertMapToObject(map) {
  *
  * @returns {string}
  */
-function jsonifyData(data) {
+export function jsonifyData(data) {
   const convertedMap = convertMapToObject(data);
   return JSON.stringify(convertedMap, null, 2);
 }
-
-module.exports = {
-  convertMapToObject,
-  forEachAsync,
-  jsonifyData,
-};
