@@ -1,6 +1,6 @@
 /* This is a logger; it needs to write to console. */
 /* eslint-disable no-console */
-const colors = require('colors/safe');
+const colors = require('chalk');
 const process = require('process');
 const path = require('path');
 const { promises } = require('fs');
