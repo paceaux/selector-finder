@@ -9,8 +9,7 @@ import ElementSearchResult from '../src/element-search-result.js';
 import SelectorFinder from '../src/selector-finder.js';
 
 const fs = promises;
-// eslint-disable-next-line no-underscore-dangle
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const rootDir = fileURLToPath(new URL('..', import.meta.url));
 
 const timeout = 5000;
 describe('getResultFromSpaPage', () => {
@@ -22,7 +21,7 @@ describe('getResultFromSpaPage', () => {
     await fs.writeFile(testHTMLPageName, testHTML);
     // eslint-disable-next-line no-underscore-dangle
     page = await global.__BROWSER__.newPage();
-    await page.goto(`file:///${__dirname}/../${testHTMLPageName}`);
+    await page.goto(`file:///${rootDir}/${testHTMLPageName}`);
   }, timeout);
 
   afterAll(async () => {
