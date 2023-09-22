@@ -1,11 +1,13 @@
 /* eslint-disable no-undef */
-import axios from 'axios';
+
+import { jest } from '@jest/globals';
 import fs from 'fs';
 
 import SiteCrawler from '../src/site-crawler.js';
 
-jest.mock('axios');
+const axios = await import('axios');
 
+jest.unstable_mockModule('axios', () => axios);
 const MOCK_DATA = {
   default: '<DOCTYPE html><html><head></head><body></body></html>',
   portfolio: `<DOCTYPE html><html><head></head><body>
@@ -131,6 +133,8 @@ afterAll(async () => {
 
 describe('getting file', () => {
   const siteCrawler = new SiteCrawler();
+  siteCrawler.libraries.axios = axios;
+
   test('getFileAsync', async () => {
     const result = await siteCrawler.getFileAsync('https://frankmtaylor.com/qualified/');
 
