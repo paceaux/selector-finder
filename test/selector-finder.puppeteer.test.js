@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./test/config/puppeteer_environment.js
+ */
 import { promises } from 'fs';
 import { fileURLToPath } from 'url';
 
