@@ -5,9 +5,13 @@ import fs from 'fs';
 
 import SiteCrawler from '../src/site-crawler.js';
 
-const axios = await import('axios');
+jest.unstable_mockModule('axios', () => ({ 
+  default: jest.fn(),
+}));
 
-jest.unstable_mockModule('axios', () => axios);
+const {default: axios } = await import('axios');
+
+
 const MOCK_DATA = {
   default: '<DOCTYPE html><html><head></head><body></body></html>',
   portfolio: `<DOCTYPE html><html><head></head><body>

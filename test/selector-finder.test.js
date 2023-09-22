@@ -6,8 +6,12 @@ import PageSearchResult from '../src/page-search-result.js';
 import ElementSearchResult from '../src/element-search-result.js';
 import SelectorFinder from '../src/selector-finder.js';
 
-const axios = await import('axios');
-jest.unstable_mockModule('axios', () => axios);
+jest.unstable_mockModule('axios', () => ({ 
+  default: jest.fn(),
+}));
+
+const {default: axios } = await import('axios');
+
 describe('SelectorFinder', () => {
   beforeEach(() => {
   });
