@@ -1,5 +1,5 @@
 import { promises } from 'fs';
-import { fileURLToPath } from 'path';
+import { fileURLToPath } from 'url';
 
 import PageSearchResult from '../src/page-search-result.js';
 import ElementSearchResult from '../src/element-search-result.js';
