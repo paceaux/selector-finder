@@ -148,7 +148,7 @@ export default {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: './test/config/puppeteer_environment.js',
+  // testEnvironment: './test/config/puppeteer_environment.js',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
