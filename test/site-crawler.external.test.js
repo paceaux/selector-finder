@@ -1,4 +1,9 @@
+import { unlink } from 'fs/promises';
 import SiteCrawler from '../src/site-crawler.js';
+
+afterAll(async () => {
+  await unlink('frankmtaylor.com.sitemap.json');
+});
 
 describe('SiteCrawler External', () => {
   test('it crawls a site and collects all of the links', async () => {

@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-import fs from 'fs/promises';
+import { unlink } from 'fs/promises';
 
 import axios from './__mock__/axios.js';
 import SiteCrawler from '../src/site-crawler.js';
@@ -125,7 +125,7 @@ axios.mockImplementation((url) => {
 });
 
 afterAll(async () => {
-  await fs.promises.unlink('frankmtaylor.com.sitemap.json');
+  await unlink('frankmtaylor.com.sitemap.json');
 });
 
 describe('getting file', () => {
