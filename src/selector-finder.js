@@ -1,12 +1,12 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
+import axios from 'axios';
+import cheerio from 'cheerio';
+import puppeteer from 'puppeteer';
 
-const { LOG_FILE_NAME } = require('./constants');
-const { forEachAsync } = require('./utils');
-const Log = require('./logger');
-const PageSearchResult = require('./page-search-result');
-const SiteSearchResult = require('./site-search-result');
+import { LOG_FILE_NAME } from './constants.js';
+import { forEachAsync } from './utils.js';
+import Log from './logger.js';
+import PageSearchResult from './page-search-result.js';
+import SiteSearchResult from './site-search-result.js';
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -15,7 +15,7 @@ const DEFAULT_LIBRARIES = {
   dom: cheerio,
   emulator: puppeteer,
 };
-class SelectorFinder {
+export default class SelectorFinder {
   constructor(config, libraries) {
     this.config = config;
     this.libraries = { ...SelectorFinder.defaultLibraries, ...libraries };
@@ -384,5 +384,3 @@ class SelectorFinder {
     return results;
   }
 }
-
-module.exports = SelectorFinder;

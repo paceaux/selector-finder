@@ -1,11 +1,11 @@
-const { promises } = require('fs');
-const cssom = require('cssom');
+import { promises } from 'fs';
+import cssom from 'cssom';
 
-const { LOG_FILE_NAME } = require('./constants');
-const Log = require('./logger');
+import { LOG_FILE_NAME } from './constants.js';
+import Log from './logger.js';
 
 const log = new Log(LOG_FILE_NAME);
-class CSSReader {
+export default class CSSReader {
   constructor(fileName) {
     if (fileName) {
       this.fileName = fileName;
@@ -67,5 +67,3 @@ class CSSReader {
     return selectors;
   }
 }
-
-module.exports = CSSReader;

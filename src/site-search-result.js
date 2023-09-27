@@ -1,4 +1,4 @@
-class SiteSearchResult extends Array {
+export default class SiteSearchResult extends Array {
   get totalMatches() {
     let total = 0;
 
@@ -11,5 +11,3 @@ class SiteSearchResult extends Array {
     return total;
   }
 }
-
-module.exports = SiteSearchResult;

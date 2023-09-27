@@ -1,25 +1,11 @@
-const LOG_FILE_NAME = 'log.txt';
-const DEFAULT_SITEMAP_URL = 'https://frankmtaylor.com/sitemap.xml';
-const DEFAULT_SHOULD_CRAWL_SITEMAP = false;
-const DEFAULT_OUTPUT_FILE = 'pages.json';
-const DEFAULT_SELECTOR = '.title';
-const DEFAULT_IS_SPA = false;
-const DEFAULT_LIMIT = 0;
-const DEFAULT_TAKE_SCREENSHOTS = false;
-const DEFAULT_SHOW_ELEMENT_DETAILS = false;
-const DEFAULT_SHOW_HTML = true;
-const DEFAULT_CRAWL = false;
-
-module.exports = {
-  LOG_FILE_NAME,
-  DEFAULT_SITEMAP_URL,
-  DEFAULT_SHOULD_CRAWL_SITEMAP,
-  DEFAULT_SELECTOR,
-  DEFAULT_OUTPUT_FILE,
-  DEFAULT_IS_SPA,
-  DEFAULT_LIMIT,
-  DEFAULT_TAKE_SCREENSHOTS,
-  DEFAULT_SHOW_ELEMENT_DETAILS,
-  DEFAULT_SHOW_HTML,
-  DEFAULT_CRAWL,
-};
+export const LOG_FILE_NAME = 'log.txt';
+export const DEFAULT_SITEMAP_URL = 'https://frankmtaylor.com/sitemap.xml';
+export const DEFAULT_SHOULD_CRAWL_SITEMAP = false;
+export const DEFAULT_OUTPUT_FILE = 'pages.json';
+export const DEFAULT_SELECTOR = '.title';
+export const DEFAULT_IS_SPA = false;
+export const DEFAULT_LIMIT = 0;
+export const DEFAULT_TAKE_SCREENSHOTS = false;
+export const DEFAULT_SHOW_ELEMENT_DETAILS = false;
+export const DEFAULT_SHOW_HTML = true;
+export const DEFAULT_CRAWL = false;

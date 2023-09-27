@@ -1,6 +1,7 @@
-const { promises } = require('fs');
-const Outputter = require('../src/outputter');
-const Logger = require('../src/logger');
+import { promises } from 'fs';
+
+import Outputter from '../src/outputter.js';
+import Logger from '../src/logger.js';
 
 const testFileName = 'test.txt';
 const customFileName = 'custom';

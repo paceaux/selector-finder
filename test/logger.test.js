@@ -1,5 +1,6 @@
-const { promises } = require('fs');
-const Logger = require('../src/logger');
+import { promises } from 'fs';
+
+import Logger from '../src/logger.js';
 
 afterAll(async () => {
   await promises.unlink('test.log.txt');
