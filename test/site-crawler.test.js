@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
-const axios = require('axios');
-const fs = require('fs');
-const SiteCrawler = require('../src/site-crawler');
 
-jest.mock('axios');
+import { unlink } from 'fs/promises';
+
+import axios from './__mock__/axios.js';
+import SiteCrawler from '../src/site-crawler.js';
 
 const MOCK_DATA = {
   default: '<DOCTYPE html><html><head></head><body></body></html>',
@@ -125,11 +125,14 @@ axios.mockImplementation((url) => {
 });
 
 afterAll(async () => {
-  await fs.promises.unlink('frankmtaylor.com.sitemap.json');
+  await unlink('frankmtaylor.com.sitemap.json');
 });
 
 describe('getting file', () => {
   const siteCrawler = new SiteCrawler();
+  siteCrawler.libraries.ajax = axios;
+
+
   test('getFileAsync', async () => {
     const result = await siteCrawler.getFileAsync('https://frankmtaylor.com/qualified/');
 
@@ -227,7 +230,7 @@ describe('SiteCrawler:Crawling', () => {
   });
   describe('getters', () => {
     const siteCrawler = new SiteCrawler();
-
+    siteCrawler.libraries.ajax = axios;
     test('it has an origin', () => {
       expect(siteCrawler.origin).toEqual('https://frankmtaylor.com');
     });
@@ -342,6 +345,8 @@ describe('SiteCrawler:Crawling', () => {
   describe('crawlSiteAsync', () => {
     test('it crawls a mock site and collects all of the links', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' });
+      siteCrawler.libraries.ajax = axios;
+
       await siteCrawler.crawlSiteAsync('https://frankmtaylor.com/work-history/');
       expect(siteCrawler.urlset.length).toEqual(8);
     });
@@ -349,6 +354,8 @@ describe('SiteCrawler:Crawling', () => {
   describe('crawl', () => {
     test('it crawls a mock site and collects all of the links', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com' });
+      siteCrawler.libraries.ajax = axios;
+
       await siteCrawler.crawlSiteAsync('https://frankmtaylor.com/work-history/');
       expect(siteCrawler.urlset.length).toEqual(8);
     });
@@ -373,6 +380,7 @@ describe('SiteCrawler: Fetching Sitemap', () => {
   describe('static getLinks', () => {
     test('it will create an array from a json object', async () => {
       const siteCrawler = new SiteCrawler();
+      siteCrawler.libraries.ajax = axios;
       const siteMapJson = await siteCrawler.getSitemapAsync('https://frankmtaylor.com/sitemap.xml');
       const sitemapLinks = SiteCrawler.getLinksFromSitemap(siteMapJson);
       expect(sitemapLinks).toBeInstanceOf(Array);
@@ -382,11 +390,15 @@ describe('SiteCrawler: Fetching Sitemap', () => {
   describe('setSitemap', () => {
     test('The linkSet will have the same links from sitemap', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
+      siteCrawler.libraries.ajax = axios;
+
       await siteCrawler.setSitemap();
       expect(siteCrawler.linkSet.size).toEqual(7);
     });
     test('the urlSet will have the same links from sitemap', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
+      siteCrawler.libraries.ajax = axios;
+
       await siteCrawler.setSitemap();
       expect(siteCrawler.urlset.length).toEqual(7);
     });

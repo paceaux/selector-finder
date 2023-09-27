@@ -1,10 +1,15 @@
-const { promises } = require('fs');
+/**
+ * @jest-environment ./test/config/puppeteer_environment.js
+ */
+import { promises } from 'fs';
+import { fileURLToPath } from 'url';
+
+import PageSearchResult from '../src/page-search-result.js';
+import ElementSearchResult from '../src/element-search-result.js';
+import SelectorFinder from '../src/selector-finder.js';
 
 const fs = promises;
-
-const PageSearchResult = require('../src/page-search-result');
-const ElementSearchResult = require('../src/element-search-result');
-const SelectorFinder = require('../src/selector-finder');
+const rootDir = fileURLToPath(new URL('..', import.meta.url));
 
 const timeout = 5000;
 describe('getResultFromSpaPage', () => {
@@ -16,7 +21,7 @@ describe('getResultFromSpaPage', () => {
     await fs.writeFile(testHTMLPageName, testHTML);
     // eslint-disable-next-line no-underscore-dangle
     page = await global.__BROWSER__.newPage();
-    await page.goto(`file:///${__dirname}/../${testHTMLPageName}`);
+    await page.goto(`file:///${rootDir}/${testHTMLPageName}`);
   }, timeout);
 
   afterAll(async () => {

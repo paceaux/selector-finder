@@ -1,12 +1,16 @@
 /* eslint-disable no-undef */
-const axios = require('axios');
-const cheerio = require('cheerio');
+import { jest } from '@jest/globals';
+import cheerio from 'cheerio';
 
-const PageSearchResult = require('../src/page-search-result');
-const ElementSearchResult = require('../src/element-search-result');
-const SelectorFinder = require('../src/selector-finder');
+import PageSearchResult from '../src/page-search-result.js';
+import ElementSearchResult from '../src/element-search-result.js';
+import SelectorFinder from '../src/selector-finder.js';
 
-jest.mock('axios');
+jest.unstable_mockModule('axios', () => ({ 
+  default: jest.fn(),
+}));
+
+const {default: axios } = await import('axios');
 
 describe('SelectorFinder', () => {
   beforeEach(() => {

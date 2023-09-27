@@ -1,6 +1,6 @@
-const ElementSearchResult = require('./element-search-result');
+import ElementSearchResult from './element-search-result.js';
 
-class PageSearchResult {
+export default class PageSearchResult {
   constructor(url) {
     this.url = url;
     this.elements = [];
@@ -42,5 +42,3 @@ class PageSearchResult {
     return this.elements.length;
   }
 }
-
-module.exports = PageSearchResult;

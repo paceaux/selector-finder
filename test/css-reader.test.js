@@ -1,8 +1,8 @@
-const { promises } = require('fs');
+import { promises } from 'fs';
 
-const Logger = require('../src/logger');
-const CSSReader = require('../src/css-reader');
-const Outputter = require('../src/outputter');
+import Logger from '../src/logger.js';
+import CSSReader from '../src/css-reader.js';
+import Outputter from '../src/outputter.js';
 
 const logger = new Logger('test.log.txt');
 const outputter = new Outputter('', logger);

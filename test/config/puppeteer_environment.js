@@ -1,14 +1,14 @@
 // puppeteer_environment.js
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const puppeteer = require('puppeteer');
-const NodeEnvironment = require('jest-environment-node');
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import puppeteer from 'puppeteer';
+import NodeEnvironment from 'jest-environment-node';
 
 const DIR = path.join(os.tmpdir(), 'jest_puppeteer_global_setup');
 
 // lint overrides b/c these are necessar
-class PuppeteerEnvironment extends NodeEnvironment {
+export default class PuppeteerEnvironment extends NodeEnvironment {
   // eslint-disable-next-line no-useless-constructor
   constructor(config) {
     super(config);
@@ -37,5 +37,3 @@ class PuppeteerEnvironment extends NodeEnvironment {
     return super.runScript(script);
   }
 }
-
-module.exports = PuppeteerEnvironment;
