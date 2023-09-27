@@ -178,6 +178,21 @@ export default class SiteCrawler {
   }
 
   /**
+   * @description gets links to sitemaps from a sitemap
+   * @param  {object} sitemapJson
+   * @returns {string[]} an array of href values to sitemaps
+   */
+  static getSitemapsFromSitemap(sitemapJson) {
+    if (!sitemapJson) throw new Error('Sitemap JSON was not provided');
+    const sitemapLinks = sitemapJson
+      .sitemapindex
+      .sitemap
+      .map((urlObject) => urlObject.loc[0]);
+
+    return sitemapLinks;
+  }
+
+  /**
    * @description Gets only links from a string containing markup
    * @param  {string} pageMarkup string containing markup
    * @param  {string} [linkSelector=this.defaultConfig.linkSelector] selector to find links
