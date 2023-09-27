@@ -174,7 +174,6 @@ describe('getting file', () => {
   const siteCrawler = new SiteCrawler();
   siteCrawler.libraries.ajax = axios;
 
-
   test('getFileAsync', async () => {
     const result = await siteCrawler.getFileAsync('https://frankmtaylor.com/qualified/');
 
@@ -439,6 +438,22 @@ describe('SiteCrawler: Fetching Sitemap', () => {
       expect(sitemapLinks.length).toEqual(2);
     });
   });
+  describe('getSitemapLinks', () => {
+    const siteCrawler = new SiteCrawler();
+    siteCrawler.libraries.ajax = axios;
+
+    test('it gets links from a sitemap', async () => {
+      const sitemapLinks = await siteCrawler.getSitemapLinks('https://frankmtaylor.com/sitemap.xml');
+      expect(sitemapLinks).toBeInstanceOf(Array);
+      expect(sitemapLinks.length).toEqual(7);
+    });
+
+    test('it gets links from a nested sitemap', async () => {
+      const sitemapLinks = await siteCrawler.getSitemapLinks('https://frankmtaylor.com/nested-sitemap.xml');
+      expect(sitemapLinks).toBeInstanceOf(Array);
+      expect(sitemapLinks.length).toEqual(11);
+    });
+  });
   describe('setSitemap', () => {
     test('The linkSet will have the same links from sitemap', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
@@ -471,7 +486,6 @@ describe('SiteCrawler: Fetching Sitemap', () => {
       siteCrawler.libraries.ajax = axios;
 
       await siteCrawler.setSitemap();
-      console.log(siteCrawler.linkSet);
       expect(siteCrawler.linkSet.size).toEqual(11);
     });
   });
