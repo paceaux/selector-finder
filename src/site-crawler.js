@@ -302,6 +302,24 @@ export default class SiteCrawler {
   }
 
   /**
+   * @description Fetches a sitemap and returns the links from it
+   * @param  {string} [sitemapUrl=this.config.startPage]
+   * @returns {string[]} an array of href values
+   */
+  async getSitemapLinks(sitemapUrl = this.config.startPage) {
+    let sitemapUrls = [];
+
+    try {
+      const sitemapJson = await this.getSitemapAsync(sitemapUrl);
+      sitemapUrls = SiteCrawler.getLinksFromSitemap(sitemapJson);
+    } catch (setSitemapError) {
+      await log.errorToFileAsync(setSitemapError);
+    }
+
+    return sitemapUrls;
+  }
+
+  /**
    * @description Fetches a sitemap and adds links to linkset
    * @param  {string} [sitemapUrl=this.config.startPage]
    */
@@ -309,8 +327,7 @@ export default class SiteCrawler {
     this.config.startPage = sitemapUrl;
 
     try {
-      const sitemapJson = await this.getSitemapAsync(sitemapUrl);
-      const sitemapUrls = SiteCrawler.getLinksFromSitemap(sitemapJson);
+      const sitemapUrls = await this.getSitemapLinks(sitemapUrl);
       this.addLinks(sitemapUrls);
     } catch (setSitemapError) {
       await this.errorToFileAsync(setSitemapError);
