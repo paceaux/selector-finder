@@ -1,6 +1,6 @@
 {
   "name": "selector-hound",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "Find an element that matches a particular CSS selector on a website ",
   "type": "module",
   "keywords": [
@@ -28,8 +28,8 @@
     "url": "https://blog.frankmtaylor.com"
   },
   "engines": {
-    "node": ">=16.17.0",
-    "npm": ">=6.0.0"
+    "node": ">=18.16.0",
+    "npm": ">=9.5.0"
   },
   "bugs": "https://github.com/paceaux/selector-finder/issues",
   "license": "MIT",
