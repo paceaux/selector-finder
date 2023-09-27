@@ -166,8 +166,14 @@ export default class SiteCrawler {
     return parsedXml;
   }
 
+  /**
+   * @description gets links to pages from a sitemap
+   * @param  {Object} sitemapJson
+   * @returns {string[]} an array of href values to sitemaps
+   */
   static getLinksFromSitemap(sitemapJson) {
     if (!sitemapJson) throw new Error('Sitemap JSON was not provided');
+    if (!sitemapJson.urlset) return [];
     const pageLinks = sitemapJson
       .urlset
       .url // note: each url node in the xml becomes object in an array called url
@@ -183,6 +189,7 @@ export default class SiteCrawler {
    */
   static getSitemapsFromSitemap(sitemapJson) {
     if (!sitemapJson) throw new Error('Sitemap JSON was not provided');
+    if (!sitemapJson.sitemapindex) return [];
     const sitemapLinks = sitemapJson
       .sitemapindex
       .sitemap
@@ -322,10 +329,18 @@ export default class SiteCrawler {
    */
   async getSitemapLinks(sitemapUrl = this.config.startPage) {
     let sitemapUrls = [];
-
+    let nestedSitemaps = [];
     try {
       const sitemapJson = await this.getSitemapAsync(sitemapUrl);
       sitemapUrls = SiteCrawler.getLinksFromSitemap(sitemapJson);
+      nestedSitemaps = SiteCrawler.getSitemapsFromSitemap(sitemapJson);
+
+      if (nestedSitemaps.length > 0) {
+        await forEachAsync(nestedSitemaps, async (nestedSitemap) => {
+          const nestedSitemapLinks = await this.getSitemapLinks(nestedSitemap);
+          sitemapUrls = [...sitemapUrls, ...nestedSitemapLinks];
+        });
+      }
     } catch (setSitemapError) {
       await log.errorToFileAsync(setSitemapError);
     }
