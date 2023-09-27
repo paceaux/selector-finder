@@ -91,13 +91,61 @@ const MOCK_DATA = {
     </url>
     </urlset>
     `,
+  otherSitemap: `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+    <loc>http://frankmtaylor.com/foo.html</loc>
+    <lastmod>2022-01-06T16:36:33.516Z</lastmod>
+    <changefreq>monthly</changefreq>
+    </url>
+    <url>
+    <loc>http://frankmtaylor.com/bar.html</loc>
+    <lastmod>2022-01-06T16:36:33.618Z</lastmod>
+    <changefreq>monthly</changefreq>
+    </url>
+    <url>
+    <loc>http://frankmtaylor.com/baz.html</loc>
+    <lastmod>2022-01-06T16:36:33.664Z</lastmod>
+    <changefreq>monthly</changefreq>
+    </url>
+    <url>
+    <loc>http://frankmtaylor.com/beep.html</loc>
+    <lastmod>2022-01-06T16:36:33.721Z</lastmod>
+    <changefreq>monthly</changefreq>
+    </url>
+    <url>
+    </urlset>
+    `,
+
+  nestedSitemap: `
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+    <loc>http://frankmtaylor.com/sitemap.xml</loc>
+    <lastmod>2022-01-06T16:36:33.516Z</lastmod>
+    <changefreq>monthly</changefreq>
+    </url>
+    <url>
+    <loc>http://frankmtaylor.com/other-sitemap.xml</loc>
+    <lastmod>2022-01-06T16:36:33.516Z</lastmod>
+    <changefreq>monthly</changefreq>
+    </url>
+  </urlset>`,
 };
 
 axios.mockImplementation((url) => {
+  console.log(`mocking implementation for ${url}`);
   switch (url) {
     case 'https://frankmtaylor.com/sitemap.xml':
       return Promise.resolve({
         data: MOCK_DATA.sitemap,
+      });
+    case 'https://frankmtaylor.com/nested-sitemap.xml':
+      console.log('NESTED SITEMAP YO');
+      return Promise.resolve({
+        data: MOCK_DATA.nestedSitemap,
+      });
+    case 'https://frankmtaylor.com/other-sitemap.xml':
+      return Promise.resolve({
+        data: MOCK_DATA.otherSitemap,
       });
     case 'https://frankmtaylor.com/portfolio/':
       return Promise.resolve({
@@ -406,10 +454,20 @@ describe('SiteCrawler: Fetching Sitemap', () => {
   describe('produceSiteLinks', () => {
     test('when produceSiteLinks is run, a file is created and it knows it, and still has data', async () => {
       const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/sitemap.xml' });
+      siteCrawler.libraries.ajax = axios;
       await siteCrawler.produceSiteLinks();
       expect(siteCrawler.hasExportedLinks).toEqual(true);
       expect(siteCrawler.linkSet.size).toBeGreaterThan(0);
       expect(siteCrawler.linkSet.has('http://frankmtaylor.com'));
+    });
+  });
+  describe('nested sitemap', () => {
+    test('it can crawl a nested sitemap', async () => {
+      const siteCrawler = new SiteCrawler({ startPage: 'https://frankmtaylor.com/nested-sitemap.xml' });
+      siteCrawler.libraries.ajax = axios;
+
+      await siteCrawler.setSitemap();
+      expect(siteCrawler.linkSet.size).toEqual(11);
     });
   });
 });
