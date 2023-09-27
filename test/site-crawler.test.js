@@ -112,7 +112,6 @@ const MOCK_DATA = {
     <lastmod>2022-01-06T16:36:33.721Z</lastmod>
     <changefreq>monthly</changefreq>
     </url>
-    <url>
     </urlset>
     `,
 
@@ -436,7 +435,6 @@ describe('SiteCrawler: Fetching Sitemap', () => {
       siteCrawler.libraries.ajax = axios;
       const siteMapJson = await siteCrawler.getSitemapAsync('https://frankmtaylor.com/nested-sitemap.xml');
       const sitemapLinks = SiteCrawler.getSitemapsFromSitemap(siteMapJson);
-      console.log(sitemapLinks);
       expect(sitemapLinks).toBeInstanceOf(Array);
       expect(sitemapLinks.length).toEqual(2);
     });
@@ -473,6 +471,7 @@ describe('SiteCrawler: Fetching Sitemap', () => {
       siteCrawler.libraries.ajax = axios;
 
       await siteCrawler.setSitemap();
+      console.log(siteCrawler.linkSet);
       expect(siteCrawler.linkSet.size).toEqual(11);
     });
   });
