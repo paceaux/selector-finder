@@ -158,11 +158,10 @@ export default class SiteCrawler {
       const parser = new this.libraries.Parser();
       parsedXml = await parser.parseStringPromise(data);
     } catch (getSitemapError) {
-      await log
-        .errorToFileAsync(getSitemapError)
-        .errorToConsoleAsync(
-          `Couldn't get the sitemap:\n ${getSitemapError}`,
-        );
+      await log.errorToFileAsync(getSitemapError);
+      await log.errorToConsoleAsync(
+        `Couldn't get the sitemap:\n ${getSitemapError}`,
+      );
     }
     return parsedXml;
   }
