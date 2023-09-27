@@ -215,13 +215,14 @@ ${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file
       `);
     await siteCrawler.produceSiteLinks();
 
+    const numberOfSiteLinks = siteCrawler.linkSet.size;
     if (!mainConfig.useExportedSitemap) {
       await log.toConsole(`
-      ||-> Site links exported to ${siteCrawler.exportFileName}
+      ||-> ${numberOfSiteLinks} URLs to pages exported to ${siteCrawler.exportFileName}.sitemap.json
       `);
     } else {
       await log.toConsole(`
-      ||-> Site links read from ${siteCrawler.exportFileName}
+      ||-> ${numberOfSiteLinks} URLs to pages read from ${siteCrawler.exportFileName}.sitemap.json
       `);
     }
 
