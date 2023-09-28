@@ -215,13 +215,14 @@ ${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file
       `);
     await siteCrawler.produceSiteLinks();
 
+    const numberOfSiteLinks = siteCrawler.linkSet.size;
     if (!mainConfig.useExportedSitemap) {
       await log.toConsole(`
-      ||-> Site links exported to ${siteCrawler.exportFileName}
+      ||-> ${numberOfSiteLinks} URLs exported to ${siteCrawler.exportFileName}.sitemap.json
       `);
     } else {
       await log.toConsole(`
-      ||-> Site links read from ${siteCrawler.exportFileName}
+      ||-> ${numberOfSiteLinks} URLs read from ${siteCrawler.exportFileName}.sitemap.json
       `);
     }
 
@@ -247,8 +248,10 @@ ${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file
     await outputter.writeDataAsync(formattedResult, outputFileName);
 
     log.endTimer();
+    const { elapsedTime } = log;
+    const friendlyTime = elapsedTime > 300 ? `${(elapsedTime / 60).toFixed(2)}m` : `${elapsedTime}s`;
     const endMessage = `
-| Finished after ${log.elapsedTime}s
+| Finished after ${friendlyTime}
 | Pages Scanned: ${totalPagesSearched} 
 | Pages with a Match: ${pagesWithSelector.length}
 | Total Results: ${totalMatches}                  
