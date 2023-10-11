@@ -391,7 +391,7 @@ export default class SiteCrawler {
     if (shouldNotProduceLinks) {
       const alreadyExistsMessage = `📂  file ${this.pathToExportedFile} already exists and recrawling was not forced.`;
       await log.infoToFileAsync(alreadyExistsMessage);
-      await log.toConsole(alreadyExistsMessage);
+      log.toConsole(alreadyExistsMessage);
       await this.setLinksFromJsonFile(`${this.exportFileName}.${this.outputter.defaultOutputFile}`);
       return;
     }
