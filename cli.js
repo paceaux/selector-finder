@@ -187,11 +187,12 @@ async function main(config) {
 
 📃  Sitemap: ${mainConfig.sitemap}
 🛑  limit: ${limit === 0 ? 'None' : limit}
-${mainConfig.cssFile ? `📂  cssFile: ${cssFile}` : ''}         
+${mainConfig.cssFile ? `📂  cssFile: ${cssFile}` : ''}
 ${mainConfig.selector && !mainConfig.cssFile ? `🎯  CSS Selector: ${mainConfig.selector}` : ''}         
-${mainConfig.isSpa ? '💡  Handle as Single Page Application' : ''}         
-${mainConfig.takeScreenshots ? '📷  Take Screenshots' : ''}  
-${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json file and make a new one'}       
+${mainConfig.showElementDetails ? '💡  Show full details for matching elements' : ''}
+${mainConfig.isSpa ? '💡  Handle as Single Page Application' : ''}
+${mainConfig.takeScreenshots ? '📷  Take Screenshots' : ''}
+${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json file and make a new one'}
 `;
     await log
       .toConsole(startMessage)
@@ -210,9 +211,8 @@ ${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json 
         useExportedSitemap: mainConfig.useExportedSitemap,
       },
     );
-    await log.toConsole(`
-      🐕 ${mainConfig.crawl ? 'Crawling site' : 'Fetching sitemap'}
-      🏁 ${mainConfig.crawl ? 'Starting on' : 'using'} ${siteCrawler.config.startPage}
+    log.toConsole(`
+🐕  ${mainConfig.crawl ? 'Crawling site' : 'Fetching sitemap'} ${mainConfig.crawl ? 'starting on 🏁' : 'from 🦴'} ${siteCrawler.config.startPage}
       `);
     await siteCrawler.produceSiteLinks();
 
@@ -220,7 +220,7 @@ ${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json 
     const isNotExported = !mainConfig.useExportedSitemap;
     const siteLinksMessage = `🔗  ${numberOfSiteLinks} URLs ${isNotExported ? 'exported to' : 'read from'} 💾 ${siteCrawler.exportFileName}.sitemap.json`;
 
-    await log.toConsole(siteLinksMessage);
+    log.toConsole(siteLinksMessage);
 
     if (siteCrawler.linkSet.size === 0) {
       const noLinksMessage = `
@@ -253,7 +253,7 @@ ${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json 
 🔗  Pages Scanned: ${totalPagesSearched} 
 🎯  Pages with a Match: ${pagesWithSelector.length}
 🧮  Total Results: ${totalMatches} ${totalMatches > pagesWithSelector.length ? '(multiple matches on a page)' : ''}              
-💾  FileName: ${outputFileName}
+💾  Results File: ${outputFileName}${outputFileName !== 'pages.json' ? '.pages.json' : ''}
 `;
     await log.toConsole(endMessage, true).infoToFileAsync();
   } catch (mainFunctionError) {
