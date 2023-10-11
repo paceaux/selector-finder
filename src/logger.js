@@ -1,6 +1,7 @@
 /* This is a logger; it needs to write to console. */
 /* eslint-disable no-console */
 import colors from 'chalk';
+import boxen from 'boxen';
 import process from 'process';
 import path from 'path';
 import { promises } from 'fs';
@@ -54,15 +55,24 @@ ${info}
 `;
   }
 
+  static boxInfo(info, showTimestamp = false) {
+    const options = { padding: 1 };
+    if (showTimestamp) {
+      options.title = (new Date()).toUTCString();
+      options.titleAlignment = 'center';
+    }
+    return boxen(info, options);
+  }
+
   toConsole(info, isImportant) {
     const rawMessage = info || this.rawMessage;
-    const infoMessage = Log.styleInfo(rawMessage);
+    const infoMessage = Log.boxInfo(rawMessage);
 
     this.rawMessage = rawMessage;
     if (isImportant) {
-      console.log(colors.bold.white(infoMessage));
+      console.log(colors.bgCyan.bold.white(infoMessage));
     } else {
-      console.log(colors.blue(infoMessage));
+      console.log(colors.cyanBright(infoMessage));
     }
 
     return this;
