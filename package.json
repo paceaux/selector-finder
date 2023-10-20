@@ -39,7 +39,7 @@
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.5",
     "cssom": "^0.5.0",
-    "puppeteer": "^17.1.1",
+    "puppeteer": "^19.0.0",
     "xml2js": "^0.4.23",
     "yargs": "^17.5.1"
   },
@@ -50,8 +50,8 @@
     "eslint-formatter-table": "^7.32.1",
     "eslint-plugin-import": "^2.26.0",
     "jest": "^29.7.0",
-    "jest-environment-node": "^26.6.2",
-    "jest-puppeteer": "^6.1.1",
+    "jest-environment-node": "^29.7.0",
+    "jest-puppeteer": "^9.0.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   }
