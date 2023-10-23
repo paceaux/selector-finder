@@ -183,14 +183,16 @@ async function main(config) {
   }
   try {
     const startMessage = `
-| Looking...                
-| Sitemap: ${mainConfig.sitemap},
-| limit: ${limit === 0 ? 'None' : limit}
-${mainConfig.cssFile ? `| cssFile (${cssFile})` : ''}         
-${mainConfig.selector && !mainConfig.cssFile ? `| CSS Selector (${mainConfig.selector})` : ''}         
-${mainConfig.isSpa ? '| Handle as Single Page Application' : ''}         
-${mainConfig.takeScreenshots ? '| Take Screenshots' : ''}  
-${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file and fetch a sitemap or recrawl'}       
+🔍🐕 SelectorHound is looking... 
+
+📃  Sitemap: ${mainConfig.sitemap}
+🛑  limit: ${limit === 0 ? 'None' : limit}
+${mainConfig.cssFile ? `📂  cssFile: ${cssFile}` : ''}
+${mainConfig.selector && !mainConfig.cssFile ? `🎯  CSS Selector: ${mainConfig.selector}` : ''}         
+${mainConfig.showElementDetails ? '💡  Show full details for matching elements' : ''}
+${mainConfig.isSpa ? '💡  Handle as Single Page Application' : ''}
+${mainConfig.takeScreenshots ? '📷  Take Screenshots' : ''}
+${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json file and make a new one'}
 `;
     await log
       .toConsole(startMessage)
@@ -209,26 +211,20 @@ ${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file
         useExportedSitemap: mainConfig.useExportedSitemap,
       },
     );
-    await log.toConsole(`
-      ||> ${mainConfig.crawl ? 'Crawling site' : 'Fetching sitemap'}
-      ||> ${mainConfig.crawl ? 'Starting on' : 'using'} ${siteCrawler.config.startPage}
+    log.toConsole(`
+🐕  ${mainConfig.crawl ? 'Crawling site' : 'Fetching sitemap'} ${mainConfig.crawl ? 'starting on 🏁' : 'from 🦴'} ${siteCrawler.config.startPage}
       `);
     await siteCrawler.produceSiteLinks();
 
     const numberOfSiteLinks = siteCrawler.linkSet.size;
-    if (!mainConfig.useExportedSitemap) {
-      await log.toConsole(`
-      ||-> ${numberOfSiteLinks} URLs exported to ${siteCrawler.exportFileName}.sitemap.json
-      `);
-    } else {
-      await log.toConsole(`
-      ||-> ${numberOfSiteLinks} URLs read from ${siteCrawler.exportFileName}.sitemap.json
-      `);
-    }
+    const isNotExported = !mainConfig.useExportedSitemap;
+    const siteLinksMessage = `🔗  ${numberOfSiteLinks} URLs ${isNotExported ? 'exported to' : 'read from'} 💾 ${siteCrawler.exportFileName}.sitemap.json`;
+
+    log.toConsole(siteLinksMessage);
 
     if (siteCrawler.linkSet.size === 0) {
       const noLinksMessage = `
-      ||-> No links found. Nothing To search.`;
+      🚫🔗  No links found. Nothing To search.`;
       await log
         .toConsole(noLinksMessage)
         .infoToFileAsync(noLinksMessage);
@@ -251,11 +247,13 @@ ${mainConfig.useExportedSitemap ? '' : '| Ignore any existing .sitemap.json file
     const { elapsedTime } = log;
     const friendlyTime = elapsedTime > 300 ? `${(elapsedTime / 60).toFixed(2)}m` : `${elapsedTime}s`;
     const endMessage = `
-| Finished after ${friendlyTime}
-| Pages Scanned: ${totalPagesSearched} 
-| Pages with a Match: ${pagesWithSelector.length}
-| Total Results: ${totalMatches}                  
-| FileName: ${outputFileName}
+🐶  SelectorHound is finished!
+
+⏱   Time lapsed: ${friendlyTime}
+🔗  Pages Scanned: ${totalPagesSearched} 
+🎯  Pages with a Match: ${pagesWithSelector.length}
+🧮  Total Results: ${totalMatches} ${totalMatches > pagesWithSelector.length ? '(multiple matches on a page)' : ''}              
+💾  Results File: ${outputFileName}${outputFileName !== 'pages.json' ? '.pages.json' : ''}
 `;
     await log.toConsole(endMessage, true).infoToFileAsync();
   } catch (mainFunctionError) {
