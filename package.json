@@ -1,13 +1,14 @@
 {
   "name": "selector-hound",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Find an element that matches a particular CSS selector on a website ",
   "type": "module",
   "keywords": [
     "CSS",
     "selector",
     "dom",
-    "utility"
+    "utility",
+    "crawler"
   ],
   "main": "cli.js",
   "bin": {
@@ -35,10 +36,11 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
+    "boxen": "^7.1.1",
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.5",
     "cssom": "^0.5.0",
-    "puppeteer": "^17.1.1",
+    "puppeteer": "^19.0.0",
     "xml2js": "^0.4.23",
     "yargs": "^17.5.1"
   },
@@ -48,9 +50,9 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-formatter-table": "^7.32.1",
     "eslint-plugin-import": "^2.26.0",
-    "jest": "^29.0.2",
-    "jest-environment-node": "^26.6.2",
-    "jest-puppeteer": "^6.1.1",
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0",
+    "jest-puppeteer": "^9.0.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   }
