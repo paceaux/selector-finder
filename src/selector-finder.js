@@ -49,7 +49,7 @@ export default class SelectorFinder {
     await forEachAsync(nodes, async (element, index) => {
       let fileName = `${url}-${index}`;
       fileName = fileName
-        .replace('https://', '')
+        .replace(/http(s?)(:\/\/)/, '')
         .replace('/', '-')
         .replace('.', 'dot');
 
