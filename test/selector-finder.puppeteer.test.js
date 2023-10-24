@@ -123,20 +123,20 @@ describe('getScreenshotsFromSpaPage', () => {
 
   afterEach(async () => {
     try {
-      await fs.rm('frankmtaylordotcom--0.png');
+      await fs.rm('frankmtaylordotcom-0.png');
     } catch (e) {}
   });
 
   test('it grabs screenshots from http', async () => {
     await page.goto('http://frankmtaylor.com');
     await SelectorFinder.getResultFromSpaPage(page, 'body', true);
-    const stats = await fs.stat('frankmtaylordotcom--0.png');
+    const stats = await fs.stat('frankmtaylordotcom-0.png');
     expect(stats.size).toBeGreaterThan(0);
   });
   test('it grabs screenshots from https', async () => {
     await page.goto('https://frankmtaylor.com');
     await SelectorFinder.getResultFromSpaPage(page, 'body', true);
-    const stats = await fs.stat('frankmtaylordotcom--0.png');
+    const stats = await fs.stat('frankmtaylordotcom-0.png');
     expect(stats.size).toBeGreaterThan(0);
   });
 }

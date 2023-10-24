@@ -51,7 +51,8 @@ export default class SelectorFinder {
       fileName = fileName
         .replace(/http(s?)(:\/\/)/, '')
         .replace('/', '-')
-        .replace('.', 'dot');
+        .replace('.', 'dot')
+        .replace('--', '-');
 
       await SelectorFinder.grabScreenAsync(element, fileName);
     });
