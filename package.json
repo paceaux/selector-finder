@@ -1,13 +1,14 @@
 {
   "name": "selector-hound",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Find an element that matches a particular CSS selector on a website ",
   "type": "module",
   "keywords": [
     "CSS",
     "selector",
     "dom",
-    "utility"
+    "utility",
+    "crawler"
   ],
   "main": "cli.js",
   "bin": {
