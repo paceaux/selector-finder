@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
             "name": "Launch Program",
             "args": [
-                "-u",
+                "-u", // url
                 "https://frankmtaylor.com/sitemap.xml",
-                "-l",
-                "20",
-                "-c",
-                "-s",
+                "-l", // limit. raise or lower for more pages AND screenshots
+                "10",
+                "-c", // screengrabs. 
+                "-s", // the selector
                 "h1"
             ],
             "skipFiles": [
