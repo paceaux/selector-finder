@@ -50,9 +50,11 @@ export default class SelectorFinder {
       let fileName = `${url}-${index}`;
       fileName = fileName
         .replace(/http(s?)(:\/\/)/, '')
-        .replace('/', '-')
         .replace('.', 'dot')
-        .replace('--', '-');
+        .replace(/\.((x|r|s)?(htm(l?))|jsp|php|asp|cfm)(x?)/gi, '')
+        .replace(/\//g, '_')
+        .replace('--', '-')
+        .replace('_-', '-');
 
       await SelectorFinder.grabScreenAsync(element, fileName);
     });
