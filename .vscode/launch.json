@@ -8,10 +8,19 @@
             "type": "pwa-node",
             "request": "launch",
             "name": "Launch Program",
+            "args": [
+                "-u",
+                "https://frankmtaylor.com/sitemap.xml",
+                "-l",
+                "20",
+                "-c",
+                "-s",
+                "h1"
+            ],
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\index.js"
+            "program": "${workspaceFolder}/cli.js"
         }
     ]
 }
