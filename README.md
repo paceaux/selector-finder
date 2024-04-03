@@ -16,9 +16,17 @@ Pages not showing up that should? Check the `log.txt` for any issues.
 
 - Node LTS (as of September 2023, Node 18.16.0)
 
-- If you want to use the `-d` or `-c` (`--isSpa` and `--takeScreenshots` options), this requires Puppeteer which in turn requires Chromium.  
+#### Some possible Puppeteer setup for Mac Users
 
-- If running this on a Mac, be sure you install chromium without a quarantine flag: `brew install chromium --no-quarantine`
+If you want to use the `-d` or `-c` (`--isSpa` and `--takeScreenshots` ) options, this requires Puppeteer which in turn requires Chromium.
+
+You may (or may not) need `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true` and `PUPPETEER_EXECUTABLE_PATH` environment variables set. They were necessary for older versions of Puppeteer and seem to be unnecessary for new ones.
+
+If you're having issues, run `printenv` in your terminal to see if those variables are set. If they are, you may need to unset them with `unset PUPPETEER_SKIP_CHROMIUM_DOWNLOAD` and `unset PUPPETEER_EXECUTABLE_PATH`. Then `source ~/.bashrc` or `source ~/.zshrc` to be sure, and run `printenv` once again.
+
+But if they aren't set, you may need to do this.
+
+After you play with those variables, reinstall this package.
 
 ### Running on-demand
 
