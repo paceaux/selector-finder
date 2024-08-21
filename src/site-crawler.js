@@ -2,7 +2,7 @@
 import axios from 'axios';
 import fs from 'fs';
 import Path from 'path';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import { Parser } from 'xml2js';
 
 import { LOG_FILE_NAME } from './constants.js';

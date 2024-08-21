@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { jest } from '@jest/globals';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 import PageSearchResult from '../src/page-search-result.js';
 import ElementSearchResult from '../src/element-search-result.js';
