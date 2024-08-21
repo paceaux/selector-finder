@@ -14,7 +14,7 @@ Pages not showing up that should? Check the `log.txt` for any issues.
 
 ### Prerequisites
 
-- Node LTS (as of September 2023, Node 18.16.0)
+- Node LTS (as of August 2024, Node 20.16.0)
 
 #### Some possible Puppeteer setup for Mac Users
 
