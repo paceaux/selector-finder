@@ -5,13 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
             "name": "Launch Program",
+            "args": [
+                "-u", // url
+                "https://frankmtaylor.com/sitemap.xml",
+                "-l", // limit. raise or lower for more pages AND screenshots
+                "10",
+                "-c", // screengrabs. 
+                "-s", // the selector
+                "h1"
+            ],
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\index.js"
+            "program": "${workspaceFolder}/cli.js"
         }
     ]
 }

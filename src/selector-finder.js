@@ -1,5 +1,5 @@
 import axios from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 
 import { LOG_FILE_NAME } from './constants.js';
@@ -47,12 +47,15 @@ export default class SelectorFinder {
    */
   static async grabScreensAsync(nodes, url) {
     await forEachAsync(nodes, async (element, index) => {
-      let fileName = `${url}-${index}`;
+      const cleanUrl = url
+        .replace(/http(s?)(:\/\/)/, '') // get rid of protocol
+        .replace('.', 'dot') // replace . with dot
+        .replace(/\.((x|r|s)?(htm(l?))|jsp|php|asp|cfm)(x?)/gi, '') // remove file extensions
+        .replace(/\//g, '_'); // directories to underscores
+      let fileName = `${cleanUrl}-${index}`;
       fileName = fileName
-        .replace(/http(s?)(:\/\/)/, '')
-        .replace('/', '-')
-        .replace('.', 'dot')
-        .replace('--', '-');
+        .replace('--', '-') // dangling double-hyphens
+        .replace('_-', '-'); // a final / that would convert to _
 
       await SelectorFinder.grabScreenAsync(element, fileName);
     });
