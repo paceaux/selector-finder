@@ -13,6 +13,7 @@ const DEFAULT_LIBRARIES = {
 
 export default class Robots {
   /**
+   * @description Class for getting a robots.txt file and parsing rules
    * @param  {Object|string|URL} [config=DEFAULT_CONFIG] - Config or url of base site
    * @param  {Object} [libraries=DEFAULT_LIBRARIES] - The libraries to use for the robots.txt file
    */
@@ -41,6 +42,7 @@ export default class Robots {
   }
 
   /**
+   * @description provides the url to the robots.txt file for the class
    * @returns {string} - The url to the robots.txt file for the site
    */
   get robotsUrl() {
@@ -48,6 +50,7 @@ export default class Robots {
   }
 
   /**
+     * @description takes the url and makes a robots url from it
      * @param  {string|URL} url - The URL to get the robots.txt file from
      * @returns {string} - A url with /robots.txt at the end
      */
@@ -69,6 +72,7 @@ export default class Robots {
   }
 
   /**
+   * @description gets the robots file from the url
    * @param  {string|URL} url - the url of the robots file
    * @returns {Promise<string>} - the text of the robots file
    */
@@ -93,6 +97,7 @@ export default class Robots {
    */
 
   /**
+   * @description gets the rules from the robots text
    * @param  {string} robotsText
    * @returns {RobotsRules} - The rules of the robots file
    */
@@ -102,12 +107,17 @@ export default class Robots {
       .trim()
       .split('\n');
 
+    // set up the data
+    // NOTE: I'm not making a robust robots parser. This doesn't account for crawl-delay
+    // I don't know where I'd put crawl-delay
     const agents = new Map();
     const allow = new Set();
     const disallow = new Set();
 
+    // declare current agent in outer scsope
     let currentAgent = '';
     lines.forEach((line) => {
+      // nix whitespace
       const cleanLine = line.trim();
       if (cleanLine.startsWith('User-agent:')) {
         const agent = line
@@ -115,18 +125,23 @@ export default class Robots {
           .split('#')[0]
           .replace('#', '')
           .trim();
+        // declare the currentAgent here
         currentAgent = agent;
         if (!agents.has(agent)) {
+          // if it doesn't exist, create it with empty array
           agents.set(agent, []);
         }
       }
+      // either it's disallow or it's allow next
       if (cleanLine.startsWith('Disallow:')) {
         const path = line
           .split(':')[1]
           .split('#')[0]
           .replace('#', '')
           .trim();
+        // add to the disallow list
         disallow.add(path);
+        // add to the agent's list
         agents.get(currentAgent).push(path);
       } else if (cleanLine.startsWith('Allow:')) {
         const path = line
@@ -134,7 +149,9 @@ export default class Robots {
           .split('#')[0]
           .replace('#', '')
           .trim();
+        // add to the allow list
         allow.add(path);
+        // add to the agent's list
         agents.get(currentAgent).push(path);
       }
     });
@@ -142,6 +159,7 @@ export default class Robots {
   }
 
   /**
+   * @description if robotsText is set, returns the parsed rules of the file
    * @returns {RobotsRules} - The rules of the robots file
    */
   get rules() {
@@ -149,6 +167,7 @@ export default class Robots {
   }
 
   /**
+   * @description gets the unique allow rules based on robotsText
    * @returns {Set} - The paths that are allowed
    */
   get allow() {
@@ -156,6 +175,7 @@ export default class Robots {
   }
 
   /**
+   * @description gets the unique disallow rules based on robotsText
    * @returns {Set} - The paths that are disallowed
    */
   get disallow() {
@@ -163,6 +183,7 @@ export default class Robots {
   }
 
   /**
+   * @description gets the agents based on robotsText
    * @returns {Map} - The rules for each agent
    */
   get agents() {
@@ -170,6 +191,7 @@ export default class Robots {
   }
 
   /**
+   * @description gets the rules from from the robotsUrl property
    * @param  {string|URL} [url=this.robotsUrl] - The url of the robots file
    * @returns {Promise<RobotsRules>} - The rules of the robots file
    */
@@ -191,6 +213,7 @@ export default class Robots {
   }
 
   /**
+   * @description creates a stringified JSON object of the data this class contains
    * @returns {string} - The JSON representation of the class
    */
   toJSON() {
