@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import Robots from '../src/robots.js';
 import axios from './__mock__/axios.js';
 
@@ -17,6 +18,7 @@ User-agent: PerplexityBot
 Disallow: /
 
 User-agent: *
+Allow: /about-me/
 Disallow: /wp-admin/
 Disallow: /wp-includes/
 Disallow: /wp-content/plugins/
@@ -28,6 +30,14 @@ axios.mockImplementation((url) => {
   }
 });
 
+global.fetch = jest.fn(() => Promise.resolve({
+  text: () => Promise.resolve(MOCK_DATA),
+}));
+
+beforeEach(() => {
+  fetch.mockClear();
+  axios.mockClear();
+});
 describe('Robots', () => {
   describe('constructor', () => {
     test('it will create a new instance of Robots', () => {
@@ -40,6 +50,10 @@ describe('Robots', () => {
     });
     test('it will create a new instance of Robots with a config', () => {
       const robots = new Robots({ url: 'http://foo.com' });
+      expect(robots).toBeInstanceOf(Robots);
+    });
+    test('it will create a new instance of Robots with a URL', () => {
+      const robots = new Robots(new URL('http://foo.com'));
       expect(robots).toBeInstanceOf(Robots);
     });
   });
@@ -106,6 +120,58 @@ describe('Robots', () => {
     test('will throw an error if fetch fails', () => {
       const url = 123;
       expect(Robots.getRobotsFile(url)).rejects.toThrow('url must be a string');
+    });
+  });
+  describe('static getRules', () => {
+    test('it will return an object even without text', () => {
+      expect(Robots.getRules()).toBeInstanceOf(Object);
+    });
+    test('it will always return an object with agents, allow, disallow', () => {
+      const rules = Robots.getRules();
+      expect(rules).toHaveProperty('agents');
+      expect(rules).toHaveProperty('allow');
+      expect(rules).toHaveProperty('disallow');
+    });
+    describe('rule types are correct', () => {
+      test('the thing returned is an object', () => {
+        const rules = Robots.getRules(MOCK_DATA);
+        expect(rules).toBeInstanceOf(Object);
+      });
+      test('the agents will be a map', () => {
+        const rules = Robots.getRules();
+        expect(rules.agents).toBeInstanceOf(Map);
+      });
+      test('the allow will be a set', () => {
+        const rules = Robots.getRules();
+        expect(rules.allow).toBeInstanceOf(Set);
+      });
+      test('the disallow will be a set', () => {
+        const rules = Robots.getRules();
+        expect(rules.disallow).toBeInstanceOf(Set);
+      });
+    });
+    describe('parsing', () => {
+      test('it will parse the rules', () => {
+        const rules = Robots.getRules(MOCK_DATA);
+        expect(rules.agents.size).toEqual(6);
+        expect(rules.allow.size).toEqual(1);
+        expect(rules.disallow.size).toEqual(5);
+      });
+      test('agents are correct', () => {
+        const rules = Robots.getRules(MOCK_DATA);
+        expect(rules.agents.has('GPTBot')).toEqual(true);
+        expect(rules.agents.has('PerplexityBot')).toEqual(true);
+        expect(rules.agents.has('*')).toEqual(true);
+      });
+      test('agent of * has all correct rules', () => {
+        const rules = Robots.getRules(MOCK_DATA);
+        const star = rules.agents.get('*');
+        expect(star).toEqual(['/about-me/', '/wp-admin/', '/wp-includes/', '/wp-content/plugins/', '/wp-admin/admin-ajax.php']);
+      });
+      test('allow is correct', () => {
+        const rules = Robots.getRules(MOCK_DATA);
+        expect(rules.allow.has('/about-me/')).toEqual(true);
+      });
     });
   });
 });
