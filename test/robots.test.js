@@ -197,7 +197,6 @@ describe('Robots', () => {
       });
       test('rules do not have comments or spaces', () => {
         const rules = Robots.getRules(MOCK_WITH_COMMENTS);
-        console.log(rules);
         expect(rules.agents.has('CCBot')).toEqual(true);
         expect(rules.agents.has('PerplexityBot')).toEqual(true);
         expect(rules.agents.has('*')).toEqual(true);
