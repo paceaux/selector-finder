@@ -189,7 +189,8 @@ describe('Robots', () => {
       test('agent of * has all correct rules', () => {
         const rules = Robots.getRules(MOCK_DATA);
         const star = rules.agents.get('*');
-        expect(star).toEqual(['/about-me/', '/wp-admin/', '/wp-includes/', '/wp-content/plugins/', '/wp-admin/admin-ajax.php']);
+        expect(star.size).toEqual(2);
+        expect(star.get('disallow')).toEqual(new Set(['/wp-admin/', '/wp-includes/', '/wp-content/plugins/', '/wp-admin/admin-ajax.php']));
       });
       test('allow is correct', () => {
         const rules = Robots.getRules(MOCK_DATA);
@@ -245,6 +246,27 @@ describe('Robots', () => {
       expect(typeof jsonified).toEqual('string');
       expect(parsed).toHaveProperty('allow');
       expect(parsed).toHaveProperty('disallow');
+      expect(parsed).toHaveProperty('agents');
+    });
+    test('will return a robust json string with live data', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      await robots.getRules();
+      const parsed = JSON.parse(robots.toJSON());
+      const jsonified = robots.toJSON();
+      expect(typeof jsonified).toEqual('string');
+      expect(parsed).toHaveProperty('allow');
+      expect(parsed).toHaveProperty('disallow');
+      expect(parsed).toHaveProperty('agents');
+      expect(parsed.agents).toBeInstanceOf(Object);
+      expect(parsed.agents['*']).toBeInstanceOf(Object);
+      expect(parsed.agents['*']).toHaveProperty('allow');
+    });
+  });
+  describe('method:isUrldisallowed', () => {
+    test('will return true if the url is disallowed', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      await robots.getRules();
+      expect(robots.isUrlDisallowed('https://blog.frankmtaylor.com/wp-admin/')).toEqual(true);
     });
   });
 });

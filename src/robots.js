@@ -128,8 +128,12 @@ export default class Robots {
         // declare the currentAgent here
         currentAgent = agent;
         if (!agents.has(agent)) {
-          // if it doesn't exist, create it with empty array
-          agents.set(agent, []);
+          // if it doesn't exist, create it with empty Map
+          const agentMap = new Map([
+            ['allow', new Set()],
+            ['disallow', new Set()],
+          ]);
+          agents.set(agent, agentMap);
         }
       }
       // either it's disallow or it's allow next
@@ -142,7 +146,7 @@ export default class Robots {
         // add to the disallow list
         disallow.add(path);
         // add to the agent's list
-        agents.get(currentAgent).push(path);
+        agents.get(currentAgent).get('disallow').add(path);
       } else if (cleanLine.startsWith('Allow:')) {
         const path = line
           .split(':')[1]
@@ -152,7 +156,7 @@ export default class Robots {
         // add to the allow list
         allow.add(path);
         // add to the agent's list
-        agents.get(currentAgent).push(path);
+        agents.get(currentAgent).get('allow').add(path);
       }
     });
     return { agents, allow, disallow };
@@ -213,16 +217,71 @@ export default class Robots {
   }
 
   /**
+   * @param  {string} url - url to check
+   * @param  {string} [userAgent='*'] name of user agent
+   * @param  {boolean} [disallowedAnywhere=false] ignore user agent, see if disallowed anywhere
+   */
+  isUrlDisallowed(url, userAgent = '*', disallowedAnywhere = false) {
+    if (!url) return false;
+
+    const safeUrl = new URL(url);
+    let disallowRules = this.agents.has(userAgent)
+      ? [...this.agents.get(userAgent).get('disallow')]
+      : [];
+
+    if (disallowedAnywhere) {
+      disallowRules = [...this.disallow];
+    }
+
+    const hasMatches = disallowRules
+      .some((rule) => safeUrl.pathname.includes(rule));
+
+    return hasMatches;
+  }
+
+  /**
+   * @description checks if the url is explicitly allowed,
+   *  robots is meant to exclude, not include. So this is here to
+   * check if a url was written out specifically
+   * @param  {string|URL} url url to validate
+   * @param  {string} [userAgent='*'] name of user agent
+   * @param  {boolean} [allowedAnywhere=false] ignore user agent and check if allowed anywhere
+   */
+  isUrlExplicityAllowed(url, userAgent = '*', allowedAnywhere = false) {
+    if (!url) return false;
+
+    const safeUrl = new URL(url);
+    let allowRules = this.agents.has(userAgent)
+      ? [...this.agents.get(userAgent).get('allow')]
+      : [];
+
+    if (allowedAnywhere) {
+      allowRules = [...this.allow];
+    }
+    const hasMatches = allowRules
+      .some((rule) => safeUrl.pathname.includes(rule));
+
+    return hasMatches;
+  }
+
+  /**
    * @description creates a stringified JSON object of the data this class contains
    * @returns {string} - The JSON representation of the class
    */
   toJSON() {
+    const agentObject = {};
+    this.agents.forEach((value, key) => {
+      agentObject[key] = {
+        allow: [...value.get('allow')],
+        disallow: [...value.get('disallow')],
+      };
+    });
     const data = {
       url: this.config.url,
       robotsUrl: this.robotsUrl,
       allow: [...this.allow],
       disallow: [...this.disallow],
-      agents: [...this.agents],
+      agents: agentObject,
     };
 
     return JSON.stringify(data, null, 2);
