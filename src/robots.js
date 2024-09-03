@@ -13,7 +13,11 @@ const DEFAULT_LIBRARIES = {
 
 export default class Robots {
   constructor(config, libraries) {
-    this.config = { ...Robots.defaultConfig, ...config };
+    const safeConfig = {};
+    if (typeof config === 'string') {
+      safeConfig.url = config;
+    }
+    this.config = { ...Robots.defaultConfig, ...safeConfig };
     this.libraries = { ...Robots.defaultLibraries, ...libraries };
     this.robotsText = '';
   }
@@ -31,24 +35,29 @@ export default class Robots {
   }
 
   /**
-     * @param  {string} url - The URL to get the robots.txt file from
+     * @param  {string|URL} url - The URL to get the robots.txt file from
      * @returns {string} - The URL of the robots
      */
   static getRobotsUrl(url) {
-    const safeUrl = url || '';
-    let cleanUrl = safeUrl
-      .trim()
-      .replace(/\/$/, '');
-
-    if (!cleanUrl.endsWith('/robots.txt')) {
-      cleanUrl = `${cleanUrl}/robots.txt`;
+    const isURL = url instanceof URL;
+    const isString = typeof url === 'string';
+    if (!isURL && !isString) {
+      throw new Error('url must be a string or URL');
     }
-    return cleanUrl;
+    if (isString && url === '') {
+      throw new Error('url must not be empty');
+    }
+    const safeUrl = !isURL ? new URL(url) : url;
+    const hasRobots = safeUrl.pathname.endsWith('robots.txt');
+    if (!hasRobots) {
+      safeUrl.pathname = 'robots.txt';
+    }
+    return safeUrl.href;
   }
 
   static async getRobotsFile(url) {
-    const cleanUrl = Robots.getRobotsUrl(url);
     let result;
+    const cleanUrl = Robots.getRobotsUrl(url);
     try {
       const response = await fetch(cleanUrl);
       const text = await response.text();
