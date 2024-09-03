@@ -174,4 +174,34 @@ describe('Robots', () => {
       });
     });
   });
+  describe('dynamic properties', () => {
+    test('it will have allow, disallow, agents without a url', async () => {
+      const robots = new Robots();
+      expect(robots.allow.size).toEqual(0);
+      expect(robots.disallow.size).toEqual(0);
+      expect(robots.agents.size).toEqual(0);
+    });
+    test('it will have rules with a url', async () => {
+      const robots = new Robots();
+      expect(robots).toHaveProperty('rules');
+      expect(robots.rules).toBeInstanceOf(Object);
+    });
+    test('it will have properties without a', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      await robots.getRules();
+      expect(robots.rules.agents.size).toEqual(6);
+      expect(robots.rules.allow.size).toEqual(1);
+      expect(robots.rules.disallow.size).toEqual(5);
+    });
+  });
+  describe('toJson', () => {
+    test('it will return a JSON string', () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      const parsed = JSON.parse(robots.toJSON());
+      const jsonified = robots.toJSON();
+      expect(typeof jsonified).toEqual('string');
+      expect(parsed).toHaveProperty('allow');
+      expect(parsed).toHaveProperty('disallow');
+    });
+  });
 });

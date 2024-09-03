@@ -182,6 +182,7 @@ export default class Robots {
    */
   toJSON() {
     const data = {
+      url: this.config.url,
       robotsUrl: this.robotsUrl,
       allow: [...this.allow],
       disallow: [...this.disallow],
