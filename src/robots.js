@@ -217,6 +217,7 @@ export default class Robots {
   }
 
   /**
+   * @description checks if the url is disallowed based on the rules
    * @param  {string} url - url to check
    * @param  {string} [userAgent='*'] name of user agent
    * @param  {boolean} [disallowedAnywhere=false] ignore user agent, see if disallowed anywhere
