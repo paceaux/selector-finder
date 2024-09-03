@@ -24,15 +24,38 @@ Disallow: /wp-includes/
 Disallow: /wp-content/plugins/
 Disallow: /wp-admin/admin-ajax.php`;
 
+const MOCK_WITH_COMMENTS = `
+User-agent: CCBot# CC Bot
+Disallow: /
+
+User-agent: PerplexityBot # Perplexity Bot
+Disallow: / # Disallow root
+
+User-agent:*
+Allow: /about-me/ # Allow about me
+Disallow: /wp-admin/# Disallow admin
+Disallow: /wp-includes/
+Disallow: /wp-content/plugins/
+Disallow: /wp-admin/admin-ajax.php`;
+
 axios.mockImplementation((url) => {
   if (url === 'https://blog.frankmtaylor.com') {
     return Promise.resolve({ data: MOCK_DATA });
   }
 });
 
-global.fetch = jest.fn(() => Promise.resolve({
-  text: () => Promise.resolve(MOCK_DATA),
-}));
+global.fetch = jest.fn((url) => {
+  if (url === 'https://blog.frankmtaylor.com/robots.txt') {
+    return Promise.resolve({
+      text: () => Promise.resolve(MOCK_DATA),
+    });
+  }
+  if (url === 'https://foo.com/robots.txt') {
+    return Promise.resolve({
+      text: () => Promise.resolve
+    });
+  }
+});
 
 beforeEach(() => {
   fetch.mockClear();
@@ -171,6 +194,14 @@ describe('Robots', () => {
       test('allow is correct', () => {
         const rules = Robots.getRules(MOCK_DATA);
         expect(rules.allow.has('/about-me/')).toEqual(true);
+      });
+      test('rules do not have comments or spaces', () => {
+        const rules = Robots.getRules(MOCK_WITH_COMMENTS);
+        console.log(rules);
+        expect(rules.agents.has('CCBot')).toEqual(true);
+        expect(rules.agents.has('PerplexityBot')).toEqual(true);
+        expect(rules.agents.has('*')).toEqual(true);
+        expect(rules.disallow.has('/wp-admin/')).toEqual(true);
       });
     });
   });

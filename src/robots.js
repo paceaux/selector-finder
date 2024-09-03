@@ -110,18 +110,30 @@ export default class Robots {
     lines.forEach((line) => {
       const cleanLine = line.trim();
       if (cleanLine.startsWith('User-agent:')) {
-        const agent = line.split(' ')[1];
+        const agent = line
+          .split(':')[1]
+          .split('#')[0]
+          .replace('#', '')
+          .trim();
         currentAgent = agent;
         if (!agents.has(agent)) {
           agents.set(agent, []);
         }
       }
       if (cleanLine.startsWith('Disallow:')) {
-        const path = line.split(' ')[1];
+        const path = line
+          .split(':')[1]
+          .split('#')[0]
+          .replace('#', '')
+          .trim();
         disallow.add(path);
         agents.get(currentAgent).push(path);
       } else if (cleanLine.startsWith('Allow:')) {
-        const path = line.split(' ')[1];
+        const path = line
+          .split(':')[1]
+          .split('#')[0]
+          .replace('#', '')
+          .trim();
         allow.add(path);
         agents.get(currentAgent).push(path);
       }
