@@ -112,7 +112,9 @@ export default class Robots {
       if (cleanLine.startsWith('User-agent:')) {
         const agent = line.split(' ')[1];
         currentAgent = agent;
-        agents.set(agent, []);
+        if (!agents.has(agent)) {
+          agents.set(agent, []);
+        }
       }
       if (cleanLine.startsWith('Disallow:')) {
         const path = line.split(' ')[1];
