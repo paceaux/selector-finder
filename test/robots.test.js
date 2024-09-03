@@ -194,7 +194,20 @@ describe('Robots', () => {
       expect(robots.rules.disallow.size).toEqual(5);
     });
   });
-  describe('toJson', () => {
+  describe('method: getRules', () => {
+    test('it will throw an error without a url', async () => {
+      const robots = new Robots();
+      expect(robots.getRules()).rejects.toThrow('url must not be empty');
+    });
+    test('it will return the rules', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      const rules = await robots.getRules();
+      expect(rules.agents.size).toEqual(6);
+      expect(rules.allow.size).toEqual(1);
+      expect(rules.disallow.size).toEqual(5);
+    });
+  });
+  describe('method: toJson', () => {
     test('it will return a JSON string', () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
       const parsed = JSON.parse(robots.toJSON());

@@ -159,13 +159,14 @@ export default class Robots {
 
   /**
    * @param  {string|URL} [url=this.robotsUrl] - The url of the robots file
-   * @returns {Promise<Map>} - The rules of the robots file
+   * @returns {Promise<RobotsRules>} - The rules of the robots file
    */
   async getRules(url = this.robotsUrl) {
-    let rules = new Map();
-    if (!url) {
-      return rules;
-    }
+    let rules = {
+      agents: new Map(),
+      allow: new Set(),
+      disallow: new Set(),
+    };
     try {
       const robotsText = await Robots.getRobotsFile(url);
       this.robotsText = robotsText;
