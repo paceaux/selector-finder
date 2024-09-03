@@ -12,9 +12,13 @@ const DEFAULT_LIBRARIES = {
 };
 
 export default class Robots {
+  /**
+   * @param  {Object|string|URL} [config=DEFAULT_CONFIG] - Config or url of base site
+   * @param  {Object} [libraries=DEFAULT_LIBRARIES] - The libraries to use for the robots.txt file
+   */
   constructor(config, libraries) {
     const safeConfig = {};
-    if (typeof config === 'string') {
+    if (typeof config === 'string' || config instanceof URL) {
       safeConfig.url = config;
     }
     this.config = { ...Robots.defaultConfig, ...safeConfig };
@@ -22,21 +26,30 @@ export default class Robots {
     this.robotsText = '';
   }
 
+  /**
+   * @returns {Object} - The default config for the class
+   */
   static get defaultConfig() {
     return DEFAULT_CONFIG;
   }
 
+  /**
+   * @returns {Object} - The default libraries for the class
+   */
   static get defaultLibraries() {
     return DEFAULT_LIBRARIES;
   }
 
+  /**
+   * @returns {string} - The url to the robots.txt file for the site
+   */
   get robotsUrl() {
     return Robots.getRobotsUrl(this.config.url);
   }
 
   /**
      * @param  {string|URL} url - The URL to get the robots.txt file from
-     * @returns {string} - The URL of the robots
+     * @returns {string} - A url with /robots.txt at the end
      */
   static getRobotsUrl(url) {
     const isURL = url instanceof URL;
@@ -55,6 +68,10 @@ export default class Robots {
     return safeUrl.href;
   }
 
+  /**
+   * @param  {string|URL} url - the url of the robots file
+   * @returns {Promise<string>} - the text of the robots file
+   */
   static async getRobotsFile(url) {
     let result;
     const cleanUrl = Robots.getRobotsUrl(url);
@@ -68,6 +85,17 @@ export default class Robots {
     return result;
   }
 
+  /**
+   * @typedef {Object} RobotsRules
+   * @property {Map} agents - The rules for each agent
+   * @property {Set} allow - The paths that are allowed
+   * @property {Set} disallow - The paths that are disallowed
+   */
+
+  /**
+   * @param  {string} robotsText
+   * @returns {RobotsRules} - The rules of the robots file
+   */
   static getRules(robotsText) {
     const safeText = robotsText || ' ';
     const lines = safeText
@@ -99,22 +127,38 @@ export default class Robots {
     return { agents, allow, disallow };
   }
 
+  /**
+   * @returns {RobotsRules} - The rules of the robots file
+   */
   get rules() {
     return Robots.getRules(this.robotsText);
   }
 
+  /**
+   * @returns {Set} - The paths that are allowed
+   */
   get allow() {
     return this?.rules?.allow || new Set();
   }
 
+  /**
+   * @returns {Set} - The paths that are disallowed
+   */
   get disallow() {
     return this?.rules?.disallow || new Set();
   }
 
+  /**
+   * @returns {Map} - The rules for each agent
+   */
   get agents() {
     return this?.rules?.agents || new Map();
   }
 
+  /**
+   * @param  {string|URL} [url=this.robotsUrl] - The url of the robots file
+   * @returns {Promise<Map>} - The rules of the robots file
+   */
   async getRules(url = this.robotsUrl) {
     let rules = new Map();
     if (!url) {
@@ -131,6 +175,9 @@ export default class Robots {
     return rules;
   }
 
+  /**
+   * @returns {string} - The JSON representation of the class
+   */
   toJSON() {
     const data = {
       robotsUrl: this.robotsUrl,
