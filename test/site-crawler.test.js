@@ -268,6 +268,29 @@ describe('SiteCrawler:Crawling', () => {
         expect.arrayContaining(['/foo', '/foo/bar', '/foo#beep']),
       );
     });
+    test('it removes anything in disallowedPaths', () => {
+      const pageLinks = ['https://google.com', '/foo', '/foo', '/foo', '/foo/bar/', '#baz', '/foo#beep', '/bars/', '/bar/foos/'];
+      const disallowedPaths = ['/bar/'];
+      const filteredLinks = SiteCrawler.filterPageLinks(pageLinks, 'https://foo.com', disallowedPaths);
+      expect(filteredLinks).toEqual(
+        expect.arrayContaining(['/foo', '/foo#beep', '/bars/']),
+      );
+    });
+    test('it removes multiples in disallowedPaths', () => {
+      const pageLinks = ['https://google.com', '/foo', '/foo', '/foo', '/foo/bar/', '#baz', '/foo#beep', '/bars/', '/bar/foos/'];
+      const disallowedPaths = ['/bar/', '#beep'];
+      const filteredLinks = SiteCrawler.filterPageLinks(pageLinks, 'https://foo.com', disallowedPaths);
+      expect(filteredLinks).toEqual(
+        expect.arrayContaining(['/foo', '/bars/']),
+      );
+    });
+    test('will not remove anything if disallowedPaths is empty', () => {
+      const pageLinks = ['https://google.com', '/foo', '/foo', '/foo', '/foo/bar', '#baz', '/foo#beep', '/bars/', '/bar/foos/'];
+      const filteredLinks = SiteCrawler.filterPageLinks(pageLinks, 'https://foo.com');
+      expect(filteredLinks).toEqual(
+        expect.arrayContaining(['/foo', '/foo/bar', '/bars/', '/bar/foos/']),
+      );
+    });
   });
   describe('getters', () => {
     const siteCrawler = new SiteCrawler();

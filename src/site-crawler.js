@@ -17,6 +17,7 @@ const DEFAULT_CONFIG = {
   linkSelector: 'a[href]',
   shouldCrawl: false,
   useExportedSitemap: true,
+  disallowedPaths: [],
 };
 
 const DEFAULT_LIBRARIES = {
@@ -230,10 +231,11 @@ export default class SiteCrawler {
    * @description Filters an array of links (removes duplicates, external urls, and anchor links)
    * @param  {string[]} pageLinks links to pages
    * @param  {string} siteOrigin the origin of the website
+   * @param {string[]} disallowedPaths an array of paths to ignore
    *
    * @returns {string[]} an array of href values
    */
-  static filterPageLinks(pageLinks, siteOrigin) {
+  static filterPageLinks(pageLinks, siteOrigin, disallowedPaths) {
     if (!Array.isArray(pageLinks)) throw new Error('pageLinks is not an array');
     if (!siteOrigin) throw new Error('No site origin is provided');
 
@@ -244,8 +246,15 @@ export default class SiteCrawler {
       return !isAnchorLink && (isFullyQualifiedSiteLink || isRelativeLink);
     });
     const uniqueLinks = [...new Set(filteredLinks)];
+    let allowedLinks = uniqueLinks;
 
-    return uniqueLinks;
+    if (disallowedPaths) {
+      disallowedPaths.forEach((disallowedPath) => {
+        allowedLinks = allowedLinks.filter((link) => link.indexOf(disallowedPath) === -1);
+      });
+    }
+
+    return allowedLinks;
   }
 
   /**
@@ -259,11 +268,11 @@ export default class SiteCrawler {
     let links = [];
 
     try {
-      const { linkSelector } = this.config;
+      const { linkSelector, disallowedPaths } = this.config;
       const { ajax, dom } = this.libraries;
       const pageMarkup = await SiteCrawler.getPageAsync(url, ajax);
       const pageLinks = SiteCrawler.getLinksFromMarkup(pageMarkup, linkSelector, dom);
-      links = SiteCrawler.filterPageLinks(pageLinks, this.origin);
+      links = SiteCrawler.filterPageLinks(pageLinks, this.origin, disallowedPaths);
     } catch (getLinksError) {
       await log.errorToFileAsync(getLinksError);
     }
