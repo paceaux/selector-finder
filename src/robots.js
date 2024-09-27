@@ -22,11 +22,13 @@ export default class Robots {
    * @param  {Object} [libraries=DEFAULT_LIBRARIES] - The libraries to use for the robots.txt file
    */
   constructor(config, libraries) {
-    const safeConfig = {};
+    let safeConfig = {};
     if (typeof config === 'string' || config instanceof URL) {
       safeConfig.url = config;
+    } else {
+      safeConfig = { ...config };
     }
-    this.config = { ...Robots.defaultConfig, ...safeConfig };
+    this.config = {...Robots.defaultConfig, ...safeConfig };
     this.libraries = { ...Robots.defaultLibraries, ...libraries };
     this.robotsText = '';
     this.outputter = new Outputter('robots.json', log);
