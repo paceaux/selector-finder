@@ -225,6 +225,7 @@ ${mainConfig.honorRobots ? '🤖 Honor any robots.txt file' : ''}
           .toConsole('🤖🐕  Getting robots.txt file...')
           .infoToFileAsync();
         await robots.getRulesAsync();
+        // consider finding a toggle. May not always want to see this.
         await robots.exportRobots();
         await robots.exportDisallowed('*');
         disallowedPaths = robots.agents.get('*')?.get('disallow') || [];
@@ -270,6 +271,7 @@ ${mainConfig.honorRobots ? '🤖 Honor any robots.txt file' : ''}
       return;
     }
     mainConfig.siteCrawler = siteCrawler;
+    mainConfig.disallowedPaths = disallowedPaths;
 
     const selectorFinder = new SelectorFinder(mainConfig);
     const result = await selectorFinder.findSelectorAsync();
