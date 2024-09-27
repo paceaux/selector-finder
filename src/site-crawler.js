@@ -231,13 +231,14 @@ export default class SiteCrawler {
    * @description Filters an array of links (removes duplicates, external urls, and anchor links)
    * @param  {string[]} pageLinks links to pages
    * @param  {string} siteOrigin the origin of the website
-   * @param {string[]} disallowedPaths an array of paths to ignore
+   * @param {string[]} [disallowedPaths=[]] an array of paths to ignore
    *
    * @returns {string[]} an array of href values
    */
-  static filterPageLinks(pageLinks, siteOrigin, disallowedPaths) {
+  static filterPageLinks(pageLinks, siteOrigin, disallowedPaths = []) {
     if (!Array.isArray(pageLinks)) throw new Error('pageLinks is not an array');
     if (!siteOrigin) throw new Error('No site origin is provided');
+    if (!Array.isArray(disallowedPaths)) throw new Error('disallowedPaths is not an array');
 
     const filteredLinks = pageLinks.filter((pageLink) => {
       const isFullyQualifiedSiteLink = pageLink.indexOf(siteOrigin) === 0;
