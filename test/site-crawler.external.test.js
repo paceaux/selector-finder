@@ -31,7 +31,7 @@ describe('SiteCrawler External', () => {
   test('it can produce siteLinks:true, which is a crawl', async () => {
     const siteCrawler = new SiteCrawler({ startPage: 'http://frankmtaylor.com/sitemap.xml' });
 
-    await siteCrawler.produceSiteLinks(false);
+    await siteCrawler.produceSiteLinks(true);
     expect(siteCrawler.urlset.length).toBeGreaterThan(12);
   });
 });
