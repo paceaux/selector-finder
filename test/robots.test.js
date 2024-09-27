@@ -1,6 +1,11 @@
+import { unlink } from 'fs/promises';
+
+
 import { jest } from '@jest/globals';
 import Robots from '../src/robots.js';
 import axios from './__mock__/axios.js';
+
+import Outputter from '../src/outputter.js';
 
 const MOCK_DATA = `User-agent: GPTBot
 Disallow: /
@@ -61,6 +66,9 @@ beforeEach(() => {
   fetch.mockClear();
   axios.mockClear();
 });
+afterAll(async () => {
+  await unlink('blog.frankmtaylor.com.robots.json');
+});
 describe('Robots', () => {
   describe('constructor', () => {
     test('it will create a new instance of Robots', () => {
@@ -90,6 +98,9 @@ describe('Robots', () => {
     });
     test('robots rules', () => {
       expect(robots.rules).toBeInstanceOf(Object);
+    });
+    test('robots outputter', () => {
+      expect(robots.outputter).toBeInstanceOf(Outputter);
     });
   });
   describe('defaultLibraries', () => {
@@ -205,7 +216,19 @@ describe('Robots', () => {
       });
     });
   });
-  describe('dynamic properties', () => {
+  describe('getters', () => {
+    test('exportFileName', () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      expect(robots.exportFileName).toEqual('blog.frankmtaylor.com');
+    });
+    test('pathToExportedFile', () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      expect(robots.pathToExportedFile).toEqual(`${process.cwd()}/blog.frankmtaylor.com.robots.json`);
+    });
+    test('hasExportedRobots', () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      expect(robots.hasExportedRobots).toEqual(false);
+    });
     test('it will have allow, disallow, agents without a url', async () => {
       const robots = new Robots();
       expect(robots.allow.size).toEqual(0);
@@ -219,7 +242,7 @@ describe('Robots', () => {
     });
     test('it will have properties without a', async () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
-      await robots.getRules();
+      await robots.getRulesAsync();
       expect(robots.rules.agents.size).toEqual(6);
       expect(robots.rules.allow.size).toEqual(1);
       expect(robots.rules.disallow.size).toEqual(5);
@@ -228,11 +251,11 @@ describe('Robots', () => {
   describe('method: getRules', () => {
     test('it will throw an error without a url', async () => {
       const robots = new Robots();
-      expect(robots.getRules()).rejects.toThrow('url must not be empty');
+      expect(robots.getRulesAsync()).rejects.toThrow('url must not be empty');
     });
     test('it will return the rules', async () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
-      const rules = await robots.getRules();
+      const rules = await robots.getRulesAsync();
       expect(rules.agents.size).toEqual(6);
       expect(rules.allow.size).toEqual(1);
       expect(rules.disallow.size).toEqual(5);
@@ -250,7 +273,7 @@ describe('Robots', () => {
     });
     test('will return a robust json string with live data', async () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
-      await robots.getRules();
+      await robots.getRulesAsync();
       const parsed = JSON.parse(robots.toJSON());
       const jsonified = robots.toJSON();
       expect(typeof jsonified).toEqual('string');
@@ -265,8 +288,16 @@ describe('Robots', () => {
   describe('method:isUrldisallowed', () => {
     test('will return true if the url is disallowed', async () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
-      await robots.getRules();
+      await robots.getRulesAsync();
       expect(robots.isUrlDisallowed('https://blog.frankmtaylor.com/wp-admin/')).toEqual(true);
+    });
+  });
+  describe('method: exportRobots', () => {
+    test('it will export to a file', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      await robots.getRulesAsync();
+      await robots.exportRobots();
+      expect(robots.hasExportedRobots).toEqual(true);
     });
   });
 });

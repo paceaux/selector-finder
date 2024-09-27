@@ -1,5 +1,9 @@
+import Path from 'path';
+import fs from 'fs';
+
 import { LOG_FILE_NAME } from './constants.js';
 import Log from './logger.js';
+import Outputter from './outputter.js';
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -25,6 +29,7 @@ export default class Robots {
     this.config = { ...Robots.defaultConfig, ...safeConfig };
     this.libraries = { ...Robots.defaultLibraries, ...libraries };
     this.robotsText = '';
+    this.outputter = new Outputter('robots.json', log);
   }
 
   /**
@@ -47,6 +52,32 @@ export default class Robots {
    */
   get robotsUrl() {
     return Robots.getRobotsUrl(this.config.url);
+  }
+
+  /**
+   * @description the name of the file to export the robots data to
+   */
+  get exportFileName() {
+    return this.robotsUrl
+      .replace(/https?:\/\//gi, '')
+      .replace(/\/robots/gi, '')
+      .replace(/.txt/gi, '');
+  }
+
+  /**
+   * @description provides a fully qualified path to the robots json file
+   * @type {string}
+   */
+  get pathToExportedFile() {
+    return Path.join(process.cwd(), `${this.exportFileName}.${this.outputter.defaultOutputFile}`);
+  }
+
+  /**
+   * @description determines if the links have already been exported to a file
+   * @type {boolean}
+   */
+  get hasExportedRobots() {
+    return fs.existsSync(this.pathToExportedFile);
   }
 
   /**
@@ -199,7 +230,7 @@ export default class Robots {
    * @param  {string|URL} [url=this.robotsUrl] - The url of the robots file
    * @returns {Promise<RobotsRules>} - The rules of the robots file
    */
-  async getRules(url = this.robotsUrl) {
+  async getRulesAsync(url = this.robotsUrl) {
     let rules = {
       agents: new Map(),
       allow: new Set(),
@@ -286,5 +317,13 @@ export default class Robots {
     };
 
     return JSON.stringify(data, null, 2);
+  }
+
+  async exportRobots(fileName = this.exportFileName) {
+    try {
+      await this.outputter.writeDataAsync(JSON.parse(this.toJSON()), fileName);
+    } catch (exportRobotsError) {
+      await log.errorToFileAsync(exportRobotsError);
+    }
   }
 }
