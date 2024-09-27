@@ -14,6 +14,7 @@ import {
   DEFAULT_SHOW_ELEMENT_DETAILS,
   DEFAULT_SHOW_HTML,
   DEFAULT_CRAWL,
+  DEFAULT_HONOR_ROBOTS,
 } from './src/constants.js';
 
 import SelectorFinder from './src/selector-finder.js';
@@ -21,6 +22,7 @@ import SiteCrawler from './src/site-crawler.js';
 import Outputter from './src/outputter.js';
 import Log from './src/logger.js';
 import CSSReader from './src/css-reader.js';
+import Robots from './src/robots.js';
 
 const log = new Log(LOG_FILE_NAME);
 
@@ -96,6 +98,12 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'boolean',
     default: DEFAULT_SHOW_HTML,
   })
+  .option('honorRobots', {
+    alias: 'b',
+    description: 'Honor robots.txt',
+    type: 'boolean',
+    default: DEFAULT_HONOR_ROBOTS,
+  })
   .help()
   .alias('help', 'h');
 
@@ -111,6 +119,7 @@ const {
   cssFile,
   showElementDetails,
   showHtml,
+  honorRobots,
 } = argv;
 
 const selectorFinderConfig = {
@@ -125,6 +134,7 @@ const selectorFinderConfig = {
   cssFile,
   showElementDetails,
   showHtml,
+  honorRobots,
 };
 
 async function setCSSFileSelectors(config) {
@@ -193,6 +203,7 @@ ${mainConfig.showElementDetails ? '💡  Show full details for matching elements
 ${mainConfig.isSpa ? '💡  Handle as Single Page Application' : ''}
 ${mainConfig.takeScreenshots ? '📷  Take Screenshots' : ''}
 ${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json file and make a new one'}
+${mainConfig.honorRobots ? '🤖 Honor any robots.txt file' : ''}
 `;
     await log
       .toConsole(startMessage)
@@ -203,12 +214,40 @@ ${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json 
       mainConfig = await setCSSFileSelectors(mainConfig);
     }
 
+    // Get the robots.txt file
+    const robots = new Robots({ url: mainConfig.sitemap });
+    // set the disallowed paths first, b/c there might be another approach to add these later
+    let disallowedPaths = [];
+
+    if (mainConfig.honorRobots) {
+      try {
+        await log
+          .toConsole('🤖🐕  Getting robots.txt file...')
+          .infoToFileAsync();
+        await robots.getRulesAsync();
+        await robots.exportRobots();
+        await robots.exportDisallowed('*');
+        disallowedPaths = robots.agents.get('*')?.get('disallow') || [];
+        disallowedPaths = [...disallowedPaths];
+      } catch (robotsError) {
+        await log
+          .toConsole('🤖🚫  Error getting robots.txt file. Continuing without it.')
+          .errorToFileAsync(robotsError);
+      }
+    }
+
+    if (disallowedPaths.length > 0) {
+      const disallowedPathsMessage = `📄🚫  Disallowed paths: ${disallowedPaths.join(', ')}`;
+      await log.toConsole(disallowedPathsMessage).infoToFileAsync(disallowedPaths);
+    }
+
     // Set up the Crawler
     const siteCrawler = new SiteCrawler(
       {
         startPage: mainConfig.sitemap,
         shouldCrawl: mainConfig.crawl,
         useExportedSitemap: mainConfig.useExportedSitemap,
+        disallowedPaths,
       },
     );
     log.toConsole(`
