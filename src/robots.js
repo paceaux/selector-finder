@@ -319,6 +319,10 @@ export default class Robots {
     return JSON.stringify(data, null, 2);
   }
 
+  /**
+   * @description exports the robots data to a file
+   * @param  {string} [fileName=this.exportFileName] name for the file the data is exported to
+   */
   async exportRobots(fileName = this.exportFileName) {
     try {
       await this.outputter.writeDataAsync(JSON.parse(this.toJSON()), fileName);
