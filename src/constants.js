@@ -9,5 +9,4 @@ export const DEFAULT_TAKE_SCREENSHOTS = false;
 export const DEFAULT_SHOW_ELEMENT_DETAILS = false;
 export const DEFAULT_SHOW_HTML = true;
 export const DEFAULT_CRAWL = false;
-
-export const HONOR_ROBOTS = false;
+export const DEFAULT_HONOR_ROBOTS = false;
