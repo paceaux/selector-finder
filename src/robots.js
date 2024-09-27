@@ -28,7 +28,7 @@ export default class Robots {
     } else {
       safeConfig = { ...config };
     }
-    this.config = {...Robots.defaultConfig, ...safeConfig };
+    this.config = { ...Robots.defaultConfig, ...safeConfig };
     this.libraries = { ...Robots.defaultLibraries, ...libraries };
     this.robotsText = '';
     this.outputter = new Outputter('robots.json', log);
@@ -75,11 +75,27 @@ export default class Robots {
   }
 
   /**
+   * @description provides a fully qualified path to the disallowed json file
+   * @type {string}
+   */
+  get pathToDisallowedFile() {
+    return Path.join(process.cwd(), `${this.exportFileName}.disallowed.json`);
+  }
+
+  /**
    * @description determines if the links have already been exported to a file
    * @type {boolean}
    */
   get hasExportedRobots() {
     return fs.existsSync(this.pathToExportedFile);
+  }
+
+  /**
+   * @description determines if a disallowed file has already exported
+   * @type {boolean}
+   */
+  get hasExportedDisallowed() {
+    return fs.existsSync(this.pathToDisallowedFile);
   }
 
   /**
@@ -333,6 +349,10 @@ export default class Robots {
     }
   }
 
+  /**
+   * @description exports the disallowed paths to a json file
+   * @param  {string} [agent='*'] the user agent whose disallow rules should be exported
+   */
   async exportDisallowed(agent = '*') {
     const disallowedIterable = this.agents.get(agent)?.get('disallow') || [];
     const disallowed = [...disallowedIterable];

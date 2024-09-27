@@ -225,9 +225,17 @@ describe('Robots', () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
       expect(robots.pathToExportedFile).toEqual(`${process.cwd()}/blog.frankmtaylor.com.robots.json`);
     });
+    test('pathToDisallowedFile', () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      expect(robots.pathToDisallowedFile).toEqual(`${process.cwd()}/blog.frankmtaylor.com.disallowed.json`);
+    });
     test('hasExportedRobots', () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
       expect(robots.hasExportedRobots).toEqual(false);
+    });
+    test('hasExportedDisallowed', () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      expect(robots.hasExportedDisallowed).toEqual(false);
     });
     test('it will have allow, disallow, agents without a url', async () => {
       const robots = new Robots();
@@ -292,11 +300,26 @@ describe('Robots', () => {
       expect(robots.isUrlDisallowed('https://blog.frankmtaylor.com/wp-admin/')).toEqual(true);
     });
   });
+  describe('method:isUrlExplicityAllowed', () => {
+    test('will return true if the url is allowed', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      await robots.getRulesAsync();
+      expect(robots.isUrlExplicityAllowed('https://blog.frankmtaylor.com/about-me/')).toEqual(true);
+    });
+  });
   describe('method: exportRobots', () => {
     test('it will export to a file', async () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
       await robots.getRulesAsync();
       await robots.exportRobots();
+      expect(robots.hasExportedRobots).toEqual(true);
+    });
+  });
+  describe('method: exportDisallowed', () => {
+    test('it will export to a file', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      await robots.getRulesAsync();
+      await robots.exportDisallowed();
       expect(robots.hasExportedRobots).toEqual(true);
     });
   });
