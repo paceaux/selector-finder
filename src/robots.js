@@ -332,4 +332,15 @@ export default class Robots {
       await log.errorToFileAsync(exportRobotsError);
     }
   }
+
+  async exportDisallowed(agent = '*') {
+    const disallowedIterable = this.agents.get(agent)?.get('disallow') || [];
+    const disallowed = [...disallowedIterable];
+    try {
+      const outputter = new Outputter('disallowed.json', log);
+      await outputter.writeDataAsync(disallowed, `${this.exportFileName}`);
+    } catch (exportDisallowedError) {
+      await log.errorToFileAsync(exportDisallowedError);
+    }
+  }
 }
