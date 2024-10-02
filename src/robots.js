@@ -138,6 +138,23 @@ export default class Robots {
     return result;
   }
 
+  static getRuleKey(rule) {
+    if (!rule) return '';
+    return rule
+      .split(':')[0]
+      .replace(':', '')
+      .toLowerCase()
+      .trim();
+  }
+
+  static getRuleValue(rule) {
+    if (!rule) return '';
+    return rule
+      .split(':')[1]
+      .split('#')[0]
+      .replace('#', '')
+      .trim();
+  }
   /**
    * @typedef {Object} RobotsRules
    * @property {Map} agents - The rules for each agent
@@ -169,11 +186,7 @@ export default class Robots {
       // nix whitespace
       const cleanLine = line.trim();
       if (cleanLine.startsWith('User-agent:')) {
-        const agent = line
-          .split(':')[1]
-          .split('#')[0]
-          .replace('#', '')
-          .trim();
+        const agent = Robots.getRuleValue(cleanLine);
         // declare the currentAgent here
         currentAgent = agent;
         if (!agents.has(agent)) {
@@ -187,21 +200,13 @@ export default class Robots {
       }
       // either it's disallow or it's allow next
       if (cleanLine.startsWith('Disallow:')) {
-        const path = line
-          .split(':')[1]
-          .split('#')[0]
-          .replace('#', '')
-          .trim();
+        const path = Robots.getRuleValue(line);
         // add to the disallow list
         disallow.add(path);
         // add to the agent's list
         agents.get(currentAgent).get('disallow').add(path);
       } else if (cleanLine.startsWith('Allow:')) {
-        const path = line
-          .split(':')[1]
-          .split('#')[0]
-          .replace('#', '')
-          .trim();
+        const path = Robots.getRuleValue(line);
         // add to the allow list
         allow.add(path);
         // add to the agent's list

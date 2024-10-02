@@ -43,6 +43,21 @@ Disallow: /wp-includes/
 Disallow: /wp-content/plugins/
 Disallow: /wp-admin/admin-ajax.php`;
 
+const MOCK_WITH_GROUPS = `
+User-agent: CCBot# CC Bot
+Disallow: /
+
+User-agent: FooBot
+User-agent: BarBot
+Disallow: / # Disallow root
+
+User-agent:*
+Allow: /about-me/ # Allow about me
+Disallow: /wp-admin/# Disallow admin
+Disallow: /wp-includes/
+Disallow: /wp-content/plugins/
+Disallow: /wp-admin/admin-ajax.php`;
+
 axios.mockImplementation((url) => {
   if (url === 'https://blog.frankmtaylor.com') {
     return Promise.resolve({ data: MOCK_DATA });
@@ -57,7 +72,7 @@ global.fetch = jest.fn((url) => {
   }
   if (url === 'https://foo.com/robots.txt') {
     return Promise.resolve({
-      text: () => Promise.resolve
+      text: () => Promise.resolve(MOCK_WITH_COMMENTS),
     });
   }
 });
@@ -185,6 +200,26 @@ describe('Robots', () => {
       });
     });
     describe('parsing', () => {
+      test('it can parse a rule value', () => {
+        const ruleValue = Robots.getRuleValue('User-agent: GPTBot');
+        expect(ruleValue).toEqual('GPTBot');
+      });
+      test('it can parse a rule value with comment', () => {
+        const ruleValue = Robots.getRuleValue('User-agent: GPTBot # GPT Bot');
+        expect(ruleValue).toEqual('GPTBot');
+      });
+      test('it can parse a rule key with agent and space', () => {
+        const ruleValue = Robots.getRuleKey('User-agent: GPTBot');
+        expect(ruleValue).toEqual('user-agent');
+      });
+      test('it can parse a rule key with agent and comment', () => {
+        const ruleValue = Robots.getRuleKey('User-agent: GPTBot # GPT Bot');
+        expect(ruleValue).toEqual('user-agent');
+      });
+      test('it can parse a rule key with disallow', () => {
+        const ruleValue = Robots.getRuleKey('disallow:/');
+        expect(ruleValue).toEqual('disallow');
+      });
       test('it will parse the rules', () => {
         const rules = Robots.getRules(MOCK_DATA);
         expect(rules.agents.size).toEqual(6);
