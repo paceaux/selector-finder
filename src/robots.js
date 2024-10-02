@@ -185,32 +185,31 @@ export default class Robots {
     lines.forEach((line) => {
       // nix whitespace
       const cleanLine = line.trim();
-      if (cleanLine.startsWith('User-agent:')) {
-        const agent = Robots.getRuleValue(cleanLine);
+      const key = Robots.getRuleKey(cleanLine);
+      const value = Robots.getRuleValue(cleanLine);
+      if (key === 'user-agent') {
         // declare the currentAgent here
-        currentAgent = agent;
-        if (!agents.has(agent)) {
+        currentAgent = value;
+        if (!agents.has(value)) {
           // if it doesn't exist, create it with empty Map
           const agentMap = new Map([
             ['allow', new Set()],
             ['disallow', new Set()],
           ]);
-          agents.set(agent, agentMap);
+          agents.set(value, agentMap);
         }
       }
       // either it's disallow or it's allow next
-      if (cleanLine.startsWith('Disallow:')) {
-        const path = Robots.getRuleValue(line);
+      if (key === 'disallow') {
         // add to the disallow list
-        disallow.add(path);
+        disallow.add(value);
         // add to the agent's list
-        agents.get(currentAgent).get('disallow').add(path);
-      } else if (cleanLine.startsWith('Allow:')) {
-        const path = Robots.getRuleValue(line);
+        agents.get(currentAgent).get('disallow').add(value);
+      } else if (key === 'allow') {
         // add to the allow list
-        allow.add(path);
+        allow.add(value);
         // add to the agent's list
-        agents.get(currentAgent).get('allow').add(path);
+        agents.get(currentAgent).get('allow').add(value);
       }
     });
     return { agents, allow, disallow };
