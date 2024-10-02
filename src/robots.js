@@ -185,31 +185,37 @@ export default class Robots {
     lines.forEach((line) => {
       // nix whitespace
       const cleanLine = line.trim();
+      if (!cleanLine) return;
       const key = Robots.getRuleKey(cleanLine);
       const value = Robots.getRuleValue(cleanLine);
-      if (key === 'user-agent') {
-        // declare the currentAgent here
-        currentAgent = value;
-        if (!agents.has(value)) {
-          // if it doesn't exist, create it with empty Map
-          const agentMap = new Map([
-            ['allow', new Set()],
-            ['disallow', new Set()],
-          ]);
-          agents.set(value, agentMap);
-        }
-      }
-      // either it's disallow or it's allow next
-      if (key === 'disallow') {
-        // add to the disallow list
-        disallow.add(value);
-        // add to the agent's list
-        agents.get(currentAgent).get('disallow').add(value);
-      } else if (key === 'allow') {
-        // add to the allow list
-        allow.add(value);
-        // add to the agent's list
-        agents.get(currentAgent).get('allow').add(value);
+
+      switch (key) {
+        case 'user-agent':
+          // declare the currentAgent here
+          currentAgent = value;
+          if (!agents.has(value)) {
+            // if it doesn't exist, create it with empty Map
+            const agentMap = new Map([
+              ['allow', new Set()],
+              ['disallow', new Set()],
+            ]);
+            agents.set(value, agentMap);
+          }
+          break;
+        case 'disallow':
+          // add to the disallow list
+          disallow.add(value);
+          // add to the agent's list
+          agents.get(currentAgent).get('disallow').add(value);
+          break;
+        case 'allow':
+          // add to the allow list
+          allow.add(value);
+          // add to the agent's list
+          agents.get(currentAgent).get('allow').add(value);
+          break;
+        default:
+          break;
       }
     });
     return { agents, allow, disallow };
