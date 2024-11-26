@@ -369,7 +369,7 @@ export default class SiteCrawler {
       const sitemapUrls = await this.getSitemapLinks(sitemapUrl);
       this.addLinks(sitemapUrls);
     } catch (setSitemapError) {
-      await this.errorToFileAsync(setSitemapError);
+      await log.errorToFileAsync(setSitemapError);
     }
   }
 
@@ -384,7 +384,7 @@ export default class SiteCrawler {
       const existingSiteLinks = JSON.parse(existingJson);
       this.addLinks(existingSiteLinks);
     } catch (setLinksError) {
-      await this.errorToFileAsync(setLinksError);
+      await log.errorToFileAsync(setLinksError);
     }
   }
 
