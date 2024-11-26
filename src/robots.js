@@ -9,6 +9,7 @@ const log = new Log(LOG_FILE_NAME);
 
 const DEFAULT_CONFIG = {
   url: '',
+  useExportedRobots: true,
 };
 
 const DEFAULT_LIBRARIES = {
@@ -16,6 +17,8 @@ const DEFAULT_LIBRARIES = {
 };
 
 export default class Robots {
+  _existingRules = null;
+
   /**
    * @description Class for getting a robots.txt file and parsing rules
    * @param  {Object|string|URL} [config=DEFAULT_CONFIG] - Config or url of base site
@@ -155,6 +158,57 @@ export default class Robots {
       .replace('#', '')
       .trim();
   }
+
+  /**
+   * @param  {Map} agents  - a map of the user agents
+   * @param  {string} url - the url to test
+   * @param  {string} [userAgent='*'] - the user agent to test
+   * @param  {boolean} [allowedAnywhere=false] - ignore userAgent and see if allowed anywhere
+   * @param  {Set} [allAllowRules=Set()]
+   */
+  static isUrlExplicityAllowed(agents, url, userAgent = '*', allowedAnywhere = false, allAllowRules = new Set()) {
+    if (!url) return false;
+
+    const safeUrl = new URL(url);
+    let allowRules = agents.has(userAgent)
+      ? [...agents.get(userAgent).get('allow')]
+      : [];
+
+    if (allowedAnywhere) {
+      allowRules = [...allAllowRules];
+    }
+    const hasMatches = allowRules
+      .some((rule) => safeUrl.pathname.includes(rule));
+
+    return hasMatches;
+  }
+
+  /**
+   * determines if a url is disallowed based on a map of agents, 
+   * @param  {Map} agents - a map of user agents
+   * @param  {string} url - the url to test
+   * @param  {string} [userAgent='*'] - the user agent to test
+   * @param  {boolean} [disallowedAnywhere=false] - ignore userAgent and see if disallowed anywhere
+   * @param  {Set} [allDisallowRules=Set()] - all disallow rules
+   */
+  static isUrlDisallowed(agents, url, userAgent = '*', disallowedAnywhere = false, allDisallowRules = new Set()) {
+    if (!agents) return false;
+    if (!url) return false;
+
+    const safeUrl = new URL(url);
+    let disallowRules = agents.has(userAgent)
+      ? [...agents.get(userAgent).get('disallow')]
+      : [];
+
+    if (disallowedAnywhere) {
+      disallowRules = [...allDisallowRules];
+    }
+
+    const hasMatches = disallowRules
+      .some((rule) => safeUrl.pathname.includes(rule));
+
+    return hasMatches;
+  }
   /**
    * @typedef {Object} RobotsRules
    * @property {Map} agents - The rules for each agent
@@ -221,12 +275,16 @@ export default class Robots {
     return { agents, allow, disallow };
   }
 
+  set rules(rules) {
+    this._existingRules = rules;
+  }
+
   /**
    * @description if robotsText is set, returns the parsed rules of the file
    * @returns {RobotsRules} - The rules of the robots file
    */
   get rules() {
-    return Robots.getRules(this.robotsText);
+    return this._existingRules || Robots.getRules(this.robotsText);
   }
 
   /**
@@ -254,16 +312,43 @@ export default class Robots {
   }
 
   /**
+   * @param  {string} fileName
+   */
+  async setRulesFromJsonFile(fileName) {
+    if (!fileName) return;
+    try {
+      const existingJson = await fs.promises.readFile(fileName, 'utf-8');
+      const jsonRules = JSON.parse(existingJson);
+      const agents = new Map(jsonRules.agents);
+      const allow = new Set(jsonRules.allow);
+      const disallow = new Set(jsonRules.disallow);
+      const existingRules = { agents, allow, disallow };
+      this.rules = existingRules;
+    } catch (setRulesError) {
+      await log.errorToFileAsync(setRulesError);
+    }
+  }
+
+  /**
    * @description gets the rules from from the robotsUrl property
    * @param  {string|URL} [url=this.robotsUrl] - The url of the robots file
+   * @param  {boolean} [useExportedRobots=this.config.useExportedRobots] - Use the exported robots file
    * @returns {Promise<RobotsRules>} - The rules of the robots file
    */
-  async getRulesAsync(url = this.robotsUrl) {
+  async getRulesAsync(url = this.robotsUrl, useExportedRobots = this.config.useExportedRobots) {
+    const shouldNotProduceRobots = useExportedRobots && this.hasExportedRobots;
+
+    if (shouldNotProduceRobots) {
+      await this.setRulesFromJsonFile(this.pathToExportedFile);
+      return this.rules;
+    }
+
     let rules = {
       agents: new Map(),
       allow: new Set(),
       disallow: new Set(),
     };
+    
     try {
       const robotsText = await Robots.getRobotsFile(url);
       this.robotsText = robotsText;
@@ -284,19 +369,7 @@ export default class Robots {
   isUrlDisallowed(url, userAgent = '*', disallowedAnywhere = false) {
     if (!url) return false;
 
-    const safeUrl = new URL(url);
-    let disallowRules = this.agents.has(userAgent)
-      ? [...this.agents.get(userAgent).get('disallow')]
-      : [];
-
-    if (disallowedAnywhere) {
-      disallowRules = [...this.disallow];
-    }
-
-    const hasMatches = disallowRules
-      .some((rule) => safeUrl.pathname.includes(rule));
-
-    return hasMatches;
+    return Robots.isUrlDisallowed(this.agents, url, userAgent, disallowedAnywhere, this.disallow);
   }
 
   /**
@@ -310,18 +383,7 @@ export default class Robots {
   isUrlExplicityAllowed(url, userAgent = '*', allowedAnywhere = false) {
     if (!url) return false;
 
-    const safeUrl = new URL(url);
-    let allowRules = this.agents.has(userAgent)
-      ? [...this.agents.get(userAgent).get('allow')]
-      : [];
-
-    if (allowedAnywhere) {
-      allowRules = [...this.allow];
-    }
-    const hasMatches = allowRules
-      .some((rule) => safeUrl.pathname.includes(rule));
-
-    return hasMatches;
+    return Robots.isUrlExplicityAllowed(this.agents, url, userAgent, allowedAnywhere, this.allow);
   }
 
   /**

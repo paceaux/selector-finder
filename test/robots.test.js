@@ -249,6 +249,13 @@ describe('Robots', () => {
         expect(rules.agents.has('*')).toEqual(true);
         expect(rules.disallow.has('/wp-admin/')).toEqual(true);
       });
+      test('grouped agents have their own entries', () => {
+        const rules = Robots.getRules(MOCK_WITH_GROUPS);
+        expect(rules.agents.has('FooBot')).toEqual(true);
+        expect(rules.agents.has('BarBot')).toEqual(true);
+        expect(rules.agents.get('BarBot').get('disallow')).toEqual(new Set(['/']));
+        // expect(rules.agents.get('FooBot').get('disallow')).toEqual(new Set(['/']));
+      });
     });
   });
   describe('getters', () => {
@@ -290,6 +297,17 @@ describe('Robots', () => {
       expect(robots.rules.allow.size).toEqual(1);
       expect(robots.rules.disallow.size).toEqual(5);
     });
+    test('rules can also be set via an object, and it populates the allow and disallow', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com');
+      const allow = new Set(['/about-me/']);
+      const disallow = new Set(['/wp-admin/']);
+      const agents = new Map([['*', disallow]]);
+      robots.rules = { agents, allow, disallow };
+
+      expect(robots.allow).toEqual(allow);
+      expect(robots.disallow).toEqual(disallow);
+      expect(robots.agents).toEqual(agents);
+    });
   });
   describe('method: getRules', () => {
     test('it will throw an error without a url', async () => {
@@ -298,6 +316,13 @@ describe('Robots', () => {
     });
     test('it will return the rules', async () => {
       const robots = new Robots('https://blog.frankmtaylor.com');
+      const rules = await robots.getRulesAsync();
+      expect(rules.agents.size).toEqual(6);
+      expect(rules.allow.size).toEqual(1);
+      expect(rules.disallow.size).toEqual(5);
+    });
+    test('it will get an existing file if useExportedRobots is true', async () => {
+      const robots = new Robots('https://blog.frankmtaylor.com', { useExportedRobots: true });
       const rules = await robots.getRulesAsync();
       expect(rules.agents.size).toEqual(6);
       expect(rules.allow.size).toEqual(1);
