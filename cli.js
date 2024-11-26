@@ -238,7 +238,7 @@ ${mainConfig.honorRobots ? '🤖 Honor any robots.txt file' : ''}
     }
 
     if (disallowedPaths.length > 0) {
-      const disallowedPathsMessage = `📄🚫  Disallowed paths: ${disallowedPaths.join(', ')}`;
+      const disallowedPathsMessage = `📄🚫  Disallowed paths: \n ${disallowedPaths.join(',\n')}`;
       await log.toConsole(disallowedPathsMessage).infoToFileAsync(disallowedPaths);
     }
 
