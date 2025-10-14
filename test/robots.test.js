@@ -1,4 +1,4 @@
-import { unlink } from 'fs/promises';
+import { unlink, writeFile } from 'fs/promises';
 
 
 import { jest } from '@jest/globals';
@@ -83,6 +83,7 @@ beforeEach(() => {
 });
 afterAll(async () => {
   await unlink('blog.frankmtaylor.com.robots.json');
+  await unlink('blog.frankmtaylor.com.disallowed.json');
 });
 describe('Robots', () => {
   describe('constructor', () => {
@@ -352,6 +353,29 @@ describe('Robots', () => {
       expect(parsed.agents['*']).toBeInstanceOf(Object);
       expect(parsed.agents['*']).toHaveProperty('allow');
     });
+    test('it can accept an object', async () => {
+      const agents = new Map();
+      const disallow = new Set(['/wp-admin/']);
+      const allow = new Set(['/about-me/']);
+      agents.set('*', new Map());
+      agents.get('*').set('disallow', disallow);
+      agents.get('*').set('allow', allow);
+      const dataObject = {
+        agents,
+        allow,
+        disallow,
+        url: 'https://foo.frankmtaylor.com',
+      };
+
+      const robots = new Robots();
+      const parsed = JSON.parse(robots.toJSON(dataObject));
+      expect(parsed).toHaveProperty('allow');
+      expect(parsed).toHaveProperty('disallow');
+      expect(parsed).toHaveProperty('agents');
+      expect(parsed.url).toEqual('https://foo.frankmtaylor.com');
+      expect(parsed).toHaveProperty('robotsUrl');
+      expect(parsed.robotsUrl).toEqual('https://foo.frankmtaylor.com/robots.txt');
+    });
   });
   describe('method:isUrldisallowed', () => {
     test('will return true if the url is disallowed', async () => {
@@ -373,6 +397,30 @@ describe('Robots', () => {
       await robots.getRulesAsync();
       await robots.exportRobots();
       expect(robots.hasExportedRobots).toEqual(true);
+    });
+  });
+  describe('method: setRulesFromJsonFile', () => {
+    test('it exports all the stuff to a file', async () => {
+      const robots = new Robots('');
+      const agents = new Map();
+      const disallow = new Set(['/wp-admin/']);
+      const allow = new Set(['/about-me/']);
+      agents.set('*', new Map());
+      agents.get('*').set('disallow', disallow);
+      agents.get('*').set('allow', allow);
+      const dataObject = {
+        agents,
+        allow,
+        disallow,
+        url: 'https://foo.frankmtaylor.com',
+      };
+      await writeFile('export-test.json', robots.toJSON(dataObject));
+      await robots.setRulesFromJsonFile('export-test.json');
+      console.log(robots.toJSON());
+      expect(robots.url).toEqual('https://foo.frankmtaylor.com');
+      expect(robots.robotsUrl).toEqual('https://foo.frankmtaylor.com/robots.txt');
+      expect(robots.rules.agents.size).toEqual(1);
+      expect(robots.rules.allow.size).toEqual(1);
     });
   });
   describe('method: exportDisallowed', () => {
