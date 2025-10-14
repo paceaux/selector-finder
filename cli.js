@@ -215,15 +215,24 @@ ${mainConfig.honorRobots ? '🤖 Honor any robots.txt file' : ''}
     }
 
     // Get the robots.txt file
-    const robots = new Robots({ url: mainConfig.sitemap });
+    let robots = null;
     // set the disallowed paths first, b/c there might be another approach to add these later
     let disallowedPaths = [];
 
     if (mainConfig.honorRobots) {
+      robots = new Robots(
+        {
+          url: mainConfig.sitemap,
+          useExportedRobots: mainConfig.useExportedSitemap,
+        },
+      );
+
       try {
         await log
           .toConsole('🤖🐕  Getting robots.txt file...')
           .infoToFileAsync();
+        // we should pass a config into getRulesAsync; 
+        // it should know whether to fetch anew or use existing
         await robots.getRulesAsync();
         // consider finding a toggle. May not always want to see this.
         await robots.exportRobots();

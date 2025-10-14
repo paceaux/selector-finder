@@ -19,6 +19,7 @@ export default class SelectorFinder {
   constructor(config, libraries) {
     this.config = config;
     this.libraries = { ...SelectorFinder.defaultLibraries, ...libraries };
+    this.robots = null;
   }
 
   static get defaultLibraries() {
@@ -87,6 +88,7 @@ export default class SelectorFinder {
     const { data } = await this.libraries.ajax(url);
     const $ = cheerio.load(data);
 
+    console.log($.html());
     const elementResults = [];
     const unusedSelectors = [];
     const selectorErrors = [];
@@ -251,8 +253,9 @@ export default class SelectorFinder {
      * @param  {string|Array} selector CSS Selector
      * @param {PuppeteerBrowser} browser a browser object instantiated with puppeteer
      * @param  {boolean} takeScreenshots grab a screenshot of element
+     * @param  {Array<string>} [disallowedPaths] paths to ignore
    */
-  async searchPagesAsync(sitemapJson, selector, browser, takeScreenshots) {
+  async searchPagesAsync(sitemapJson, selector, browser, takeScreenshots, disallowedPaths) {
     const results = new SiteSearchResult();
 
     try {
@@ -285,10 +288,12 @@ export default class SelectorFinder {
      * @param  {Object} sitemapJson JSON object generated from sitemap
      * @param  {string|Array} selector CSS Selector
      * @param  {boolean} takeScreenshots grab a screenshot of element
+     * @param  {boolean} isSpa is the site a single-page app
+     * @param {Array<string>} disallowedPaths
      *
      * @returns {Array<SearchPageResult>}
      */
-  async searchSiteAsync(sitemapJson, selector, takeScreenshots, isSpa) {
+  async searchSiteAsync(sitemapJson, selector, takeScreenshots, isSpa, disallowedPaths) {
     const usePuppeteer = takeScreenshots || isSpa;
     let results = null;
     let browser = null;
@@ -302,7 +307,13 @@ export default class SelectorFinder {
         });
       }
 
-      results = await this.searchPagesAsync(sitemapJson, selector, browser, takeScreenshots);
+      results = await this.searchPagesAsync(
+        sitemapJson,
+        selector,
+        browser,
+        takeScreenshots,
+        disallowedPaths,
+      );
 
       if (usePuppeteer) {
         await browser.close();
@@ -341,6 +352,7 @@ export default class SelectorFinder {
     selector,
     takeScreenshots,
     isSpa,
+    disallowedPaths,
   } = {}) {
     let result = null;
 
@@ -353,6 +365,7 @@ export default class SelectorFinder {
           selector,
           takeScreenshots,
           isSpa,
+          disallowedPaths,
         );
 
       result = {
