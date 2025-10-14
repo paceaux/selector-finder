@@ -16,6 +16,23 @@ const DEFAULT_LIBRARIES = {
 
 };
 
+/**
+ * @class Robots
+ * @description Class for getting a robots.txt file and parsing rules
+ * @param  {Object|string|URL} [config=DEFAULT_CONFIG] - Config or url of base site
+ * @param  {Object} [libraries=DEFAULT_LIBRARIES] - The libraries to use for the robots.txt file
+ * @property {Object} config - The configuration for the class
+ * @property {Object} libraries - The libraries to use for the robots.txt file
+ * @property {string} robotsText - The text of the robots file
+ * @property {Outputter} outputter - The outputter for the class
+ * @property {string} exportFileName - The name of the file to export the robots data to
+ * @property {string} pathToExportedFile - The path to the exported file
+ * @property {string} pathToDisallowedFile - The path to the disallowed file
+ * @property {boolean} hasExportedRobots - Determines if the links have already been exported to a file
+ * @property {boolean} hasExportedDisallowed - Determines if a disallowed file has already exported
+ * @property {Map} 
+
+ */
 export default class Robots {
   _existingRules = null;
 
@@ -141,6 +158,12 @@ export default class Robots {
     return result;
   }
 
+  /**
+   * Reads a line from a robots file and determines what the keyname is
+   * @static
+   * @param  {string} rule
+   * @returns {string} - The key of the rule
+   */
   static getRuleKey(rule) {
     if (!rule) return '';
     return rule
@@ -150,6 +173,12 @@ export default class Robots {
       .trim();
   }
 
+  /**
+   * Reads a line from a robots file and determines what the value is
+   * @static
+   * @param  {string} rule
+   * @returns {string} - The value of the rule
+   */
   static getRuleValue(rule) {
     if (!rule) return '';
     return rule
@@ -209,11 +238,18 @@ export default class Robots {
 
     return hasMatches;
   }
+
+  /**
+   * @typedef {Map} AgentRules
+   * @property {Set<string>} allow - The paths that are allowed
+   * @property {Set<string>} disallow - The paths that are disallowed
+   */
+
   /**
    * @typedef {Object} RobotsRules
-   * @property {Map} agents - The rules for each agent
-   * @property {Set} allow - The paths that are allowed
-   * @property {Set} disallow - The paths that are disallowed
+   * @property {AgentRules} agents - The rules for each agent
+   * @property {Set<string>} allow - The paths that are allowed
+   * @property {Set<string>} disallow - The paths that are disallowed
    */
 
   /**
@@ -305,7 +341,7 @@ export default class Robots {
 
   /**
    * @description gets the agents based on robotsText
-   * @returns {Map} - The rules for each agent
+   * @returns {AgentRules} - The rules for each agent
    */
   get agents() {
     return this?.rules?.agents || new Map();
@@ -313,17 +349,34 @@ export default class Robots {
 
   /**
    * @param  {string} fileName
+   * @param  {string[]} [ruleNames=['agents', 'allow', 'disallow']]
    */
-  async setRulesFromJsonFile(fileName) {
+  async setRulesFromJsonFile(fileName, ruleNames = ['agents', 'allow', 'disallow']) {
     if (!fileName) return;
     try {
-      const existingJson = await fs.promises.readFile(fileName, 'utf-8');
-      const jsonRules = JSON.parse(existingJson);
-      const agents = new Map(jsonRules.agents);
-      const allow = new Set(jsonRules.allow);
-      const disallow = new Set(jsonRules.disallow);
+      const savedJson = await fs.promises.readFile(fileName, 'utf-8');
+      const savedRules = JSON.parse(savedJson);
+      const hasExistingAgents = this.rules.agents.size > 0;
+      const hasExistingAllow = this.rules.allow.size > 0;
+      const hasExistingDisallow = this.rules.disallow.size > 0;
+
+      const currentAgents = hasExistingAgents ? this.rules.agents : new Map();
+      const currentAllow = hasExistingAllow ? this.rules.allow : new Set();
+      const currentDisallow = hasExistingDisallow ? this.rules.disallow : new Set();
+
+      const url = savedRules.url || savedRules.config.url || this.config.url;
+      const agents = ruleNames.includes('agents')
+         ? new Map(savedRules.agents || savedRules)
+          : currentAgents;
+      const allow = ruleNames.includes('allow') 
+        ? new Set(savedRules.allow || savedRules)
+        : currentAllow;
+      const disallow = ruleNames.includes('disallow')
+        ? new Set(savedRules.disallow || savedRules)
+        : currentDisallow;
       const existingRules = { agents, allow, disallow };
       this.rules = existingRules;
+      this.config.url = url;
     } catch (setRulesError) {
       await log.errorToFileAsync(setRulesError);
     }
@@ -387,22 +440,28 @@ export default class Robots {
   }
 
   /**
-   * @description creates a stringified JSON object of the data this class contains
+   * @description creates a stringified JSON object of agents, or the agents on this object
+   * @param  {Object} [data=this] - The data
    * @returns {string} - The JSON representation of the class
    */
-  toJSON() {
+  toJSON(dataObject = this) {
     const agentObject = {};
-    this.agents.forEach((value, key) => {
+    const agents = dataObject.agents || this.agents || new Map();
+    agents.forEach((value, key) => {
       agentObject[key] = {
         allow: [...value.get('allow')],
         disallow: [...value.get('disallow')],
       };
     });
+    const allow = dataObject.allow || this.allow || new Set();
+    const disallow = dataObject.disallow || this.disallow || new Set();
+    const url = dataObject.url || dataObject.config?.url || this.config.url;
+    const robotsUrl = Robots.getRobotsUrl(url);
     const data = {
-      url: this.config.url,
-      robotsUrl: this.robotsUrl,
-      allow: [...this.allow],
-      disallow: [...this.disallow],
+      url,
+      robotsUrl,
+      allow: [...allow],
+      disallow: [...disallow],
       agents: agentObject,
     };
 
