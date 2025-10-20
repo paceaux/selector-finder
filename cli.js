@@ -249,7 +249,7 @@ ${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json 
     const endMessage = `
 🐶  SelectorHound is finished!
 
-⏱   Time lapsed: ${friendlyTime}
+🕜  Time lapsed: ${friendlyTime}
 🔗  Pages Scanned: ${totalPagesSearched} 
 🎯  Pages with a Match: ${pagesWithSelector.length}
 🧮  Total Results: ${totalMatches} ${totalMatches > pagesWithSelector.length ? '(multiple matches on a page)' : ''}              
