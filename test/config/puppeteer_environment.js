@@ -1,5 +1,5 @@
 // puppeteer_environment.js
-import {readFile} from 'fs/promises';
+import { readFile } from 'fs/promises';
 import os from 'os';
 import path from 'path';
 import puppeteer from 'puppeteer';
