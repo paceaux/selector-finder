@@ -1,6 +1,6 @@
 {
   "name": "selector-hound",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Find an element that matches a particular CSS selector on a website ",
   "type": "module",
   "keywords": [
