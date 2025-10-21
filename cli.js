@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-
-import yargs from 'yargs/yargs';
+// This is recommended way to import according to docs
+/* eslint-disable import/no-unresolved */
+import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 import {
