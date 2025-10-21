@@ -208,7 +208,7 @@ describe('SiteCrawler:Crawling', () => {
     test('it throws an error without a url', async () => {
       await expect(async () => SiteCrawler.getPageAsync(''))
         .rejects
-        .toThrowError('A url was not provided');
+        .toThrow('A url was not provided');
     });
   });
   describe('static getLinksFromMarkup', () => {
@@ -234,18 +234,18 @@ describe('SiteCrawler:Crawling', () => {
     });
     test('it will throw an error without page markup', () => {
       expect(() => SiteCrawler.getLinksFromMarkup(''))
-        .toThrowError('Markup was not provided');
+        .toThrow('Markup was not provided');
     });
   });
   describe('static filterPageLinks', () => {
     test('it throws without an array', () => {
       expect(() => SiteCrawler.filterPageLinks('', 'https://google.com'))
-        .toThrowError('pageLinks is not an array');
+        .toThrow('pageLinks is not an array');
     });
     test('it throws without a baseUrl', () => {
       const pageLinks = ['https://google.com', '/foo', '/foo/bar/'];
       expect(() => SiteCrawler.filterPageLinks(pageLinks))
-        .toThrowError('No site origin is provided');
+        .toThrow('No site origin is provided');
     });
     test('it filters out external links', () => {
       const pageLinks = ['https://google.com', '/foo', '/foo/bar'];

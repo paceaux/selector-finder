@@ -1,10 +1,11 @@
 /* This is a logger; it needs to write to console. */
 /* eslint-disable no-console */
-import colors from 'chalk';
+import chalk from 'chalk';
 import boxen from 'boxen';
 import process from 'process';
 import path from 'path';
 import { promises } from 'fs';
+import { COLOR_COOL, COLOR_NEUTRAL_LIGHTEST } from './constants.js';
 
 const fs = promises;
 
@@ -92,9 +93,9 @@ ${info}
 
     this.rawMessage = rawMessage;
     if (isImportant) {
-      console.log(colors.bgCyan.bold.white(infoMessage));
+      console.log(chalk.bgHex(COLOR_COOL).hex(COLOR_NEUTRAL_LIGHTEST)(infoMessage));
     } else {
-      console.log(colors.cyanBright(infoMessage));
+      console.log(chalk.hex(COLOR_COOL).bold(infoMessage));
     }
 
     return this;

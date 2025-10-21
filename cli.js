@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-
-import yargs from 'yargs/yargs';
+// This is recommended way to import according to docs
+/* eslint-disable import/no-unresolved */
+import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 import {
@@ -249,7 +250,7 @@ ${mainConfig.useExportedSitemap ? '' : '💡  Ignore any existing .sitemap.json 
     const endMessage = `
 🐶  SelectorHound is finished!
 
-⏱   Time lapsed: ${friendlyTime}
+🕜  Time lapsed: ${friendlyTime}
 🔗  Pages Scanned: ${totalPagesSearched} 
 🎯  Pages with a Match: ${pagesWithSelector.length}
 🧮  Total Results: ${totalMatches} ${totalMatches > pagesWithSelector.length ? '(multiple matches on a page)' : ''}              
