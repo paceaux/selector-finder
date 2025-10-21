@@ -1,5 +1,5 @@
 // puppeteer_environment.js
-import fs from 'fs';
+import {readFile} from 'fs/promises';
 import os from 'os';
 import path from 'path';
 import puppeteer from 'puppeteer';
@@ -17,7 +17,7 @@ export default class PuppeteerEnvironment extends NodeEnvironment {
   async setup() {
     await super.setup();
     // get the wsEndpoint
-    const wsEndpoint = fs.readFileSync(path.join(DIR, 'wsEndpoint'), 'utf8');
+    const wsEndpoint = await readFile(path.join(DIR, 'wsEndpoint'), 'utf8');
     if (!wsEndpoint) {
       throw new Error('wsEndpoint not found');
     }
@@ -30,7 +30,16 @@ export default class PuppeteerEnvironment extends NodeEnvironment {
   }
 
   async teardown() {
+    // eslint-disable-next-line no-underscore-dangle
+    if (this.global.__BROWSER_GLOBAL__) {
+      // eslint-disable-next-line no-underscore-dangle
+      this.global.__BROWSER_GLOBAL__.disconnect();
+    }
     await super.teardown();
+  }
+
+  getVmContext() {
+    return super.getVmContext();
   }
 
   runScript(script) {
