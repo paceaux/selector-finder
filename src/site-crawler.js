@@ -12,6 +12,13 @@ import { forEachAsync } from './utils.js';
 
 const log = new Log(LOG_FILE_NAME);
 
+/**
+ * @typedef {Object} SiteCrawlerConfig
+ * @property {string} startPage - The starting URL for crawling or sitemap retrieval
+ * @property {string} linkSelector - CSS selector used to find links on pages
+ * @property {boolean} shouldCrawl - Whether to crawl pages or use sitemap
+ * @property {boolean} useExportedSitemap - Whether to use existing exported sitemap file if available
+ */
 const DEFAULT_CONFIG = {
   startPage: 'https://frankmtaylor.com',
   linkSelector: 'a[href]',
@@ -19,13 +26,28 @@ const DEFAULT_CONFIG = {
   useExportedSitemap: true,
 };
 
+/**
+ * @typedef {Object} SiteCrawlerLibraries
+ * @property {Object} ajax - an ajax library (usually axios)
+ * @property {Object} dom - an HTML parser
+ * @property {Object} Parser - an XML parser
+ */
 const DEFAULT_LIBRARIES = {
   ajax: axios,
   dom: cheerio,
   Parser,
 };
 
+/**
+ * @class SiteCrawler
+ * @classdesc Produces a sitemap either from a sitemap.xml or by crawling
+ */
 export default class SiteCrawler {
+  /**
+   * Creates an instance of SiteCrawler
+   * @param  {SiteCrawlerConfig} config
+   * @param  {SiteCrawlerLibraries} libraries
+   */
   constructor(config, libraries) {
     this.config = { ...SiteCrawler.defaultConfig, ...config };
     this.libraries = { ...SiteCrawler.defaultLibraries, ...libraries };
@@ -33,32 +55,64 @@ export default class SiteCrawler {
     this.outputter = new Outputter('sitemap.json', log);
   }
 
+  /**
+   * The default configuration for the SiteCrawler
+   * @static
+   * @property {SiteCrawlerConfig} defaultConfig
+   */
   static get defaultConfig() {
     return DEFAULT_CONFIG;
   }
 
+  /**
+   * The default libraries for the SiteCrawler
+   * @static
+   * @readonly
+   * @property {SiteCrawlerLibraries} defaultLibraries
+   */
   static get defaultLibraries() {
     return DEFAULT_LIBRARIES;
   }
 
+  /**
+   * The origin part of the URL
+   * @readonly
+   * @property {string} origin
+   */
   get origin() {
     const url = new URL(this.config.startPage);
 
     return url.origin;
   }
 
+  /**
+   * The host part of the URL
+   * @readonly
+   * @property {string} host
+   */
   get host() {
     const url = new URL(this.config.startPage);
 
     return url.host;
   }
 
+  /**
+   * The name of the file the sitecrawler exports to
+   * @readonly
+   * @property {string} exportFileName
+   */
   get exportFileName() {
     return this.origin.replace(/https?:\/\//gi, '');
   }
 
   /**
-   * @description formats collection of links to look like jsonified sitemap
+   * @typedef {Object} SiteUrl
+   * @property {string} loc - a url to a page on a site
+   */
+
+  /**
+   * formated collection of links to look like jsonified sitemap
+   * @property {SiteUrl[]} urlset - an array of SiteUrls
    */
   get urlset() {
     const linkArray = [...this.linkSet]
@@ -74,15 +128,16 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description provides a fully qualified path to the sitemap json file
-   * @type {string}
+   * provides a fully qualified path to the sitemap json file
+   * @readonly
+   * @property {string} pathToExportedFile - the path where the exported file will be placed
    */
   get pathToExportedFile() {
     return Path.join(process.cwd(), `${this.exportFileName}.${this.outputter.defaultOutputFile}`);
   }
 
   /**
-   * @description determines if the links have already been exported to a file
+   * Determines if the links have already been exported to a file
    * @type {boolean}
    */
   get hasExportedLinks() {
@@ -107,11 +162,11 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Gets an HTML page
+   * Gets an HTML page
+   * @static
    * @async
-   * @param  {string|URL} url fully qualified url to page
-   * @param  {Axios} [ajax=this.defaultLibraries.ajax] ajax library
-   *
+   * @param  {string|URL} url - fully qualified url to page
+   * @param  {Axios} [ajax=this.defaultLibraries.ajax] - ajax library
    * @returns {string} HTML markup as a string
    */
   static async getPageAsync(url, ajax = this.defaultLibraries.ajax) {
@@ -128,7 +183,7 @@ export default class SiteCrawler {
   }
 
   /**
- * @description makes an ajax request for a url
+ * makes an ajax request for a url
  * @param  {string} url
  *
  * @returns {object} Result of the request
@@ -145,11 +200,10 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Gets an XML Sitemap
+   * Gets an XML Sitemap
    * @param  {string} [sitemapUrl=this.config.startPage] fully qualified url
    *
    * @returns {object} parsed xml
-   *
    */
   async getSitemapAsync(sitemapUrl = this.config.startPage) {
     let parsedXml = null;
@@ -167,7 +221,7 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description gets links to pages from a sitemap
+   * gets links to pages from a sitemap
    * @param  {Object} sitemapJson
    * @returns {string[]} an array of href values to sitemaps
    */
@@ -183,7 +237,7 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description gets links to sitemaps from a sitemap
+   * gets links to sitemaps from a sitemap
    * @param  {object} sitemapJson
    * @returns {string[]} an array of href values to sitemaps
    */
@@ -199,7 +253,8 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Gets only links from a string containing markup
+   * Gets only links from a string containing markup
+   * @static
    * @param  {string} pageMarkup string containing markup
    * @param  {string} [linkSelector=this.defaultConfig.linkSelector] selector to find links
    * @param  {Cheerio} [dom=this.defaultLibraries.dom] Dom querying library
@@ -227,7 +282,7 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Filters an array of links (removes duplicates, external urls, and anchor links)
+   * Filters an array of links (removes duplicates, external urls, and anchor links)
    * @param  {string[]} pageLinks links to pages
    * @param  {string} siteOrigin the origin of the website
    *
@@ -249,7 +304,7 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Gets array of href values from a page
+   * Gets array of href values from a page
    * @async
    * @param  {string} url fully qualified url to page
    *
@@ -271,8 +326,10 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Crawls a page and adds links to the linkSet
+   * Crawls a page and adds links to the linkSet
+   * @async
    * @param  {string} url fully qualified usrl to page
+   * @returns {Promise<void>}
    */
   async crawlPageAsync(url) {
     try {
@@ -284,8 +341,10 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Crawls entire site looking for links
+   * Crawls entire site looking for links
+   * @async
    * @param  {string} url=this.config.startPage
+   * @returns {Promise<void>}
    */
   async crawlSiteAsync(url = this.config.startPage) {
     try {
@@ -299,8 +358,10 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Exports all of the collected site links to a file
+   * Exports all of the collected site links to a file
+   * @async
    * @param {string} [fileName=this.exportFileName] Name of file to be concatenated to sitemap.json
+   * @returns {Promise<void>}
    */
   async exportSiteLinks(fileName = this.exportFileName) {
     try {
@@ -311,8 +372,9 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Crawls. Wrapper for crawl, in case other functionality should be added
+   * Crawls. Wrapper for crawl, in case other functionality should be added
    * @param  {string} startPage=this.config.startPage
+   * @returns {Promise<void>}
    */
   async crawl(startPage = this.config.startPage) {
     try {
@@ -323,7 +385,7 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Fetches a sitemap and returns the links from it
+   * Fetches a sitemap and returns the links from it
    * @param  {string} [sitemapUrl=this.config.startPage]
    * @returns {string[]} an array of href values
    */
@@ -349,7 +411,8 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description Fetches a sitemap and adds links to linkset
+   * Fetches a sitemap and adds links to linkset
+   * @async
    * @param  {string} [sitemapUrl=this.config.startPage]
    */
   async setSitemap(sitemapUrl = this.config.startPage) {
@@ -364,7 +427,8 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description sets links from an existing json file
+   * sets links from an existing json file
+   * @async
    * @param  {string} fileName
    */
   async setLinksFromJsonFile(fileName) {
@@ -379,9 +443,10 @@ export default class SiteCrawler {
   }
 
   /**
-   * @description wrapper for crawl and setSitemap that also produces export file
-   * @param  {boolean} [shouldCrawl=this.config.shouldCrawl]
-   * @param {boolean} [useExportedSitemap=this.config.useExportedSitemap] use existing file if already exists
+   * wrapper for crawl and setSitemap that also produces export file
+   * @async
+   * @param  {boolean} [shouldCrawl=this.config.shouldCrawl] - whether it should crawl
+   * @param {boolean} [useExportedSitemap=this.config.useExportedSitemap] - use existing file if already exists
    */
   async produceSiteLinks(
     shouldCrawl = this.config.shouldCrawl,
