@@ -10,17 +10,48 @@ import SiteSearchResult from './site-search-result.js';
 
 const log = new Log(LOG_FILE_NAME);
 
+/**
+ * @typedef {Object} SelectorFinderConfig
+ * @property {string} sitemap - URL for the sitemap or starting page
+ * @property {boolean} crawl - Whether to treat the URL as an HTML page and crawl from there
+ * @property {number} limit - How many pages to crawl (0 means unlimited)
+ * @property {boolean} useExportedSitemap - Whether to use existing sitemap file or force refetch
+ * @property {string|string[]} selector - CSS selector(s) to search for
+ * @property {string} outputFileName - Name of the output file
+ * @property {boolean} takeScreenshots - Whether to take screenshots of matched elements
+ * @property {boolean} isSpa - Whether the target is a Single Page Application
+ * @property {string} [cssFile] - Optional path to a CSS file to extract selectors from
+ * @property {boolean} showElementDetails - Whether to show element details like tagname,
+ * attributes, innerText
+ * @property {boolean} showHtml - Whether to show HTML markup for matched elements
+ * @property {SiteCrawler} [siteCrawler] - Optional SiteCrawler instance (added during processing)
+ */
+
+/**
+ * @typedef {Object} SelectorFinderLibraries
+ * @property {Object} axios - The library for fetching pages
+ * @property {string} dom - The library for parsing HTML
+ * @property {puppeteer} emulator - The library for emulating the browser
+ */
 const DEFAULT_LIBRARIES = {
   ajax: axios,
   dom: cheerio,
   emulator: puppeteer,
 };
 export default class SelectorFinder {
+  /**
+   * creates a SelectorFinder instance
+   * @param {SelectorFinderConfig} config - configuration for finding the selector
+   * @param {SelectorFinderLibraries} libraries - Libraries to use
+   */
   constructor(config, libraries) {
     this.config = config;
     this.libraries = { ...SelectorFinder.defaultLibraries, ...libraries };
   }
 
+  /**
+   * @type {SelectorFinderLibraries} - the libraries the class uses
+   */
   static get defaultLibraries() {
     return DEFAULT_LIBRARIES;
   }
@@ -66,21 +97,21 @@ export default class SelectorFinder {
      * @param {string} tag tag name of element
      * @param {object} attributes all attributes on element
      * @param {string} innerText innerText of element
-     */
+  */
   /**
      * @typedef PageResult
      * @param {string} url url of the page
      * @param {number} totalMatches
      * @param {Array<SelectorResult>} innerText innerText of element
-     */
+  */
 
   /**
-     * @description Gets result from Cheeri
-     * @param  {string} url
-     * @param  {string|Array<string>} cssSelector
-     *
-     * @returns {PageResult|null}
-     */
+    * @description Gets result from Cheeri
+    * @param  {string} url
+    * @param  {string|Array<string>} cssSelector
+    *
+    * @returns {PageResult|null}
+  */
   async getResultFromStaticPage(url, cssSelector) {
     let pageSearchResult = null;
     const selectors = Array.isArray(cssSelector) ? cssSelector : cssSelector.split(',');
@@ -169,7 +200,7 @@ export default class SelectorFinder {
      * @param  {boolean} takeScreenshots
      *
      * @returns {PageResult|null}
-     */
+  */
   static async getResultFromSpaPage(page, cssSelector, takeScreenshots) {
     let pageSearchResult = null;
     const selectors = Array.isArray(cssSelector) ? cssSelector : cssSelector.split(',');
@@ -210,16 +241,15 @@ export default class SelectorFinder {
      * @property {string} url Url of the page with a result
      * @property {number} totalMatches total number of matches
      * @property {<SelectorSearchResult>} elements a cheerio object with the results
-     */
-
+  */
   /**
-     * @description searches a single url for a selector
-     * @param  {string} url
-     * @param  {string} selector a valid css selector
-     * @param  {Object} browser puppeteer browser object
-     *
-     * @returns {null|SearchPageResult}
-     */
+    * @description searches a single url for a selector
+    * @param  {string} url
+    * @param  {string} selector a valid css selector
+    * @param  {Object} browser puppeteer browser object
+    *
+    * @returns {null|SearchPageResult}
+  */
   async searchPageAsync(url, selector, browser, takeScreenshots) {
     let pageSearchResult = null;
 
@@ -273,19 +303,18 @@ export default class SelectorFinder {
     }
     return results;
   }
-  /**
-     * @typedef SearchPageResult
-     * @property {string} url
-     * @property {number} totalmatches
-     * @param {Array<SelectorResult>} elements
-     */
 
+  /**
+   * @typedef SearchPageResult
+   * @property {string} url
+   * @property {number} totalmatches
+   * @param {Array<SelectorResult>} elements
+  */
   /**
      * @description Searches all pages provided from JSON object
      * @param  {Object} sitemapJson JSON object generated from sitemap
      * @param  {string|Array} selector CSS Selector
      * @param  {boolean} takeScreenshots grab a screenshot of element
-     *
      * @returns {Array<SearchPageResult>}
      */
   async searchSiteAsync(sitemapJson, selector, takeScreenshots, isSpa) {
@@ -315,26 +344,16 @@ export default class SelectorFinder {
   }
 
   /**
-     * @typedef SelectorSearchResult
-     * @property {number} totalPagesSearched
-     * @property {Map<String, Object>} pagesWithSelector
-     */
+   * @typedef SelectorSearchResult
+   * @property {number} totalPagesSearched
+   * @property {Map<String, Object>} pagesWithSelector
+  */
 
   /**
-     * @typedef FindSelectorConfig
-     * @property  {string} sitemap
-     * @property  {number} limit total pages to search
-     * @property  {string|array} selector CSS selector
-     * @property  {boolean} takeScreenshots take screenshot of element
-     * @property  {boolean} isSpa indicates the site may be a single-page app
-     * @property {string} cssFile path to a CSS file where there are css rules
-     *
-  /**
-     * Finds a CSS selector on a site using a sitemap
-     * @param  {FindSelectorConfig} config
-
-     * @returns {SelectorSearchResult}
-     */
+   * Finds a CSS selector on a site using a sitemap
+   * @param  {SelectorFinderConfig} config
+   * @returns {SelectorSearchResult}
+  */
   async getSearchResultsAsync({
     limit,
     siteCrawler,
@@ -369,11 +388,10 @@ export default class SelectorFinder {
   }
 
   /**
-     * Finds a CSS selector on a site using a sitemap
-     * @param  {FindSelectorConfig} config
-
-     * @returns {SelectorSearchResult}
-     */
+    * Finds a CSS selector on a site using a sitemap
+    * @param  {FindSelectorConfig} config
+    * @returns {SelectorSearchResult}
+  */
   async findSelectorAsync(config = this.config) {
     let results = null;
     if (!config) {
