@@ -114,6 +114,22 @@ const {
   showHtml,
 } = argv;
 
+/**
+ * @typedef {Object} SelectorFinderConfig
+ * @property {string} sitemap - URL for the sitemap or starting page
+ * @property {boolean} crawl - Whether to treat the URL as an HTML page and crawl from there
+ * @property {number} limit - How many pages to crawl (0 for unlimited)
+ * @property {boolean} useExportedSitemap - Whether to use existing sitemap file or force refetch
+ * @property {string|string[]} selector - CSS selector(s) to search for
+ * @property {string} outputFileName - Name of the output file
+ * @property {boolean} takeScreenshots - Whether to take screenshots of matched elements
+ * @property {boolean} isSpa - Whether the target is a Single Page Application
+ * @property {string} [cssFile] - Optional path to a CSS file to extract selectors from
+ * @property {boolean} showElementDetails - Whether to show element details like tagname,
+ * attributes, innerText
+ * @property {boolean} showHtml - Whether to show HTML markup for matched elements
+ * @property {SiteCrawler} [siteCrawler] - Optional SiteCrawler instance (added during processing)
+ */
 const selectorFinderConfig = {
   sitemap,
   crawl,
@@ -128,6 +144,12 @@ const selectorFinderConfig = {
   showHtml,
 };
 
+/**
+ * Decides if it's a single selector or an array b/c it's a CSS file
+ * @async
+ * @param {SelectorFinderConfig} config - configuration for finding CSS selectors
+ * @returns {Promise<SelectorFinderConfig>}
+ */
 async function setCSSFileSelectors(config) {
   if (config.cssFile) {
     try {
@@ -142,6 +164,13 @@ async function setCSSFileSelectors(config) {
   return config;
 }
 
+/**
+ * Formats the results based on what the user has asked for
+ * @param  {SelectorSearchResult} result
+ * @param  {boolean} hasElementDetails - whether the json should show element details
+ * @param  {boolean} hasElementHtml - whether the full HTML should be shown for the element
+ * @returns {Object}
+ */
 function getFormattedResult(result, hasElementDetails, hasElementHtml) {
   const formattedResult = { ...result };
 
@@ -174,6 +203,13 @@ function getFormattedResult(result, hasElementDetails, hasElementHtml) {
 
   return formattedResult;
 }
+
+/**
+ * The CLI; where everything starts
+ * @async
+ * @param {SelectorFinderConfig} config - The configuration from command line arguments
+ * @returns {Promise<void>}
+ */
 async function main(config) {
   const outputter = new Outputter(DEFAULT_OUTPUT_FILE, log);
   let mainConfig = { ...config };
