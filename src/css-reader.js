@@ -19,6 +19,10 @@ export default class CSSReader {
    */
   constructor(fileName) {
     if (fileName) {
+      /**
+       * @public
+       * @property {string|undefined} - the name of the CSS file
+       */
       this.fileName = fileName;
     }
   }
@@ -26,6 +30,7 @@ export default class CSSReader {
   /**
    * Reads the contents of a file asynchronously
    * @static
+   * @async
    * @param {string} fileName - The name of a file to read from
    * @returns {Promise<string|null>} The contents of the file or null if an error occurs
    */
@@ -67,6 +72,10 @@ export default class CSSReader {
    */
   setRawCSS(rawCSS) {
     if (rawCSS) {
+      /**
+       * @public
+       * @property {string|undefined} - the contents of a CSS file
+       */
       this.rawCSS = rawCSS;
     }
   }
