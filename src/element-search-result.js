@@ -8,13 +8,34 @@ import * as cheerio from 'cheerio';
 export default class ElementSearchResult {
   /**
    * Creates an instance of ElementSearchResult
-   * @param {Object} element - The element object to extract information from
+   * @param {HTMLElement} element - The element object to extract information from
    */
+
   constructor(element) {
+    /**
+     * @public
+     * @type {string} The inner text content of the element
+    */
     this.tag = element.name || element.localName;
+
     this.applyAttributes(element);
+
+    /**
+     * @public
+     * @type {string} The inner text content of the element
+    */
     this.innerText = element.text || element.innerText;
+
+    /**
+     * @public
+     * @type {string} The CSS selector that matches this element
+    */
     this.selector = element.cssSelector || element.selector;
+
+    /**
+     * @public
+     * @type {CheerioAPI} Cheerio's API
+    */
     this.html = cheerio.load(element, null, false);
   }
 
@@ -41,11 +62,15 @@ export default class ElementSearchResult {
 
   /**
    * Applies attributes from an element to this instance if they exist
-   * @param {Object} element - The element containing attributes to apply
+   * @param {Node} element - The element containing attributes to apply
    */
   applyAttributes(element) {
     const attributes = element.attribs || element.attributes;
     if (attributes && Object.keys(attributes).length > 0) {
+      /**
+       * @public
+       * @type {NamedNodeMap|undefined} - a map of attributes
+       */
       this.attributes = attributes;
     }
   }
