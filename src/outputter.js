@@ -19,7 +19,16 @@ export default class Outputter {
    * @param {Log} logger - An instance of Log
    */
   constructor(defaultOutputFile = DEFAULT_OUTPUT_FILE, logger = new Log(LOG_FILE_NAME)) {
+    /**
+     * @public
+     * @type {string} - defaultFilename for outputting
+     */
     this.defaultOutputFile = defaultOutputFile;
+
+    /**
+     * @public
+     * @type {Log} - Logger
+     */
     this.log = logger;
   }
 
