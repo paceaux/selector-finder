@@ -18,14 +18,18 @@ const fs = promises;
 export default class Log {
   /**
    * Creates an instance of Log
-   * @param {string} [logFile] - The name of the file to log to
+   * @param {string} logFile - The name of the file to log to
    */
   constructor(logFile) {
+    /**
+     * @type {string} logFile - the path to the logfile from the current directory
+     */
     this.logFile = path.resolve(process.cwd(), logFile);
   }
 
   /**
    * Logs an error to a log file
+   * @async
    * @param  {Error} error - an error object
    * @returns {Promise<Log>} - returns the instance so that other methods can be chained
    */
@@ -34,6 +38,10 @@ export default class Log {
       ? error.stack
       : this.rawMessage;
 
+    /**
+     * @public
+     * @type {string} rawMessage - the unformatted message
+     */
     this.rawMessage = rawMessage;
     try {
       await fs.appendFile(this.logFile, Log.styleInfo(this.rawMessage, true));
@@ -47,6 +55,7 @@ export default class Log {
 
   /**
    * Logs text to a file
+   * @async
    * @param  {string} info - the text to log
    * @returns {Promise<Log>} - returns the instance so that other methods can be chained
    */
