@@ -38,6 +38,11 @@ const DEFAULT_LIBRARIES = {
   dom: cheerio,
   emulator: puppeteer,
 };
+
+/**
+ * @class SelectorFinder
+ * @classdesc The engine that finds selectors
+ */
 export default class SelectorFinder {
   /**
    * creates a SelectorFinder instance
@@ -161,6 +166,13 @@ export default class SelectorFinder {
     return pageSearchResult;
   }
 
+  /**
+   * @description Gets a single result from a SPA page
+   * @async
+   * @param {Object} page - Puppeteer Page Object
+   * @param {string} selector - The selector to get the result from
+   * @returns {Array<ElementSearchResult>} - The result from the page
+   */
   static async getOneResultFromSpaPage(page, selector) {
     const elementSearchResults = await page.evaluate(
       (cssSelector) => {
@@ -247,6 +259,7 @@ export default class SelectorFinder {
     * @param  {string} url
     * @param  {string} selector a valid css selector
     * @param  {Object} browser puppeteer browser object
+    * @param  {boolean} takeScreenshots whether to take screenshots of the page
     *
     * @returns {null|SearchPageResult}
   */
