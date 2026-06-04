@@ -1,6 +1,6 @@
 /**
  * @description CLI default for a sitemap. Overwritten by --sitemap or -u
- * @constant {string} DEFAULT_SITEMAP_URL - The default sitemap URL; default is https://frankmtaylor.com/sitemap.xml
+ * @constant {string} DEFAULT_SITEMAP_URL - The default sitemap URL
  */
 export const DEFAULT_SITEMAP_URL = 'https://frankmtaylor.com/sitemap.xml';
 
