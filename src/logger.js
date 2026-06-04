@@ -14,6 +14,8 @@ const fs = promises;
  * @class Log
  * @classdesc This handles all logging in the application, whether it's
  *   to the terminal or to a log file
+ * @property {number|undefined} timerStart - A Date.now() that's set when timerStart is activated
+ * @property {number|undefined} timerEnd - A Date.now() that's set on timerEnd
  */
 export default class Log {
   /**
@@ -107,7 +109,7 @@ ${info}
    * Logs a styled message to the console
    * @param  {string} info - the info to style
    * @param  {boolean} isImportant - whether to give the message a background
-   * @returns {Promise<Log>} - returns the instance so that other methods can be chained
+   * @returns {Log} - returns the instance so that other methods can be chained
    */
   toConsole(info, isImportant) {
     const rawMessage = info || this.rawMessage;
@@ -125,7 +127,7 @@ ${info}
 
   /**
    * Starts a timer on the log object (you only get one)
-   * @returns {Promise<Log>} - returns the instance so that other methods can be chained
+   * @returns {Log} - returns the instance so that other methods can be chained
    */
   startTimer() {
     this.timerStart = Date.now();
@@ -136,8 +138,8 @@ ${info}
   }
 
   /**
-   * ends a timer on the log object
-   * @returns {Promise<Log>} - returns the instance so that other methods can be chained
+   * Ends a timer on the log object
+   * @returns {Log} - returns the instance so that other methods can be chained
    */
   endTimer() {
     this.timerEnd = Date.now();
