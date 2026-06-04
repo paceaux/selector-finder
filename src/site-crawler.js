@@ -49,9 +49,25 @@ export default class SiteCrawler {
    * @param  {SiteCrawlerLibraries} libraries
    */
   constructor(config, libraries) {
+    /**
+     * @public
+     * @type {SiteCrawlerConfig} - The config for the instance
+     */
     this.config = { ...SiteCrawler.defaultConfig, ...config };
+    /**
+     * @public
+     * @type {SiteCrawlerLibraries} - The Libraries the crawler uses
+     */
     this.libraries = { ...SiteCrawler.defaultLibraries, ...libraries };
+    /**
+     * @public
+     * @type {Set<string>} - The set of unique links for the site
+     */
     this.linkSet = new Set();
+    /**
+     * @public
+     * @type {Outputter} - The outputter for the crawler; used to create the sitemap.json file
+     */
     this.outputter = new Outputter('sitemap.json', log);
   }
 
