@@ -14,7 +14,7 @@ export default class ElementSearchResult {
   constructor(element) {
     /**
      * @public
-     * @type {string} The inner text content of the element
+     * @type {string} The tag name of the element
      */
     this.tag = element.name || element.localName;
 
