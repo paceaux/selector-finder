@@ -15,7 +15,7 @@ export default class ElementSearchResult {
     /**
      * @public
      * @type {string} The inner text content of the element
-    */
+     */
     this.tag = element.name || element.localName;
 
     this.applyAttributes(element);
@@ -23,19 +23,19 @@ export default class ElementSearchResult {
     /**
      * @public
      * @type {string} The inner text content of the element
-    */
+     */
     this.innerText = element.text || element.innerText;
 
     /**
      * @public
      * @type {string} The CSS selector that matches this element
-    */
+     */
     this.selector = element.cssSelector || element.selector;
 
     /**
      * @public
      * @type {CheerioAPI} Cheerio's API
-    */
+     */
     this.html = cheerio.load(element, null, false);
   }
 
