@@ -111,7 +111,7 @@ export default class SelectorFinder {
   */
 
   /**
-    * @description Gets result from Cheeri
+    * @description Gets result from Cheerio
     * @param  {string} url
     * @param  {string|Array<string>} cssSelector
     *
