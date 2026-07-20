@@ -9,20 +9,41 @@ import { COLOR_COOL, COLOR_NEUTRAL_LIGHTEST } from './constants.js';
 
 const fs = promises;
 
+/**
+ * For logging messages
+ * @class Log
+ * @classdesc This handles all logging in the application, whether it's
+ *   to the terminal or to a log file
+ * @property {number|undefined} timerStart - A Date.now() that's set when timerStart is activated
+ * @property {number|undefined} timerEnd - A Date.now() that's set on timerEnd
+ */
 export default class Log {
+  /**
+   * Creates an instance of Log
+   * @param {string} logFile - The name of the file to log to
+   */
   constructor(logFile) {
+    /**
+     * @type {string} logFile - the path to the logfile from the current directory
+     */
     this.logFile = path.resolve(process.cwd(), logFile);
   }
 
   /**
-     * @description Logs an error to a log file
-     * @param  {Error} error
-     */
+   * Logs an error to a log file
+   * @async
+   * @param  {Error} error - an error object
+   * @returns {Promise<Log>} - returns the instance so that other methods can be chained
+   */
   async errorToFileAsync(error) {
     const rawMessage = error
       ? error.stack
       : this.rawMessage;
 
+    /**
+     * @public
+     * @type {string} rawMessage - the unformatted message
+     */
     this.rawMessage = rawMessage;
     try {
       await fs.appendFile(this.logFile, Log.styleInfo(this.rawMessage, true));
@@ -35,9 +56,10 @@ export default class Log {
   }
 
   /**
-   * @description logs text to a file
+   * Logs text to a file
+   * @async
    * @param  {string} info - the text to log
-   * @returns {this}
+   * @returns {Promise<Log>} - returns the instance so that other methods can be chained
    */
   async infoToFileAsync(info) {
     const rawMessage = info || this.rawMessage;
@@ -54,9 +76,11 @@ export default class Log {
   }
 
   /**
-   * @description outputs a message using internal "styles"
-   * @param  {string} info - the info to style
-   * @param  {boolean} showTimestamp=false - whether to show a timestamp
+   * Generates a message in a box, optionally with a timestamp as the header
+   * @static
+   * @param  {string} info - the text to style
+   * @param  {boolean} [showTimestamp=false] - whether to show a timestamp
+   * @returns {string} a formatted string
    */
   static styleInfo(info, showTimestamp = false) {
     return `
@@ -67,10 +91,11 @@ ${info}
   }
 
   /**
-   * @description adds a colorful padded box around a message
+   * Adds a colorful padded box around a message, optionally with a timestamp
+   * @static
    * @param  {string} info - the info to style
-   * @param  {boolean} showTimestamp=false - whether to show a timestamp
-   * @return {boxen} a styled message
+   * @param  {boolean} [showTimestamp=false] - whether to show a timestamp
+   * @returns {boxen} a styled message
    */
   static boxInfo(info, showTimestamp = false) {
     const options = { padding: 1 };
@@ -82,10 +107,10 @@ ${info}
   }
 
   /**
-   * @description logs a message to the console that is styled
+   * Logs a styled message to the console
    * @param  {string} info - the info to style
    * @param  {boolean} isImportant - whether to give the message a background
-   * @returns {this}
+   * @returns {Log} - returns the instance so that other methods can be chained
    */
   toConsole(info, isImportant) {
     const rawMessage = info || this.rawMessage;
@@ -102,7 +127,8 @@ ${info}
   }
 
   /**
-   * @description starts a timer on the log object (you only get one)
+   * Starts a timer on the log object (you only get one)
+   * @returns {Log} - returns the instance so that other methods can be chained
    */
   startTimer() {
     this.timerStart = Date.now();
@@ -113,7 +139,8 @@ ${info}
   }
 
   /**
-   * @description ends a timer on the log object
+   * Ends a timer on the log object
+   * @returns {Log} - returns the instance so that other methods can be chained
    */
   endTimer() {
     this.timerEnd = Date.now();
@@ -122,11 +149,12 @@ ${info}
   }
 
   /**
-   * @description gets the elapsed time
+   * Gets the time between startTimer() and endTimer()
+   * @readonly
    * @returns {number} the elapsed time in seconds
    */
   get elapsedTime() {
-    let elapsedTime = null;
+    let elapsedTime = 0;
 
     if (this.timerStart && this.timerEnd) {
       elapsedTime = this.timerEnd - this.timerStart;

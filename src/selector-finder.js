@@ -8,26 +8,67 @@ import Log from './logger.js';
 import PageSearchResult from './page-search-result.js';
 import SiteSearchResult from './site-search-result.js';
 
+/** @typedef {import('./site-crawler.js').default} SiteCrawler */
+/** @typedef {import('./element-search-result.js').default} ElementSearchResult */
+/** @typedef {import('puppeteer').Browser} PuppeteerBrowser */
+/** @typedef {import('puppeteer').ElementHandle} PuppeteerNode */
+
 const log = new Log(LOG_FILE_NAME);
 
+/**
+ * @typedef {object} SelectorFinderConfig
+ * @property {string} sitemap - URL for the sitemap or starting page
+ * @property {boolean} crawl - Whether to treat the URL as an HTML page and crawl from there
+ * @property {number} limit - How many pages to crawl (0 means unlimited)
+ * @property {boolean} useExportedSitemap - Whether to use existing sitemap file or force refetch
+ * @property {string|string[]} selector - CSS selector(s) to search for
+ * @property {string} outputFileName - Name of the output file
+ * @property {boolean} takeScreenshots - Whether to take screenshots of matched elements
+ * @property {boolean} isSpa - Whether the target is a Single Page Application
+ * @property {string} [cssFile] - Optional path to a CSS file to extract selectors from
+ * @property {boolean} showElementDetails - Whether to show element details like tagname,
+ * attributes, innerText
+ * @property {boolean} showHtml - Whether to show HTML markup for matched elements
+ * @property {SiteCrawler} [siteCrawler] - Optional SiteCrawler instance (added during processing)
+ */
+
+/**
+ * @typedef {object} SelectorFinderLibraries
+ * @property {object} axios - The library for fetching pages
+ * @property {string} dom - The library for parsing HTML
+ * @property {puppeteer} emulator - The library for emulating the browser
+ */
 const DEFAULT_LIBRARIES = {
   ajax: axios,
   dom: cheerio,
   emulator: puppeteer,
 };
+
+/**
+ * @class SelectorFinder
+ * @classdesc The engine that finds selectors
+ */
 export default class SelectorFinder {
+  /**
+   * creates a SelectorFinder instance
+   * @param {SelectorFinderConfig} config - configuration for finding the selector
+   * @param {SelectorFinderLibraries} libraries - Libraries to use
+   */
   constructor(config, libraries) {
     this.config = config;
     this.libraries = { ...SelectorFinder.defaultLibraries, ...libraries };
   }
 
+  /**
+   * @type {SelectorFinderLibraries} - the libraries the class uses
+   */
   static get defaultLibraries() {
     return DEFAULT_LIBRARIES;
   }
 
   /**
    * Grabs a screenshot of a puppeteer element
-   * @param  {Object} element puppeteer element
+   * @param  {object} element puppeteer element
    * @param  {string} fileName name of the image element saved to the filesystem
    */
   static async grabScreenAsync(element, fileName) {
@@ -42,8 +83,8 @@ export default class SelectorFinder {
   }
 
   /**
-   * @param  {Array<puppeternodes>} nodes
-   * @param  {string} url
+   * @param  {Array<PuppeteerNode>} nodes - nodes returned from puppeteer
+   * @param  {string} url - the url from which to get a screenshot
    */
   static async grabScreensAsync(nodes, url) {
     await forEachAsync(nodes, async (element, index) => {
@@ -62,25 +103,24 @@ export default class SelectorFinder {
   }
 
   /**
-     * @typedef SelectorResult
-     * @param {string} tag tag name of element
-     * @param {object} attributes all attributes on element
-     * @param {string} innerText innerText of element
-     */
+   * @typedef SelectorResult
+   * @param {string} tag tag name of element
+   * @param {object} attributes all attributes on element
+   * @param {string} innerText innerText of element
+   */
   /**
-     * @typedef PageResult
-     * @param {string} url url of the page
-     * @param {number} totalMatches
-     * @param {Array<SelectorResult>} innerText innerText of element
-     */
+   * @typedef PageResult
+   * @param {string} url url of the page
+   * @param {number} totalMatches - the total matches on the page
+   * @param {Array<SelectorResult>} innerText innerText of element
+   */
 
   /**
-     * @description Gets result from Cheeri
-     * @param  {string} url
-     * @param  {string|Array<string>} cssSelector
-     *
-     * @returns {PageResult|null}
-     */
+   * @description Gets result from Cheerio
+   * @param  {string} url - the url from which to get results
+   * @param  {string|Array<string>} cssSelector - CSS selector or Selectors
+   * @returns {PageResult|null} - the result from the search
+   */
   async getResultFromStaticPage(url, cssSelector) {
     let pageSearchResult = null;
     const selectors = Array.isArray(cssSelector) ? cssSelector : cssSelector.split(',');
@@ -130,6 +170,13 @@ export default class SelectorFinder {
     return pageSearchResult;
   }
 
+  /**
+   * @description Gets a single result from a SPA page
+   * @async
+   * @param {object} page - Puppeteer Page Object
+   * @param {string} selector - The selector to get the result from
+   * @returns {Array<ElementSearchResult>} - The result from the page
+   */
   static async getOneResultFromSpaPage(page, selector) {
     const elementSearchResults = await page.evaluate(
       (cssSelector) => {
@@ -164,12 +211,11 @@ export default class SelectorFinder {
   }
 
   /**
-     * @param  {Object} page Puppeteer Page Object
-     * @param  {string|Array<string>} cssSelector
-     * @param  {boolean} takeScreenshots
-     *
-     * @returns {PageResult|null}
-     */
+   * @param  {object} page Puppeteer Page Object - the puppeteer page object
+   * @param  {string|Array<string>} cssSelector - a CSS selector or selectors
+   * @param  {boolean} takeScreenshots - whether to take screenshots
+   * @returns {PageResult|null} - a page result if successful
+   */
   static async getResultFromSpaPage(page, cssSelector, takeScreenshots) {
     let pageSearchResult = null;
     const selectors = Array.isArray(cssSelector) ? cssSelector : cssSelector.split(',');
@@ -206,20 +252,19 @@ export default class SelectorFinder {
   }
 
   /**
-     * @typedef SearchPageResult
-     * @property {string} url Url of the page with a result
-     * @property {number} totalMatches total number of matches
-     * @property {<SelectorSearchResult>} elements a cheerio object with the results
-     */
-
+   * @typedef SearchPageResult
+   * @property {string} url Url of the page with a result
+   * @property {number} totalMatches total number of matches
+   * @property {SelectorSearchResult[]} elements a cheerio object with the results
+   */
   /**
-     * @description searches a single url for a selector
-     * @param  {string} url
-     * @param  {string} selector a valid css selector
-     * @param  {Object} browser puppeteer browser object
-     *
-     * @returns {null|SearchPageResult}
-     */
+   * @description searches a single url for a selector
+   * @param  {string} url - a url of a page on which to search
+   * @param  {string} selector a valid css selector
+   * @param  {object} browser puppeteer browser object
+   * @param  {boolean} takeScreenshots whether to take screenshots of the page
+   * @returns {null|SearchPageResult} the result from searching a single page
+   */
   async searchPageAsync(url, selector, browser, takeScreenshots) {
     let pageSearchResult = null;
 
@@ -247,10 +292,11 @@ export default class SelectorFinder {
   }
 
   /**
-     * @param  {Object} sitemapJson JSON object generated from sitemap
-     * @param  {string|Array} selector CSS Selector
-     * @param {PuppeteerBrowser} browser a browser object instantiated with puppeteer
-     * @param  {boolean} takeScreenshots grab a screenshot of element
+   * @param  {object} sitemapJson JSON object generated from sitemap
+   * @param  {string|Array} selector CSS Selector
+   * @param {PuppeteerBrowser} browser a browser object instantiated with puppeteer
+   * @param  {boolean} takeScreenshots grab a screenshot of element
+   * @returns {SiteSearchResult} the result of searching many pages
    */
   async searchPagesAsync(sitemapJson, selector, browser, takeScreenshots) {
     const results = new SiteSearchResult();
@@ -273,21 +319,21 @@ export default class SelectorFinder {
     }
     return results;
   }
-  /**
-     * @typedef SearchPageResult
-     * @property {string} url
-     * @property {number} totalmatches
-     * @param {Array<SelectorResult>} elements
-     */
 
   /**
-     * @description Searches all pages provided from JSON object
-     * @param  {Object} sitemapJson JSON object generated from sitemap
-     * @param  {string|Array} selector CSS Selector
-     * @param  {boolean} takeScreenshots grab a screenshot of element
-     *
-     * @returns {Array<SearchPageResult>}
-     */
+   * @typedef SearchPageResult
+   * @property {string} url - the url of a page searched
+   * @property {number} totalmatches - the total matches on the apge
+   * @param {Array<SelectorResult>} elements - elements which match the search
+   */
+  /**
+   * @description Searches all pages provided from JSON object
+   * @param  {object} sitemapJson JSON object generated from sitemap
+   * @param  {string|Array} selector CSS Selector
+   * @param  {boolean} takeScreenshots grab a screenshot of element
+   * @param {boolean} isSpa - whether to treat the entire experience as a single page app
+   * @returns {Array<SearchPageResult>} the result of searching many pages
+   */
   async searchSiteAsync(sitemapJson, selector, takeScreenshots, isSpa) {
     const usePuppeteer = takeScreenshots || isSpa;
     let results = null;
@@ -315,26 +361,16 @@ export default class SelectorFinder {
   }
 
   /**
-     * @typedef SelectorSearchResult
-     * @property {number} totalPagesSearched
-     * @property {Map<String, Object>} pagesWithSelector
-     */
+   * @typedef SelectorSearchResult
+   * @property {number} totalPagesSearched - the total pages from the site that were searched
+   * @property {Map<string, object>} pagesWithSelector - the results of the search
+   */
 
   /**
-     * @typedef FindSelectorConfig
-     * @property  {string} sitemap
-     * @property  {number} limit total pages to search
-     * @property  {string|array} selector CSS selector
-     * @property  {boolean} takeScreenshots take screenshot of element
-     * @property  {boolean} isSpa indicates the site may be a single-page app
-     * @property {string} cssFile path to a CSS file where there are css rules
-     *
-  /**
-     * Finds a CSS selector on a site using a sitemap
-     * @param  {FindSelectorConfig} config
-
-     * @returns {SelectorSearchResult}
-     */
+   * Finds a CSS selector on a site using a sitemap
+   * @param  {SelectorFinderConfig} config - sitemapJson - A json object that represents the sitemap
+   * @returns {SelectorSearchResult} - the result of the search
+   */
   async getSearchResultsAsync({
     limit,
     siteCrawler,
@@ -369,11 +405,10 @@ export default class SelectorFinder {
   }
 
   /**
-     * Finds a CSS selector on a site using a sitemap
-     * @param  {FindSelectorConfig} config
-
-     * @returns {SelectorSearchResult}
-     */
+   * Finds a CSS selector on a site using a sitemap
+   * @param  {SelectorFinderConfig} config - the configuration for the search
+   * @returns {SelectorSearchResult} the result of searching the entire site
+   */
   async findSelectorAsync(config = this.config) {
     let results = null;
     if (!config) {
