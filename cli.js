@@ -115,7 +115,7 @@ const {
 } = argv;
 
 /**
- * @typedef {Object} SelectorFinderConfig
+ * @typedef {object} SelectorFinderConfig
  * @property {string} sitemap - URL for the sitemap or starting page
  * @property {boolean} crawl - Whether to treat the URL as an HTML page and crawl from there
  * @property {number} limit - How many pages to crawl (0 for unlimited)
@@ -148,7 +148,7 @@ const selectorFinderConfig = {
  * Decides if it's a single selector or an array b/c it's a CSS file
  * @async
  * @param {SelectorFinderConfig} config - configuration for finding CSS selectors
- * @returns {Promise<SelectorFinderConfig>}
+ * @returns {Promise<SelectorFinderConfig>} - a modified config
  */
 async function setCSSFileSelectors(config) {
   if (config.cssFile) {
@@ -165,11 +165,17 @@ async function setCSSFileSelectors(config) {
 }
 
 /**
+ * @typedef SelectorSearchResult
+ * @property {number} totalPagesSearched - the total number of pages search
+ * @property {Map<string, object>} pagesWithSelector - a K-V map where K is url and V is page object
+ */
+
+/**
  * Formats the results based on what the user has asked for
- * @param  {SelectorSearchResult} result
+ * @param  {SelectorSearchResult} result - a search result (defined in selector.finder.js)
  * @param  {boolean} hasElementDetails - whether the json should show element details
  * @param  {boolean} hasElementHtml - whether the full HTML should be shown for the element
- * @returns {Object}
+ * @returns {object} page results with or without extra details on results
  */
 function getFormattedResult(result, hasElementDetails, hasElementHtml) {
   const formattedResult = { ...result };

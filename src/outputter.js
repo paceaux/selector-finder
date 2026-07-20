@@ -34,9 +34,9 @@ export default class Outputter {
 
   /**
    * Outputs the results to a file
-   * @param  {*} data - data to write to the file
+   * @param  {object|string} data - data to write to the file
    * @param  {string} fileName - name of the file to create
-   * @returns {Promise}
+   * @returns {Promise<void>}
    */
   async writeFileAsync(data, fileName) {
     if (!data || !fileName) {
@@ -56,11 +56,11 @@ export default class Outputter {
 
   /**
    * Stringifies an object and writes it to a file.
-   * @longdesc If a filename is not given, the filename is the default.
+   * @description If a filename is not given, the filename is the default.
    *  If a filename is given, it's prepended to the default filename
-   * @param  {Object} data - An object to write to the file
+   * @param  {object} data - An object to write to the file
    * @param  {string} [fileName = DEFAULT_OUTPUT_FILE] - Name of the file.
-   * @returns {Promise}
+   * @returns {Promise} an empty promise if successful
    */
   async writeDataAsync(data, fileName) {
     let outputFileName = this.defaultOutputFile;

@@ -79,7 +79,8 @@ export default class Log {
    * Generates a message in a box, optionally with a timestamp as the header
    * @static
    * @param  {string} info - the text to style
-   * @param  {boolean} showTimestamp=false - whether to show a timestamp
+   * @param  {boolean} [showTimestamp=false] - whether to show a timestamp
+   * @returns {string} a formatted string
    */
   static styleInfo(info, showTimestamp = false) {
     return `
@@ -93,8 +94,8 @@ ${info}
    * Adds a colorful padded box around a message, optionally with a timestamp
    * @static
    * @param  {string} info - the info to style
-   * @param  {boolean} showTimestamp=false - whether to show a timestamp
-   * @return {boxen} a styled message
+   * @param  {boolean} [showTimestamp=false] - whether to show a timestamp
+   * @returns {boxen} a styled message
    */
   static boxInfo(info, showTimestamp = false) {
     const options = { padding: 1 };

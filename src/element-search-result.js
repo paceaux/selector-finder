@@ -1,3 +1,5 @@
+// HTMLElement and CheerioAPI are types from external sources
+/* eslint-disable jsdoc/no-undefined-types */
 import * as cheerio from 'cheerio';
 
 /**
@@ -10,7 +12,6 @@ export default class ElementSearchResult {
    * Creates an instance of ElementSearchResult
    * @param {HTMLElement} element - The element object to extract information from
    */
-
   constructor(element) {
     /**
      * @public
@@ -42,8 +43,8 @@ export default class ElementSearchResult {
   /**
    * Gets attributes from an element and returns them as an object
    * @static
-   * @param {Object} element - The element to extract attributes from
-   * @returns {Object|null} An object containing attribute name-value pairs, or null if none
+   * @param {object} element - The element to extract attributes from
+   * @returns {object|null} An object containing attribute name-value pairs, or null if none
    *  exist
    */
   static extractAttributes(element) {

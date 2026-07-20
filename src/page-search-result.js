@@ -66,7 +66,7 @@ export default class PageSearchResult {
 
   /**
    * Adds element search results from matched DOM nodes
-   * @param {Object[]} matches - Array of DOM nodes that matched a CSS selector
+   * @param {object[]} matches - Array of DOM nodes that matched a CSS selector
    * @param {string} cssSelector - The CSS selector used to find the matches
    */
   addElementSearchResults(matches, cssSelector) {

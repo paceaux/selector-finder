@@ -17,6 +17,7 @@
         "afterAll": true
     },
     "rules": {
-        "import/extensions": "off"
+        "import/extensions": "off",
+        "jsdoc/no-defaults": 0
     }
 }

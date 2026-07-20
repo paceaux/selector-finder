@@ -21,7 +21,7 @@ export default class CSSReader {
     if (fileName) {
       /**
        * @public
-       * @property {string|undefined} - the name of the CSS file
+       * @property {string|undefined} fileName - the name of the CSS file
        */
       this.fileName = fileName;
     }
@@ -74,7 +74,7 @@ export default class CSSReader {
     if (rawCSS) {
       /**
        * @public
-       * @property {string|undefined} - the contents of a CSS file
+       * @property {string|undefined} rawCSS - the contents of a CSS file
        */
       this.rawCSS = rawCSS;
     }
@@ -83,7 +83,7 @@ export default class CSSReader {
   /**
    * Gets the parsed CSS as a CSSOM object
    * @readonly
-   * @returns {Object|undefined} The parsed CSS object or undefined if no raw CSS is available
+   * @returns {object|undefined} The parsed CSS object or undefined if no raw CSS is available
    */
   get parsedCSS() {
     let parsedCSS;
