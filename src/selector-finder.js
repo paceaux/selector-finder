@@ -8,6 +8,11 @@ import Log from './logger.js';
 import PageSearchResult from './page-search-result.js';
 import SiteSearchResult from './site-search-result.js';
 
+/** @typedef {import('./site-crawler.js').default} SiteCrawler */
+/** @typedef {import('./element-search-result.js').default} ElementSearchResult */
+/** @typedef {import('puppeteer').Browser} PuppeteerBrowser */
+/** @typedef {import('puppeteer').ElementHandle} PuppeteerNode */
+
 const log = new Log(LOG_FILE_NAME);
 
 /**
@@ -78,7 +83,7 @@ export default class SelectorFinder {
   }
 
   /**
-   * @param  {Array<puppeternodes>} nodes - nodes returned from puppeteer
+   * @param  {Array<PuppeteerNode>} nodes - nodes returned from puppeteer
    * @param  {string} url - the url from which to get a screenshot
    */
   static async grabScreensAsync(nodes, url) {

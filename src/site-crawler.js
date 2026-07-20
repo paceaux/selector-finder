@@ -10,6 +10,9 @@ import Log from './logger.js';
 import Outputter from './outputter.js';
 import { forEachAsync } from './utils.js';
 
+/** @typedef {import('axios').AxiosStatic} Axios */
+/** @typedef {typeof import('cheerio')} Cheerio */
+
 const log = new Log(LOG_FILE_NAME);
 
 /**
