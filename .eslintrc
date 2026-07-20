@@ -3,7 +3,8 @@
         "browser": false,
         "es2022": true
     },
-    "extends": "airbnb-base",
+    "extends": ["airbnb-base", "plugin:jsdoc/recommended"],
+    "plugins": ["jsdoc"],
     "parserOptions": {
         "ecmaVersion": 12
     },
@@ -16,6 +17,7 @@
         "afterAll": true
     },
     "rules": {
-        "import/extensions": "off"
+        "import/extensions": "off",
+        "jsdoc/no-defaults": 0
     }
 }
